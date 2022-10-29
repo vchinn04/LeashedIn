@@ -23,7 +23,7 @@ import EmailRoundedIcon from '@mui/icons-material/EmailRounded';
 const RightIconTable = {
   "/AboutMe":  <PersonRoundedIcon />,
   "/Experience": <EmojiEventsRoundedIcon />,
-  "/Education": <SchoolRoundedIcon />,
+  "/Login": <SchoolRoundedIcon />,
   /*"/ContactMe": <EmailRoundedIcon />*/
 }
 const iconButtonStyle = {

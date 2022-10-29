@@ -14,7 +14,7 @@ class HomePage extends React.Component
   componentDidMount() {
     var testinng = {
       dataKey: "quang",
-      dataVTheDeeloper68!
+      dataValue:
        {
         "money": 10,
         "status": "bo..."
