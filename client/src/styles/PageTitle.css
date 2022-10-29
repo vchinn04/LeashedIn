@@ -1,0 +1,31 @@
+#TitleFrame {
+  width: 92.5%;
+  height: 20%;
+
+  position: fixed;
+  top: 15%;
+  left: 7%;
+
+  display: block;
+}
+
+#TitleText {
+  margin-left: 0%;
+  margin-top: 0%;
+  margin-bottom: 0;
+  font-size: 5vw;
+  font-family: Verdana, Aral, sans-serif;
+  color: #FFFFFF;
+  text-shadow: -0.6vw 0.2vw #223F82;
+}
+
+#TitleLine {
+  display: block;
+  width: 85%;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  margin-left: 0%;
+  margin-right: auto;
+  border-style: inset;
+  border-width: 1px;
+}

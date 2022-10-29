@@ -1,0 +1,60 @@
+#HomePageFrame {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left:0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#MainTextFrame {
+  width: 40%;
+  height: 50%;
+  clear: both;
+  margin-top: 10%;
+}
+
+#NameText{
+  text-align: left;
+  font-family: Verdana, Aral, sans-serif;
+  font-size: 6.95vw;
+  color: #FFFFFF;
+  text-shadow: 0.6vw 0px #223F82;
+  margin-bottom: 0px;
+  margin-top: 0px;
+  margin-left: 0px;
+  letter-spacing: 17px;
+}
+
+#IntroText {
+  text-align: left;
+  font-family: Verdana, Aral, sans-serif;
+  font-size: 2.9vw;
+  color: #FFFFFF;
+  margin-bottom: 0px;
+  margin-top: 0px;
+}
+#WebDescription span {
+  text-align: left;
+  display: block;
+  font-family: Verdana, Aral, sans-serif;
+  font-size: 1.5vw;
+  color: #ADADAD;
+  margin-bottom: 0px;
+  margin-top: 0px;
+  margin-left: 1%;
+}
+#IconFrame {
+  text-align: right;
+  font-family: Verdana, Aral, sans-serif;
+  font-size: 23vw;
+  color: #FFFFFF;
+  text-shadow: -3.5vw 1.25vw rgba(34, 63, 130, 0.9);
+  margin-bottom: 0px;
+  margin-top: -5%;
+  margin-left: -2%;
+  letter-spacing: 17px;
+  -webkit-transform: rotate(-5deg);
+}

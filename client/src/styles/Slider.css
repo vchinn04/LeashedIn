@@ -1,0 +1,135 @@
+#SliderFrame {
+  size: relative;
+  width: 90%;
+  height: 7.5%;
+
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 2.25em;
+
+  display: block;
+}
+
+#SliderBackground {
+  z-index: 10;
+
+  size: relative;
+  width: 100%;
+  height: 100%;
+  background: #1B1B1B;
+  border-radius: 100px;
+  position: relative;
+  border: 2px #223F82 solid;
+
+  margin: auto;
+}
+
+.SliderBody {
+  size: relative;
+  height: 100%;
+
+  background-image: repeating-linear-gradient(-45deg, #223F82 0px, #223F82 15px, #2d50a1 15px, #2d50a1 30px);
+
+  border-radius: 100px;
+  position: relative;
+  margin-left: 0%;
+}
+
+#SliderCircle {
+  size: absolute;
+  height: 100%;
+  width: 2.5vw;
+
+  background: #223F82;
+
+  position: relative;
+  margin-left: auto;
+  margin-right: 0%;
+  box-shadow: 0px 0px 10px #161616;
+  border-radius: 200px;
+}
+
+#SliderText {
+  size: relative;
+  width: 100%;
+  height: 100%;
+
+  text-align:left;
+  line-height: 239%;
+  text-indent: 1em;
+  margin:auto;
+
+  font-family: Verdana, Aral, sans-serif;
+  font-size: 1vw;
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+
+  color: #F2F2F2;
+
+  display: flex;
+}
+
+#ExperienceMarkers {
+  size: relative;
+  width: 100%;
+  height: 40%;
+}
+
+#MarkerFrame {
+  z-index: 5;
+  size:relative;
+  width: 25%;
+  height: 100%;
+  display: inline-block;
+  margin-top: 1%;
+}
+
+#Marker {
+  z-index: 5;
+  size:relative;
+  height: 100%;
+  width: 2%;
+  background: white;
+  transform-origin: center;
+
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  top: -75%;
+}
+
+#MarkerText {
+  size:relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  top: -75%;
+
+  font-family: Verdana, Aral, sans-serif;
+  font-size: 0.75vw;
+  color: #F2F2F2;
+}
+
+.Knowledgable {
+  position: relative;
+  left: 7.5%;
+}
+
+.Experienced {
+  position: relative;
+  left: 20%;
+}
+
+.Expert {
+  position: relative;
+  left: 30%;
+}
+
+.fade {
+  animation-name: fade;
+  animation-duration: 1.5s;
+}
