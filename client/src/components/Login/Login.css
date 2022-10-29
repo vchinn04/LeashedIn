@@ -1,0 +1,10 @@
+.loginContainer {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.padTop {
+    margin-top: 40px;
+}
