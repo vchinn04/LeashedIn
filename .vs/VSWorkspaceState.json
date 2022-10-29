@@ -3,9 +3,14 @@
     "",
     "\\client",
     "\\client\\src",
+    "\\client\\src\\components",
+    "\\client\\src\\components\\Library",
+    "\\client\\src\\components\\Library\\Following",
+    "\\client\\src\\components\\Login",
+    "\\client\\src\\images",
     "\\server",
-    "\\server\\src"
+    "\\server\\modules"
   ],
-  "SelectedNode": "\\server\\src\\index.js",
+  "SelectedNode": "\\server",
   "PreviewInSolutionExplorer": false
 }
