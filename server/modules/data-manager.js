@@ -1,6 +1,8 @@
 // getting-started.js
 const mongoose = require('mongoose');
 
+const mongoPass = require('./mongo-pass.js');
+
 const userSchema = new mongoose.Schema({
   usrId: Number,
   name: String,
@@ -9,7 +11,7 @@ const userSchema = new mongoose.Schema({
 const UserM = mongoose.model('Users', userSchema);
 
 exports.setupMongo = async function () { //Connect to our database and output that connection was successful
-  const uri = "mongodb+srv://LeashedIn:s2ZJakXqyORboGKB@cluster0.pyvzkqi.mongodb.net/?retryWrites=true&w=majority" //url for connecting with our MongoDB Atlas
+  const uri = "mongodb+srv://LeashedIn:" + mongoPass.AtlasPass + "@cluster0.pyvzkqi.mongodb.net/?retryWrites=true&w=majority" //url for connecting with our MongoDB Atlas
   console.log('\x1b[33m', "Attempting Connection with MongoDB")
 
   await mongoose.connect(uri); //Try to connect to MongoDB
