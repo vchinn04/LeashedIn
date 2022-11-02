@@ -1,23 +1,25 @@
-const express = require('express'); //Line 1
-const bodyParser = require('body-parser');
+const express = require('express');
+const bodyParser = require('body-parser'); // Middleware to parse incoming requests before handlers
 
-const app = express(); //Line 2
-const port = process.env.PORT || 5000; //Line 3
+const app = express();
+const port = process.env.PORT || 5000; //Set our port to be 5000 (localhost:5000)
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+const dataManager = require('./modules/data-manager.js')
 
-testDict = {
+app.use(bodyParser.json()); //Parses JSON and turns into JS accessible vars
+app.use(bodyParser.urlencoded({ extended: true })); //Does same as line above but for URL encoded. extended=true means the data may not neccessarily be just a string.
+
+testDict = { //IGNORE just used to make sure client-server communication worked!
   "vchinn04" : {
     "money": 0,
     "status": "ye..."
   }
 };
 
-// create a GET route
 app.get('/api/hello', (req, res) => { //Get Event
   res.send({ express: 'Hello from Express' });
 });
+
 app.get('/api/ExperienceGetter', (req, res) => { //Get Event
   res.send({ express: 'heye from Express' });
 });
@@ -35,10 +37,12 @@ app.post('/PostTestEvent', (req, res) => {//Post Event, used to set data on serv
   var inputValue = inputDict.dataValue;
   console.log(inputValue);
 
+  dataManager.addUser(21, inputKey, inputValue);
   testDict[inputKey] = inputValue;
   res.send(
     JSON.stringify(testDict),
   );
 });
 
-app.listen(port, () => console.log(`Ye, listening on port ${port}`)); //Line 6
+dataManager.setupMongo().catch(err => console.log(err)); //Initialize the DataBase in the data-manager modules
+app.listen(port, () => console.log(`Server Up! Listening on port ${port}`)); //Binds server to localhost:5000

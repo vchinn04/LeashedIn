@@ -4,13 +4,15 @@ import "../styles/Homepage.css"
 class HomePage extends React.Component
 {
   constructor(props) {
+    console.log("Constructor homepage called!")
+
     super(props);
     this.state = {
       renderedResponse: ''
     };
   }
 
-
+  /*
   componentDidMount() {
     var testinng = {
       dataKey: "quang",
@@ -20,8 +22,9 @@ class HomePage extends React.Component
         "status": "bo..."
       }
     }
-    var myString = JSON.stringify(testinng);
-    fetch('/PostTestEvent',{
+
+    fetch('/PostTestEvent',
+      {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(testinng),
@@ -35,18 +38,12 @@ class HomePage extends React.Component
         console.error('Error:', error);
       });
   }
+  */
 
   render() {
     return (
       <div id="HomePageFrame">
-        <div id="MainTextFrame">
-          <h2 id="IntroText">Hi, my name is</h2>
-          <p id="WebDescription"><span>   I am a programmer/scripter</span><span>and I welcome you to my website!</span><span>Here you can see my projects, education, etc, using the topbar!</span></p>
-        </div>
-
-        <div id="IconFrame">
-              <h1>V</h1>
-        </div>
+      
       </div>
     );
   }

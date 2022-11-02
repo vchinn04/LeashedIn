@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Button, Container } from 'react-bootstrap';
-import './Login.css';
-import { AuthContext } from '../../context.js';
+import '../styles/Login.css';
+import { AuthContext } from '../context.js';
 
 class Login extends React.Component {
     static contextType = AuthContext;
@@ -11,6 +11,7 @@ class Login extends React.Component {
         this.state =
         {
             email: '',
+            username: '',
             password: ''
         };
 
@@ -37,9 +38,9 @@ class Login extends React.Component {
             credentials: 'include',
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: this.state.email, password: this.state.password })
+            body: JSON.stringify({ email: this.state.email, username: this.state.username, password: this.state.password })
         };
-        const response = await fetch('http://localhost:4000/user/login', requestOptions);
+        const response = await fetch('http://localhost:4000/user/signup', requestOptions);
         const data = await response.json();
         console.log(data)
 
@@ -70,7 +71,7 @@ class Login extends React.Component {
         // slightly changed some css and centered it
         return (
             <div className='loginContainer'>
-                <h3>Please login</h3>
+                <h3>Please signup</h3>
                 <Container className='loginContainer' fluid>
                     <div>
                         <Form className="loginForm" onSubmit={this.handleFormSubmit}>
@@ -78,7 +79,10 @@ class Login extends React.Component {
                                 <Form.Label>Email</Form.Label>
                                 <Form.Control required type="email" placeholder="Enter email" name="email" value={this.state.email} onChange={this.handleInputChange} />
                             </Form.Group>
-
+                            <Form.Group className="mb-3">
+                                <Form.Label>Email</Form.Label>
+                                <Form.Control required type="username" placeholder="Enter username" name="username" value={this.state.username} onChange={this.handleInputChange} />
+                            </Form.Group>
                             <Form.Group className="mb-3" controlId="formBasicPassword">
                                 <Form.Label>Password</Form.Label>
                                 <Form.Control required type="password" placeholder="Password" name="password" value={this.state.password} onChange={this.handleInputChange} />
@@ -89,8 +93,8 @@ class Login extends React.Component {
                         </Form>
                     </div>
                 </Container>
-                <Button className="padTop" variant="secondary" href="/createAccount">
-                    Signup
+                <Button className="padTop" variant="secondary" href="/login">
+                    Login
                 </Button>
             </div>
         );

@@ -4,7 +4,7 @@ import { Routes, Route } from "react-router";
 import HomePage from "./HomePage"
 import Experience from "./Experience"
 
-import Login from "../components/Login/Login"
+import Login from "../components/Login"
 
 
 const Router = () => {

@@ -23,6 +23,7 @@ class Experience extends React.Component
 {
 
   constructor(props) {
+    console.log("Constructor called!")
     super(props);
     this.state = {
       renderedResponse: ''
