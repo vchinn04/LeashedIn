@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Button, Container } from 'react-bootstrap';
-import './Login.css';
-import { AuthContext } from '../../context.js';
+import '../styles/Login.css';
+import { AuthContext } from '../context.js';
 
 class Login extends React.Component {
     static contextType = AuthContext;

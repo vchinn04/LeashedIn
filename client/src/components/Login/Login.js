@@ -1,21 +1,47 @@
 import React from 'react';
-import { Form, Button, Container } from 'react-bootstrap';
+
+import { Form, Container } from 'react-bootstrap';
+import { Navigate } from 'react-router-dom';
+
 import './Login.css';
+
 import { AuthContext } from '../../context.js';
 
-class Login extends React.Component {
-    static contextType = AuthContext;
-    constructor(props) {
-        super(props);
-        // initialize username and password so form is controlled
-        this.state =
-        {
-            email: '',
-            password: ''
-        };
+import { styled } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Input from '@mui/material/Input';
+import InputLabel from '@mui/material/InputLabel';
+import InputAdornment from '@mui/material/InputAdornment';
+import FormControl from '@mui/material/FormControl';
+import TextField from '@mui/material/TextField';
+import PersonIcon from '@mui/icons-material/Person';
+import KeyIcon from '@mui/icons-material/Key';
+import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
 
-        this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleFormSubmit = this.handleFormSubmit.bind(this);
+
+const ColorButton = styled(Button)(({ theme }) => ({
+  backgroundColor: "#825DD7",
+  '&:hover': {
+    backgroundColor: "#7150BC",
+  },
+}));
+
+
+class Login extends React.Component {
+      static contextType = AuthContext;
+      constructor(props) {
+      super(props);
+      // initialize username and password so form is controlled
+      this.state =
+      {
+          email: '',
+          password: '',
+          resultV: '',
+      };
+
+      this.handleInputChange = this.handleInputChange.bind(this);
+      this.handleFormSubmit = this.handleFormSubmit.bind(this);
     }
 
     // neat trick to handle all changes to both forms
@@ -24,74 +50,105 @@ class Login extends React.Component {
         const target = event.target;
         const value = target.value;
         const name = target.name;
-
         this.setState({
             [name]: value
         });
     }
-
     async handleFormSubmit(event) {
-        event.preventDefault();
-        // POST request using fetch with async/await
-        const requestOptions = {
-            credentials: 'include',
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: this.state.email, password: this.state.password })
-        };
-        const response = await fetch('http://localhost:4000/user/login', requestOptions);
-        const data = await response.json();
-        console.log(data)
+      console.log("My life be like ooo ahh")
+      console.log(this.state.email)
+      console.log(this.state.password)
 
-        if (data.errors || data.message) {
-            // alert to error
-            alert("Incorrect username or password.");
-        }
-        //auth token is saved as a cookie
-        // if it was successful
+      fetch('/UserLogIn',
+        {
+          method: 'POST',
+          headers: { "Content-Type": "application/json",
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ email: this.state.email, password: this.state.password }),
+        }) .then((response) => response.json())
 
-        if (data.token) {
-            // dispatch() from AuthContext with auth token from response
-            console.log("Successful login...");
-            this.context.dispatch({
-                type: "LOGIN",
-                payload: {
-                    ...data,
-                    email: this.state.email
-                }
-            });
-        }
+        .then((result) => {
+          console.log('Success:', result.loginStatus);
+          if (!result.loginStatus)
+          {
 
+          }
+          else {
+          //  switchToMainPage()
+           console.log(this.props)
+            this.props.setLoginStatus(true)
+          }
+        })
+        .catch((error) => {
+          console.log("Noo")
+          console.error('Error:', error);
+        });
     }
 
-    render() {
-        // mostly copied from react-bootstrap page examples
-        // https://react-bootstrap.github.io/forms/overview/
-        // slightly changed some css and centered it
-        return (
-            <div className='loginContainer'>
-                <h3>Please login</h3>
-                <Container className='loginContainer' fluid>
-                    <div>
-                        <Form className="loginForm" onSubmit={this.handleFormSubmit}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Email</Form.Label>
-                                <Form.Control required type="email" placeholder="Enter email" name="email" value={this.state.email} onChange={this.handleInputChange} />
-                            </Form.Group>
 
-                            <Form.Group className="mb-3" controlId="formBasicPassword">
-                                <Form.Label>Password</Form.Label>
-                                <Form.Control required type="password" placeholder="Password" name="password" value={this.state.password} onChange={this.handleInputChange} />
-                            </Form.Group>
-                            <Button variant="secondary" type="submit">
-                                Submit
-                            </Button>
+    render() {
+      // mostly copied from react-bootstrap page examples
+     // https://react-bootstrap.github.io/forms/overview/
+     // slightly changed some css and centered it
+
+     // Changed to use MUI and Bootstrap together and added custom sx to mui buttons
+        return (
+            <div className='login-background-frame'>
+                <h3>Please Log In</h3>
+
+                <Divider variant="middle" sx={{ m: -0.5, mb: 1 }}/>
+
+                <Container className='loginContainer' fluid>
+                    <Form className="loginForm" onSubmit={this.handleFormSubmit}>
+                          <TextField id="outlined-basic"
+                             name="email"
+                             label="Username"
+                             variant="outlined"
+                             fullWidth
+                             margin="normal"
+                             InputProps={{
+                                     startAdornment: (
+                                       <InputAdornment position="start">
+                                         <PersonIcon />
+                                       </InputAdornment>
+                                     ),
+                             }}
+                             value={this.state.email}
+                             onChange={this.handleInputChange}
+                          />
+
+                          <TextField id="outlined-password-input"
+                             label="Password"
+                             name="password"
+                             fullWidth
+                             type="password"
+                             margin="normal"
+                             InputProps={{
+                                startAdornment: (
+                                 <InputAdornment position="start">
+                                     <KeyIcon />
+                                 </InputAdornment>
+                                ),
+                             }}
+                             value={this.state.password}
+                             onChange={this.handleInputChange}
+                          />
+
+                          <ColorButton variant="contained" size="large" sx={{ width: 1, fontWeight: 'bold' }} onClick={this.handleFormSubmit}>
+                              Log In
+                          </ColorButton>
                         </Form>
-                    </div>
                 </Container>
-                <Button className="padTop" variant="secondary" href="/createAccount">
-                    Signup
+
+                <Divider variant="middle" sx={{ m: 2 }}/>
+
+                <Button variant="contained" color="success" size="large" sx={{ fontWeight: 'bold' }}>
+                    Create Account
                 </Button>
+                  {
+                    this.state.redirect && <Navigate to='/main' replace={true}/>
+                  }
             </div>
         );
     }
