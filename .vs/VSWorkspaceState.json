@@ -6,11 +6,9 @@
     "\\client\\src\\components",
     "\\client\\src\\components\\Library",
     "\\client\\src\\components\\Library\\Following",
-    "\\client\\src\\components\\Login",
     "\\client\\src\\images",
     "\\server",
     "\\server\\modules"
   ],
-  "SelectedNode": "\\server",
   "PreviewInSolutionExplorer": false
 }
