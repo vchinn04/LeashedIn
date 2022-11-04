@@ -4,11 +4,13 @@
     "\\client",
     "\\client\\src",
     "\\client\\src\\components",
-    "\\client\\src\\components\\Library",
-    "\\client\\src\\components\\Library\\Following",
     "\\client\\src\\images",
+    "\\client\\src\\pages",
     "\\server",
-    "\\server\\modules"
+    "\\server\\src",
+    "\\server\\src\\model",
+    "\\server\\src\\routes"
   ],
+  "SelectedNode": "\\server\\src\\model\\user.js",
   "PreviewInSolutionExplorer": false
 }
