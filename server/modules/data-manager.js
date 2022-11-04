@@ -5,8 +5,10 @@ const mongoPass = require('./mongo-pass.js');
 
 const userSchema = new mongoose.Schema({
   usrId: Number,
+  email: String,
   name: String,
-  hobby: Map
+  password: String,
+  hobby: Map,
 });
 const UserM = mongoose.model('Users', userSchema);
 
@@ -37,9 +39,16 @@ exports.addUser = async function (usrIdV, usrNameV, usrHobbyV) {
   console.log(userEntry);
 }
 
-exports.getUser = function (usrIndex) { //Getter function template
+exports.getUser =  async function (usrIndex) { //Getter function template
   console.log("Getting user");
-
+  console.log(usrIndex)
+//  const userExists = await UserM.exists({ email: /^${usrIndex}/ }); // { _id: ... }
+//  console.log(userExists)
+  let docs = await UserM.find({ email:usrIndex });
+  console.log("--------DOCS-----------")
+  console.log(docs)
+  console.log("------------------")
+  return  docs;
 }
 
 exports.updateUser = function (userIndex) { //Function will be used for updating existing users data

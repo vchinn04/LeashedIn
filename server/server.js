@@ -24,6 +24,29 @@ app.get('/api/ExperienceGetter', (req, res) => { //Get Event
   res.send({ express: 'heye from Express' });
 });
 
+app.post('/UserLogIn', async (req, res) => { //Get Event
+  var inputDict = req.body;
+  console.log("Log In request!")
+  console.log(req.body)
+  console.log(req.body.email)
+  const userData = await dataManager.getUser(req.body.email)
+  console.log(userData)
+  userObj = userData[0];
+  console.log(userObj)
+  if (userObj == undefined){
+    console.log("Bad email!")
+
+    res.send({ loginStatus: false, errorMessage: 'Invalid email or password!' });
+  }
+  else if (userObj.password != req.body.password) {
+    console.log("Bad passowrd!")
+    res.send({ loginStatus: false, errorMessage: 'Invalid email or password!' });
+  }
+  else {
+    console.log("Success!")
+    res.send(JSON.stringify({ loginStatus: true, errorMessage: 'No Errors!' }));
+  }
+});
 
 app.post('/PostTestEvent', (req, res) => {//Post Event, used to set data on server
   console.log(req.body);

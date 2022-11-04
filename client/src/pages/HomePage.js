@@ -1,5 +1,7 @@
 import * as React from "react"
-import "../styles/Homepage.css"
+import "./Homepage.css"
+import Login from "../components/Login/Login"
+import { useLocation } from 'react-router-dom'
 
 class HomePage extends React.Component
 {
@@ -10,40 +12,21 @@ class HomePage extends React.Component
     this.state = {
       renderedResponse: ''
     };
+
   }
-
-  /*
-  componentDidMount() {
-    var testinng = {
-      dataKey: "quang",
-      dataValue:
-       {
-        "money": 10,
-        "status": "bo..."
-      }
-    }
-
-    fetch('/PostTestEvent',
-      {
-        method: 'POST',
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(testinng),
-      }) .then((response) => response.text())
-
-      .then((result) => {
-        console.log('Success:', result);
-      })
-      .catch((error) => {
-        console.log("Noo")
-        console.error('Error:', error);
-      });
-  }
-  */
 
   render() {
+
     return (
-      <div id="HomePageFrame">
-      
+      <div className="main-frame">
+        <div className="homepage-stripe-background">
+          <div className="description-frame">
+            <h2 className="logo-text">LeashedIn</h2>
+            <p className="app-description"><span>The way to connnect with fellow</span><span>pet owners, companies, and dog parks!</span></p>
+          </div>
+
+          <Login setLoginStatus={this.props.setLoginStat} />
+        </div>
       </div>
     );
   }
