@@ -42,8 +42,7 @@ exports.addUser = async function (usrIdV, usrNameV, usrHobbyV) {
 exports.getUser =  async function (usrIndex) { //Getter function template
   console.log("Getting user");
   console.log(usrIndex)
-//  const userExists = await UserM.exists({ email: /^${usrIndex}/ }); // { _id: ... }
-//  console.log(userExists)
+
   let docs = await UserM.find({ email:usrIndex });
   console.log("--------DOCS-----------")
   console.log(docs)

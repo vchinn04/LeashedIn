@@ -1,40 +1,21 @@
 import * as React from 'react'
-import { Routes, Route, Navigate } from "react-router";
-import {useEffect, useState} from 'react';
+import { Routes, Route } from "react-router";
 
 import HomePage from "./HomePage"
 import MainPage from "./MainPage"
-
-
+import LoginState from "./LoginState"
 
 const Router = () => {
-  const [loginStatus, setLoginStatus] = LoginHook();
+  const [loginStatus, setLoginState] = LoginState();
 
-  //let homepagePath = (loginStatus) ? "/main" : "/login"
   console.log(loginStatus)
 
   return (
     <Routes>
-      <Route exact path="/" element={(loginStatus) ? <MainPage loginStat={loginStatus} /> : <HomePage loginStat={loginStatus} setLoginStat={setLoginStatus} /> } />
-
-      <Route exact path="/profile" element={<MainPage loginStat={loginStatus} />} />
-
+      <Route exact path="/" element={(loginStatus) ? <MainPage loginStatus={loginStatus} /> : <HomePage setLoginState={setLoginState} /> } /> //Render either login page or main page depending on login status.
+      <Route exact path="/profile" element={<MainPage loginStatus={loginStatus} />} />
     </Routes>
   );
 }
-
-function LoginHook() {
-  const [loginStatus, setLoginStatus] = useState(sessionStorage.getItem('LoginStatus'));
-
-
-  const saveLoginStatus = (newLoginStatus) => {
-    sessionStorage.setItem('LoginStatus', newLoginStatus);
-    setLoginStatus(newLoginStatus);
-  };
-
-
-  return [loginStatus, saveLoginStatus];
-}
-
 
 export default Router;

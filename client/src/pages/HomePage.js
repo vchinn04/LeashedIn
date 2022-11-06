@@ -25,7 +25,7 @@ class HomePage extends React.Component
             <p className="app-description"><span>The way to connnect with fellow</span><span>pet owners, companies, and dog parks!</span></p>
           </div>
 
-          <Login setLoginStatus={this.props.setLoginStat} />
+          <Login setLoginState={this.props.setLoginState} />
         </div>
       </div>
     );

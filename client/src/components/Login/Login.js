@@ -77,7 +77,7 @@ class Login extends React.Component {
           else {
           //  switchToMainPage()
            console.log(this.props)
-            this.props.setLoginStatus(true)
+            this.props.setLoginState(true)
           }
         })
         .catch((error) => {
