@@ -1,9 +1,14 @@
 import React from 'react';
 import { Form, Button, Container } from 'react-bootstrap';
-import './Login.css';
+import '../Login/Login.css';
+import './CreateAccount.css';
 import { AuthContext } from '../../context.js';
+import { Link } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
-class Login extends React.Component {
+
+
+class CreateAccount extends React.Component {
     static contextType = AuthContext;
     constructor(props) {
         super(props);
@@ -12,6 +17,8 @@ class Login extends React.Component {
         {
             email: '',
             username: '',
+            firstName: '',
+            lastName: '',
             password: ''
         };
 
@@ -38,7 +45,8 @@ class Login extends React.Component {
             credentials: 'include',
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: this.state.email, username: this.state.username, password: this.state.password })
+            body: JSON.stringify({ email: this.state.email, username: this.state.username, firstName: this.state.firstName,
+                lastName: this.state.lastName, password: this.state.password })
         };
         const response = await fetch('http://localhost:4000/user/signup', requestOptions);
         const data = await response.json();
@@ -65,40 +73,48 @@ class Login extends React.Component {
 
     }
 
+
     render() {
         // mostly copied from react-bootstrap page examples
         // https://react-bootstrap.github.io/forms/overview/
         // slightly changed some css and centered it
         return (
             <div className='loginContainer'>
-                <h3>Please signup</h3>
-                <Container className='loginContainer' fluid>
+                <h1>Sign Up</h1>
+                <h2>Join the petwork</h2>
+                <Container className='createAccountContainer' fluid>
                     <div>
-                        <Form className="loginForm" onSubmit={this.handleFormSubmit}>
+                        <Form className="createAccountForm" onSubmit={this.handleFormSubmit}>
                             <Form.Group className="mb-3">
-                                <Form.Label>Email</Form.Label>
-                                <Form.Control required type="email" placeholder="Enter email" name="email" value={this.state.email} onChange={this.handleInputChange} />
+                                <Form.Control required type="firstName" placeholder="First Name" name="firstName" value={this.state.firstName} onChange={this.handleInputChange} />
+                                <Form.Control required type="lastName" placeholder="Last Name" name="lastName" value={this.state.lastName} onChange={this.handleInputChange} />
                             </Form.Group>
                             <Form.Group className="mb-3">
-                                <Form.Label>Email</Form.Label>
                                 <Form.Control required type="username" placeholder="Enter username" name="username" value={this.state.username} onChange={this.handleInputChange} />
                             </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Control required type="email" placeholder="Enter email" name="email" value={this.state.email} onChange={this.handleInputChange} />
+                            </Form.Group>
                             <Form.Group className="mb-3" controlId="formBasicPassword">
-                                <Form.Label>Password</Form.Label>
                                 <Form.Control required type="password" placeholder="Password" name="password" value={this.state.password} onChange={this.handleInputChange} />
                             </Form.Group>
-                            <Button variant="secondary" type="submit">
-                                Submit
-                            </Button>
+                            <Link to="/MoreInfoCreate">
+                                <Button variant="secondary" type="submit">
+                                    Sign Up
+                                </Button>
+                            </Link>
                         </Form>
                     </div>
                 </Container>
-                <Button className="padTop" variant="secondary" href="/login">
-                    Login
-                </Button>
+                
+                <Link to="/">
+                    <Button className="padTop" variant="secondary">
+                        Go back to login
+                    </Button>
+                </Link>
             </div>
         );
     }
 };
 
-export default Login;
+export default CreateAccount;
