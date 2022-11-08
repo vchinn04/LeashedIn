@@ -19,6 +19,9 @@ import KeyIcon from '@mui/icons-material/Key';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 
+import { Link } from 'react-router-dom';
+
+
 
 const ColorButton = styled(Button)(({ theme }) => ({
   backgroundColor: "#825DD7",
@@ -143,7 +146,7 @@ class Login extends React.Component {
 
                 <Divider variant="middle" sx={{ m: 2 }}/>
 
-                <Button variant="contained" color="success" size="large" sx={{ fontWeight: 'bold' }}>
+                <Button variant="contained" color="success" size="large" sx={{ fontWeight: 'bold' }} component={Link} to="/CreateAccount">
                     Create Account
                 </Button>
                   {

@@ -1,0 +1,44 @@
+.post-frame {
+    width: 50%;
+    height: 50%;
+    top: 50;
+    left:20;
+    display: flex;
+  }
+  .image {
+    height: 20px;
+    width: 20px;
+  }
+
+.postContainer {
+    width: 100%;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.headerContainer {
+    width: 70%;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.descriptionContainer {
+    width: 70%;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+}
+
+.footerContainer {
+    width: 20%;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
