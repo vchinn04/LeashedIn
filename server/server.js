@@ -24,6 +24,14 @@ app.get('/api/ExperienceGetter', (req, res) => { //Get Event
   res.send({ express: 'heye from Express' });
 });
 
+app.get('/getUserArr', async (req, res) => { //Get Event
+  console.log(req.query)
+  const userListData = await dataManager.getUserList(req.query.searchEntry)
+
+  res.send({ express: 'heye from Express', userList: JSON.stringify(userListData)  });
+});
+
+
 app.post('/UserLogIn', async (req, res) => { //Get Event
   var inputDict = req.body;
   console.log("Log In request!")

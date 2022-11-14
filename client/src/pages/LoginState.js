@@ -4,7 +4,12 @@ function LoginState() { //Custom Hook/Global State.. example used from React Doc
   const [loginStatus, setState] = useState(sessionStorage.getItem('LoginStatus'));
 
   function dispatch(newLoginState){
-    sessionStorage.setItem('LoginStatus', newLoginState);
+    if (!newLoginState){
+      sessionStorage.removeItem('LoginStatus');
+    }
+    else {
+      sessionStorage.setItem('LoginStatus', newLoginState);
+    }
     setState(newLoginState);
   };
 
