@@ -73,7 +73,7 @@ const Following = () => {
                 <div className="libraryButtonGroup">
                     <ButtonGroup>
                         <div className="libraryButtonSelected">
-                            <Button className="bg-transparent " href="/library/following" variant="link">Following</Button>
+                            <Button className="bg-transparent " href="/following" variant="link">Following</Button>
                         </div>
                     </ButtonGroup>
                 </div>
