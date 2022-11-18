@@ -1,0 +1,33 @@
+.libraryButtonGroup {
+    float: left;
+}
+
+.libraryButton {
+    color: black;
+}
+
+.libraryButtonSelected {
+    color: #FF7F22;
+}
+
+.btn-link {
+    color: inherit;
+}
+
+    .btn-link:hover {
+        color: #FF7F22;
+    }
+
+.Name {
+    font-weight: bold;
+    font-size: 32px;
+    line-height: 24px; /* within paragraph */
+    margin-bottom: 0px; /* between paragraphs */
+}
+
+.Artist {
+    font-weight: lighter;
+    font-size: 20px;
+    line-height: 24px; /* within paragraph */
+    margin-bottom: 20px; /* between paragraphs */
+}

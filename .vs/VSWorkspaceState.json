@@ -2,12 +2,15 @@
   "ExpandedNodes": [
     "",
     "\\client",
-    "\\client\\public",
     "\\client\\src",
+    "\\client\\src\\components",
+    "\\client\\src\\components\\CreateAccount",
+    "\\client\\src\\components\\Login",
+    "\\client\\src\\images",
     "\\client\\src\\pages",
     "\\server",
     "\\server\\modules"
   ],
-  "SelectedNode": "\\client\\src\\pages\\HomePage.js",
+  "SelectedNode": "\\client\\src\\components\\CreateAccount\\petOwner.jsx",
   "PreviewInSolutionExplorer": false
 }
