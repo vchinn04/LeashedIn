@@ -72,10 +72,6 @@ const Following = () => {
             <Container fluid>
                 <div className="libraryButtonGroup">
                     <ButtonGroup>
-                        <div className="libraryButton">
-                            <Button className="bg-transparent " href="/library/likes" variant="link">Likes</Button>
-                            <Button className="bg-transparent " href="/library/playlists" variant="link">Playlists</Button>
-                        </div>
                         <div className="libraryButtonSelected">
                             <Button className="bg-transparent " href="/library/following" variant="link">Following</Button>
                         </div>
