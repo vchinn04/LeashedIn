@@ -17,8 +17,7 @@ class CreateAccount extends React.Component {
         {
             email: '',
             username: '',
-            firstName: '',
-            lastName: '',
+            displayName: '',
             password: ''
         };
 
@@ -45,8 +44,8 @@ class CreateAccount extends React.Component {
             credentials: 'include',
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: this.state.email, username: this.state.username, firstName: this.state.firstName,
-                lastName: this.state.lastName, password: this.state.password })
+            body: JSON.stringify({ email: this.state.email, username: this.state.username,
+                displayName: this.state.displayName, password: this.state.password })
         };
         const response = await fetch('http://localhost:4000/user/signup', requestOptions);
         const data = await response.json();
@@ -86,20 +85,19 @@ class CreateAccount extends React.Component {
                     <div>
                         <Form className="createAccountForm" onSubmit={this.handleFormSubmit}>
                             <Form.Group className="mb-3">
-                                <Form.Control required type="firstName" placeholder="First Name" name="firstName" value={this.state.firstName} onChange={this.handleInputChange} />
-                                <Form.Control required type="lastName" placeholder="Last Name" name="lastName" value={this.state.lastName} onChange={this.handleInputChange} />
+                                <Form.Control required type="displayName" placeholder="Display Name" name="displayName" value={this.state.displayName} onChange={this.handleInputChange} />
                             </Form.Group>
                             <Form.Group className="mb-3">
-                                <Form.Control required type="username" placeholder="Enter username" name="username" value={this.state.username} onChange={this.handleInputChange} />
+                                <Form.Control required type="username" placeholder="Username" name="username" value={this.state.username} onChange={this.handleInputChange} />
                             </Form.Group>
                             <Form.Group className="mb-3">
-                                <Form.Control required type="email" placeholder="Enter email" name="email" value={this.state.email} onChange={this.handleInputChange} />
+                                <Form.Control required type="email" placeholder="Email" name="email" value={this.state.email} onChange={this.handleInputChange} />
                             </Form.Group>
                             <Form.Group className="mb-3" controlId="formBasicPassword">
                                 <Form.Control required type="password" placeholder="Password" name="password" value={this.state.password} onChange={this.handleInputChange} />
                             </Form.Group>
                             <Link to="/MoreInfoCreate">
-                                <Button variant="secondary" type="submit">
+                                <Button type="button" disabled={(!this.state.email) || (!this.state.displayName) || (!this.state.username) || (!this.state.password)}>
                                     Sign Up
                                 </Button>
                             </Link>
