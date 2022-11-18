@@ -6,6 +6,7 @@ import { AuthContext } from '../../context.js';
 import { Link } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import Select from "react-select";
 
 class MoreInfoCreate extends React.Component {
     static contextType = AuthContext;
@@ -15,12 +16,30 @@ class MoreInfoCreate extends React.Component {
         this.state =
         {
             value: 'selectAccountType',
-            displayName: '',
+            pet: '',
+            petsArray: [],
+            petName: '',
+            organizationName: '',
+            options: [
+                {value: 'amphibian', label: 'amphibian'},
+                {value: 'cat', label: 'cat'},
+                {value: 'dog', label: 'dog'},
+                {value: 'bird', label: 'bird'},
+                {value: 'ferret', label: 'ferret'},
+                {value: 'fish', label: 'fish'},
+                {value: 'guineaPig', label: 'guinea pig'},
+                {value: 'horse', label: 'horse'},
+                {value: 'insect', label: 'insect'},
+                {value: 'lizard', label: 'lizard'},
+                {value: 'rabbit', label: 'rabbit'},
+                {value: 'turtle', label: 'turtle'}
+            ]
 
         };
 
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleFormSubmit = this.handleFormSubmit.bind(this);
+        this.multiPetSelectHandleOnChange = this.multiPetSelectHandleOnChange.bind(this);
     }
 
     // neat trick to handle all changes to both forms
@@ -74,77 +93,60 @@ class MoreInfoCreate extends React.Component {
         this.setState({value: a.target.value});
     };
 
+    petSelectHandleOnChange = (a) => {
+        this.setState({pet: a.value});
+    };
+
+    multiPetSelectHandleOnChange(a) {
+        this.setState(state => {
+            return {
+              petsArray: a
+            };
+          });
+    }
+
     render() {
         const value = this.state.value;
         let createForm;
         if (value == "eventOrganizer") {
             createForm = <div classname="mt-4">
-                                <Form.Group className="mb-3">
-                                    <Form.Label>I plan to host events for...</Form.Label>
-                                    <Form.Select id="createAccountFormSelect">
-                                        <option value="amphibian">amphibians</option>
-                                        <option value="cat">cats</option>
-                                        <option value="dog">dogs</option>
-                                        <option value="bird">birds</option>
-                                        <option value="ferret">ferrets</option>
-                                        <option value="fish">fish</option>
-                                        <option value="guineaPig">guinea pigs</option>
-                                        <option value="horse">horses</option>
-                                        <option value="insect">insects</option>
-                                        <option value="lizard">lizards</option>
-                                        <option value="rabbit">rabbits</option>
-                                        <option value="turtle">turtles</option>
-                                    </Form.Select>
-                                </Form.Group>
+                                 <Container className='eventOrganizerPets' fluid>
+                                <div>
+                                    <h>I plan to host events for</h>
+                                    <div>
+                                        <Select className="form-select" onChange={this.multiPetSelectHandleOnChange}
+                                         value={this.state.petsArray} options={this.state.options} isMulti/>
+                                    </div>
+                                </div>
+                            </Container>
                             </div>;
         } else if (value == "petOwner") {
             createForm = <div classname="mt-4">
                             <Form.Group className="mb-3">
-                                <Form.Control required type="petName" placeholder="Pet Name" name="petName"/>
+                                <Form.Control required type="petName" placeholder="Pet Name" name="petName" value={this.state.petName} onChange={this.handleInputChange}/>
                             </Form.Group>
-                            <Form.Group className="mb-3">
-                                <Form.Label>My pet is a...</Form.Label>
-                                <Form.Select id="createAccountFormSelect">
-                                    <option value="amphibian">amphibian</option>
-                                    <option value="cat">cat</option>
-                                    <option value="dog">dog</option>
-                                    <option value="bird">bird</option>
-                                    <option value="ferret">ferret</option>
-                                    <option value="fish">fish</option>
-                                    <option value="guineaPig">guinea pig</option>
-                                    <option value="horse">horse</option>
-                                    <option value="insect">insect</option>
-                                    <option value="lizard">lizard</option>
-                                    <option value="rabbit">rabbit</option>
-                                    <option value="turtle">turtle</option>
-                                </Form.Select>
-                            </Form.Group>
+                            <Container className='petOwnerPet' fluid>
+                                <div>
+                                    <h>My pet is {(this.state.pet == "insect" || this.state.pet == "amphibian") ? "an" : "a"}</h>
+                                    <Select className="form-select" onChange={this.petSelectHandleOnChange} options={this.state.options}/>
+                                </div>
+                            </Container>
                         </div>;
         } else if (value == "shelterOrStore") {
             createForm = <div classname="mt-4">
                             <Form.Group className="mb-3">
-                                <Form.Control required type="organizationName" placeholder="Name of Shelter or Store" name="organizationName"/>
+                                <Form.Control required type="organizationName" placeholder="Name of Shelter or Store" name="organizationName"
+                                 value={this.state.organizationName} onChange={this.handleInputChange}/>
                             </Form.Group>
-                            <Form.Group className="mb-3">
-                                <Form.Label>We have...</Form.Label>
-                                <Form.Select id="createAccountFormSelect">
-                                    <option value="amphibian">amphibians</option>
-                                    <option value="cat">cats</option>
-                                    <option value="dog">dogs</option>
-                                    <option value="bird">birds</option>
-                                    <option value="ferret">ferrets</option>
-                                    <option value="fish">fish</option>
-                                    <option value="guineaPig">guinea pigs</option>
-                                    <option value="horse">horses</option>
-                                    <option value="insect">insects</option>
-                                    <option value="lizard">lizards</option>
-                                    <option value="rabbit">rabbits</option>
-                                    <option value="turtle">turtles</option>
-                                </Form.Select>
-                            </Form.Group>
+                            <Container className='shelterOrStorePets' fluid>
+                                <div>
+                                    <h>We offer</h>
+                                    <Select className="form-select" onChange={this.multiPetSelectHandleOnChange}
+                                     value={this.state.petsArray} options={this.state.options} isMulti/>
+                                </div>
+                            </Container>
                         </div>;
         }
-
     
         return (
             <div className='loginContainer'>
@@ -152,7 +154,7 @@ class MoreInfoCreate extends React.Component {
                 <Container className='createAccountContainer' fluid>
                     <div>
                         <div className="mt-4">
-                            <h2>I am a...</h2>
+                            <h>I am {this.state.value == "eventOrganizer" ? "an" : "a"} </h>
                             <select className="form-select" onChange={this.entityHandleOnChange} value={this.state.value}>
                                 <option value="selectAccountType">select one</option>
                                 <option value="petOwner">pet owner</option>
@@ -163,6 +165,14 @@ class MoreInfoCreate extends React.Component {
                     </div>
                 </Container>
                 {createForm}
+                <Link to="/">
+                    <Button type="button" disabled={(this.state.value == "petOwner" && ((! this.state.petName) || (! this.state.pet))) ||
+                                                    (this.state.value == "eventOrganizer" && (! this.state.petsArray.length)) || 
+                                                    (this.state.value == "shelterOrStore" && ((! this.state.organizationName) || (! this.state.petsArray.length))) ||
+                                                    (this.state.value == "selectAccountType")}>
+                        Let's Go
+                    </Button>
+                </Link>
             </div>
         );
     }
