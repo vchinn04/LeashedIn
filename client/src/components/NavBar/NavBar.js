@@ -46,7 +46,7 @@ const SearchListBox = (props) => //List that displays found profile buttons
                           }
                           }}>
                             <ListItemIcon>
-                              {(item._id!=-1) ? <Avatar src='./Eduardo.jpeg' alt={item.name} /> : <ErrorIcon /> }
+                              {(item._id!=-1) ? <Avatar src='/Eduardo.jpeg' alt={item.name} /> : <ErrorIcon /> }
                             </ListItemIcon>
                             <ListItemText primary={item.name} />
                     </ListItemButton>
@@ -110,7 +110,7 @@ const NavBar = (props) =>
     <div className="navbar-frame">
 
       <IconButton color="primary" aria-label="upload picture" component={Link} to="/">
-        <Avatar src='./Logo.png' alt="Home" variant="rounded"/>
+        <Avatar src='/Logo.png' alt="Home" variant="rounded"/>
       </IconButton>
 
       <div className="search-frame">
@@ -145,7 +145,7 @@ const NavBar = (props) =>
         </div>
 
         <IconButton color="primary" aria-label="profile"  component={Link} to="/profile">
-          <Avatar src='./Eduardo.jpeg' alt="Profile" />
+          <Avatar src='/Eduardo.jpeg' alt="Profile" />
         </IconButton>
 
         <IconButton aria-label="logout" onClick={() => props.setLoginState(false)} component={Link} to="/">
