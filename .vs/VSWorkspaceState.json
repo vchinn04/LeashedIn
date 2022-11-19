@@ -4,13 +4,13 @@
     "\\client",
     "\\client\\src",
     "\\client\\src\\components",
-    "\\client\\src\\components\\Library",
-    "\\client\\src\\components\\Library\\Following",
+    "\\client\\src\\components\\CreateAccount",
     "\\client\\src\\components\\Login",
     "\\client\\src\\images",
+    "\\client\\src\\pages",
     "\\server",
     "\\server\\modules"
   ],
-  "SelectedNode": "\\server",
+  "SelectedNode": "\\client\\src\\components\\CreateAccount\\petOwner.jsx",
   "PreviewInSolutionExplorer": false
 }
