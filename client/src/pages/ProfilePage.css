@@ -52,10 +52,18 @@
   margin-bottom: 0;
   text-align: center;
   font-family: Verdana, Aral, sans-serif;
-
   color: #825DD7;
 }
-
+:disabled {
+    color: black !important;
+    -webkit-text-fill-color:black !important;
+}
+.pic-frame .path-text {
+  position: relative;
+  margin-bottom: -5px;
+  margin-top: 1px;
+  font-size: 15px;
+}
 .pic-frame .subname {
   text-align:center;
   margin-top: 0;

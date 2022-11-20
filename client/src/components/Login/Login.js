@@ -8,7 +8,7 @@ import './Login.css';
 import { AuthContext } from '../../context.js';
 
 import { styled } from '@mui/material/styles';
-import Box from '@mui/material/Box';
+//import Box from '@mui/material/Box';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -58,7 +58,6 @@ class Login extends React.Component {
         });
     }
     async handleFormSubmit(event) {
-      console.log("My life be like ooo ahh")
       console.log(this.state.email)
       console.log(this.state.password)
 
