@@ -4,11 +4,13 @@ const mongoose = require('mongoose');
 const mongoPass = require('./mongo-pass.js');
 
 const userSchema = new mongoose.Schema({
-  usrId: Number,
   email: String,
-  name: String,
   password: String,
-  hobby: Map,
+  aboutMe: String,
+  ownerName: String,
+  pets: Array,
+  profilePicture: String,
+  username: String
 });
 const UserM = mongoose.model('Users', userSchema);
 
@@ -50,19 +52,32 @@ exports.getUser =  async function (usrIndex) { //Getter function template
   return  docs;
 }
 
+exports.getUserData =  async function (usrIndex) { //Getter function template
+  console.log("Getting user data");
+  console.log(usrIndex)
+
+  let docs = await UserM.findOne({ username:usrIndex });
+  return  docs;
+}
+
 exports.getUserList =  async function (searchParams) { //Getter function template
   console.log("Getting user list");
   console.log(searchParams)
   const regExVar = "/"+searchParams+"/"
-  let docs = await UserM.find({ name:{ $regex: new RegExp('^' + searchParams , 'i') } }).limit(5);
+  let docs = await UserM.find({ username:{ $regex: new RegExp('^' + searchParams , 'i') } }).limit(5);
   console.log("--------DOCS-----------")
   console.log(docs)
   console.log("------------------")
   return  docs;
 }
 
-
-exports.updateUser = function (userIndex) { //Function will be used for updating existing users data
+exports.updateUser = function (userInfo) { //Function will be used for updating existing users data
   console.log("Updating user");
-
+   UserM.findOneAndUpdate({username: userInfo.username},{ownerName: userInfo.ownername, aboutMe: userInfo.aboutme, profilePicture: userInfo.profilepic},function(error,result){
+     if(error){
+       console.log("Error: ", error)
+     }else{
+       console.log(result);
+     }
+   });
 }

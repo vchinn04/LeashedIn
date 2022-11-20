@@ -9,6 +9,7 @@ const dataManager = require('./modules/data-manager.js')
 app.use(bodyParser.json()); //Parses JSON and turns into JS accessible vars
 app.use(bodyParser.urlencoded({ extended: true })); //Does same as line above but for URL encoded. extended=true means the data may not neccessarily be just a string.
 const multer  = require('multer')
+const fs = require('fs')
 
 const fileStorageEngine = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -44,13 +45,15 @@ app.get('/getUserArr', async (req, res) => { //Get Event
 
 app.get('/getUserProfileText', async (req, res) => { //Get Event
   console.log(req.query)
-  res.send({ aboutMe: "YEA SO\nthis dude said\nsomestuff\n😉", ownerName: "Victor Ch."})
+  const userData = await dataManager.getUserData(req.query.username)
+  res.send({ aboutMe: userData.aboutMe, ownerName: userData.ownerName})
 });
 
 app.get('/getUserProfilePic', async (req, res) => { //Get Event
   console.log(req.query)
-  let imagePath = __dirname + "/images/1668842435241--Screen Shot 2022-10-12 at 10.11.00 PM.png"
-  res.sendfile("/images/1668842435241--Screen Shot 2022-10-12 at 10.11.00 PM.png",{ root: __dirname });
+  const userData = await dataManager.getUserData(req.query.username)
+  let imagePath = "/images/" + userData.profilePicture
+  res.sendfile(imagePath, { root: __dirname });
 });
 
 
@@ -59,7 +62,9 @@ app.post('/UserLogIn', async (req, res) => { //Get Event
   console.log("Log In request!")
   console.log(req.body)
   console.log(req.body.email)
+
   const userData = await dataManager.getUser(req.body.email)
+
   console.log(userData)
   userObj = userData[0];
   console.log(userObj)
@@ -74,7 +79,8 @@ app.post('/UserLogIn', async (req, res) => { //Get Event
   }
   else {
     console.log("Success!")
-    res.send(JSON.stringify({ loginStatus: true, errorMessage: 'No Errors!' }));
+    console.log(userData.username)
+    res.send(JSON.stringify({ loginStatus: true, username: userObj.username, errorMessage: 'No Errors!' }));
   }
 });
 
@@ -98,10 +104,27 @@ app.post('/PostTestEvent', (req, res) => {//Post Event, used to set data on serv
 });
 
 
-app.post('/UpdateProfile', upload.single('image'), (req, res) => {
+app.post('/UpdateProfile', upload.single('image'), async (req, res) => {
   console.log(req.file)
-  console.log(req.body.userName)
-  console.log(req.body.aboutState)
+  console.log(req.body.username)
+  console.log(req.body.aboutme)
+  console.log(req.body.ownername)
+
+  const userInfo = {
+    username: req.body.username,
+    ownername: req.body.ownername,
+    aboutme: req.body.aboutme,
+    profilepic: req.file.filename
+  }
+
+  const userData = await dataManager.getUserData(req.body.username)
+  if (userData.profilePicture != "")
+  {
+    const imagePath = __dirname + "/images/" + userData.profilePicture
+    fs.unlinkSync(imagePath)
+  }
+
+  dataManager.updateUser(userInfo);
   res.send(JSON.stringify({ loginStatus: "ohh yea", errorMessage: 'No Errors!' }));
 
 });

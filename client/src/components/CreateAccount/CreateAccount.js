@@ -104,7 +104,7 @@ class CreateAccount extends React.Component {
                         </Form>
                     </div>
                 </Container>
-                
+
                 <Link to="/">
                     <Button className="padTop" variant="secondary">
                         Go back to login

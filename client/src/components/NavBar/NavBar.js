@@ -23,7 +23,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ErrorIcon from '@mui/icons-material/Error';
 import { spacing } from '@mui/system';
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react';
 
 const SearchListBox = (props) => //List that displays found profile buttons
 {
@@ -66,6 +66,7 @@ const NavBar = (props) =>
 {
   const [searchState, setSearchState] = useState("");
   const [userArrObj, setUserArr] = useState([]);
+  const [inputImage, setImage] = useState(null);
 
   const getResponse = async(searchString) => {
     const url = '/getUserArr?' + new URLSearchParams({ searchEntry: searchString }).toString() //Fire get event to find users with search string in their usernames
@@ -106,6 +107,29 @@ const NavBar = (props) =>
 
         setSearchState(target.value); //Update the Search State to make sure value in text field is up to date
   }
+
+  useEffect(() => {
+    const getData = async() => {
+      const url = '/getUserProfilePic?' + new URLSearchParams({ username: props.loginStatus }).toString()
+
+      fetch(url)
+      .then(async (result) => {
+        console.log('File retrieval success!');
+        let myBlob = await result.blob()
+
+         var reader  = new FileReader();
+         reader.onload = function(e)  {
+             setImage(e.target.result)
+          }
+          reader.readAsDataURL(myBlob);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+    }
+
+    getData()
+  }, []);
   return (
     <div className="navbar-frame">
 
@@ -144,8 +168,8 @@ const NavBar = (props) =>
              }
         </div>
 
-        <IconButton color="primary" aria-label="profile"  component={Link} to="/profile">
-          <Avatar src='/Eduardo.jpeg' alt="Profile" />
+        <IconButton color="primary" aria-label="profile"  component={Link} to={`/profile/${props.loginStatus}`}>
+          <Avatar src={inputImage} alt="Profile" />
         </IconButton>
 
         <IconButton aria-label="logout" onClick={() => props.setLoginState(false)} component={Link} to="/">

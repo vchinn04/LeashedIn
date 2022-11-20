@@ -8,11 +8,8 @@ import './Login.css';
 import { AuthContext } from '../../context.js';
 
 import { styled } from '@mui/material/styles';
-//import Box from '@mui/material/Box';
-import Input from '@mui/material/Input';
-import InputLabel from '@mui/material/InputLabel';
+
 import InputAdornment from '@mui/material/InputAdornment';
-import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import PersonIcon from '@mui/icons-material/Person';
 import KeyIcon from '@mui/icons-material/Key';
@@ -78,8 +75,7 @@ class Login extends React.Component {
           }
           else {
           //  switchToMainPage()
-           console.log(this.props)
-            this.props.setLoginState(true)
+            this.props.setLoginState(result.username)
           }
         })
         .catch((error) => {

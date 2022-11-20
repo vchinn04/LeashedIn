@@ -98,10 +98,9 @@ const ProfilePage = (props ) =>
   const [inputImage, setImage] = useState(null);
   const [inputImagePath, setImagePath] = useState(null);
   const [inputImageFile, setImageFile] = useState(null);
-
+  const avatarMarginTop = (props.loginStatus == id) ? -2 : 4
   //console.log(id)
   //console.log((aboutState.split('\n')).length)
-
   const setUpFile = (file) =>
   {
     var reader  = new FileReader();
@@ -117,8 +116,9 @@ const ProfilePage = (props ) =>
 
     var data = new FormData()
     data.append('image',inputImageFile, inputImageFile.name)
-    data.append('userName', ownerName)
-    data.append('aboutState', aboutState)
+    data.append('username', props.loginStatus)
+    data.append('ownername', ownerName)
+    data.append('aboutme', aboutState)
 
     fetch('/UpdateProfile',
       {
@@ -147,8 +147,8 @@ const ProfilePage = (props ) =>
 
   useEffect(() => {
     const getData = async() => {
-      const url = '/getUserProfileText?' + new URLSearchParams({ username: "vchinn" }).toString()
-      const url2 = '/getUserProfilePic?' + new URLSearchParams({ username: "vchinn" }).toString()
+      const url = '/getUserProfileText?' + new URLSearchParams({ username: props.loginStatus }).toString()
+      const url2 = '/getUserProfilePic?' + new URLSearchParams({ username: props.loginStatus }).toString()
 
       fetch(url).then((response) => response.json())
       .then((result) => {
@@ -182,18 +182,18 @@ const ProfilePage = (props ) =>
   return (
       <div className="profile-page-frame">
 
-        <NavBar setLoginState={props.setLoginState} />
+        <NavBar loginStatus={props.loginStatus} setLoginState={props.setLoginState} />
 
         <div className="info-frame">
 
           <div className="pic-frame">
 
-            <EditSaveButton isEditing={isEditing} setEdit={setEdit} handleSubmit={handleSubmit}/>
+            {(props.loginStatus == id) && <EditSaveButton isEditing={isEditing} setEdit={setEdit} handleSubmit={handleSubmit}/>}
 
             <Avatar
               alt="vchinn"
               src={(inputImage) ? inputImage : '/Eduardo.jpeg'}
-              sx={{mx: 'auto', mt: -2, pt: 0, width: 175, height: 175, border: '5px solid #825DD7'}}
+              sx={{mx: 'auto', mt: avatarMarginTop, pt: 0, width: 175, height: 175, border: '5px solid #825DD7'}}
             />
 
             {isEditing && <Button variant="contained" component="label" color="primary"  size="small" sx={{position: 'absolute', top: '35%', mb:0, left: '60%' ,fontWeight: 'bold' }}>
@@ -209,7 +209,7 @@ const ProfilePage = (props ) =>
               inputProps={{style: {fontSize: 32, color: '#825DD7', textAlign: 'center',fontFamily: 'Verdana', fontWeight: "bold"}}} onChange={(event) => {setName(event.target.value)}}
             />}
 
-            <h2 className="subname">@vchinn</h2>
+            <h2 className="subname">@{props.loginStatus}</h2>
           </div>
 
           <div className="about-me-frame">
