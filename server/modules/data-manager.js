@@ -4,16 +4,18 @@ const mongoose = require('mongoose');
 const mongoPass = require('./mongo-pass.js');
 
 const userSchema = new mongoose.Schema({
-  usrId: Number,
   email: String,
-  name: String,
   password: String,
-  hobby: Map,
+  aboutMe: String,
+  ownerName: String,
+  pets: Array,
+  profilePicture: String,
+  username: String
 });
 const UserM = mongoose.model('Users', userSchema);
 
 exports.setupMongo = async function () { //Connect to our database and output that connection was successful
-  const uri = "mongodb+srv://ftemp:" + mongoPass.AtlasPass + "@cluster0.pyvzkqi.mongodb.net/?retryWrites=true&w=majority" //url for connecting with our MongoDB Atlas
+  const uri = mongoPass.AtlasPass//url for connecting with our MongoDB Atlas
   console.log('\x1b[33m', "Attempting Connection with MongoDB")
 
   await mongoose.connect(uri); //Try to connect to MongoDB
@@ -50,19 +52,32 @@ exports.getUser =  async function (usrIndex) { //Getter function template
   return  docs;
 }
 
+exports.getUserData =  async function (usrIndex) { //Getter function template
+  console.log("Getting user data");
+  console.log(usrIndex)
+
+  let docs = await UserM.findOne({ username:usrIndex });
+  return  docs;
+}
+
 exports.getUserList =  async function (searchParams) { //Getter function template
   console.log("Getting user list");
   console.log(searchParams)
   const regExVar = "/"+searchParams+"/"
-  let docs = await UserM.find({ name:{ $regex: new RegExp('^' + searchParams , 'i') } }).limit(5);
+  let docs = await UserM.find({ username:{ $regex: new RegExp('^' + searchParams , 'i') } }).limit(5);
   console.log("--------DOCS-----------")
   console.log(docs)
   console.log("------------------")
   return  docs;
 }
 
-
-exports.updateUser = function (userIndex) { //Function will be used for updating existing users data
+exports.updateUser = function (userInfo) { //Function will be used for updating existing users data
   console.log("Updating user");
-
+   UserM.findOneAndUpdate({username: userInfo.username},{ownerName: userInfo.ownername, aboutMe: userInfo.aboutme, profilePicture: userInfo.profilepic},function(error,result){
+     if(error){
+       console.log("Error: ", error)
+     }else{
+       console.log(result);
+     }
+   });
 }

@@ -4,13 +4,13 @@
     "\\client",
     "\\client\\src",
     "\\client\\src\\components",
-    "\\client\\src\\components\\Library",
-    "\\client\\src\\components\\Library\\Following",
-    "\\client\\src\\components\\Login",
+    "\\client\\src\\components\\Following",
+    "\\client\\src\\components\\NavBar",
     "\\client\\src\\images",
+    "\\client\\src\\pages",
     "\\server",
     "\\server\\modules"
   ],
-  "SelectedNode": "\\server",
+  "SelectedNode": "\\client\\src\\components\\Following\\Following.css",
   "PreviewInSolutionExplorer": false
 }

@@ -18,7 +18,7 @@ class MainPage extends React.Component
   render() {
     return (
       <div className="main-frame">
-        <NavBar setLoginState={this.props.setLoginState} />
+        <NavBar loginStatus={this.props.loginStatus} setLoginState={this.props.setLoginState} />
       </div>
     );
   }

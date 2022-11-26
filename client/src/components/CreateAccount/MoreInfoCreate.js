@@ -147,7 +147,7 @@ class MoreInfoCreate extends React.Component {
                             </Container>
                         </div>;
         }
-    
+
         return (
             <div className='loginContainer'>
                 <h1>Tell us more about yourself</h1>
@@ -167,7 +167,7 @@ class MoreInfoCreate extends React.Component {
                 {createForm}
                 <Link to="/">
                     <Button type="button" disabled={(this.state.value == "petOwner" && ((! this.state.petName) || (! this.state.pet))) ||
-                                                    (this.state.value == "eventOrganizer" && (! this.state.petsArray.length)) || 
+                                                    (this.state.value == "eventOrganizer" && (! this.state.petsArray.length)) ||
                                                     (this.state.value == "shelterOrStore" && ((! this.state.organizationName) || (! this.state.petsArray.length))) ||
                                                     (this.state.value == "selectAccountType")}>
                         Let's Go
@@ -179,4 +179,3 @@ class MoreInfoCreate extends React.Component {
 };
 
 export default MoreInfoCreate;
-

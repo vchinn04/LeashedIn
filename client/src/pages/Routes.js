@@ -15,7 +15,7 @@ const Router = () => {
 
   return (
     <Routes>
-      <Route exact path="/" element={(loginStatus) ? <MainPage setLoginState={setLoginState} /> : <HomePage setLoginState={setLoginState} /> } /> //Render either login page or main page depending on login status.
+      <Route exact path="/" element={(loginStatus) ? <MainPage loginStatus={loginStatus} setLoginState={setLoginState} /> : <HomePage setLoginState={setLoginState} /> } /> //Render either login page or main page depending on login status.
       <Route exact path="/profile/:id" element={<ProfilePage loginStatus={loginStatus} setLoginState={setLoginState} />} />
       <Route exact path="/CreateAccount" element={<CreateAccount />} />
       <Route exact path="/MoreInfoCreate" element={<MoreInfoCreate />} />
