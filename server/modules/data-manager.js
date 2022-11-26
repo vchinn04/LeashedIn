@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 
 const mongoPass = require('./mongo-pass.js');
+const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
   email: String,
@@ -12,6 +13,16 @@ const userSchema = new mongoose.Schema({
   profilePicture: String,
   username: String
 });
+
+const petSchema = new mongoose.Schema({
+  PetId: String,
+  PetName: String,
+  PetType: String,
+  PetDescription: String,
+  PetImage: String
+})
+
+const PetM = mongoose.model("Pets", petSchema)
 const UserM = mongoose.model('Users', userSchema);
 
 exports.setupMongo = async function () { //Connect to our database and output that connection was successful
@@ -81,3 +92,81 @@ exports.updateUser = function (userInfo) { //Function will be used for updating 
      }
    });
 }
+
+
+/*-----------PET FUNCTIONS----------*/
+exports.createPet = async function(petEntry, usrIndx)  {
+  petId = ""
+  let isExist = false
+  do
+  {
+      petId = await crypto.randomBytes(20)
+      petId = petId.toString('hex')
+
+      isExist = await PetM.exists({ PetId: petId });
+
+      if (!isExist)
+      {
+        petEntry["PetId"] = petId
+        const petDatEntry = new PetM(petEntry)
+
+        await petDatEntry.save()
+        let docs = await UserM.findOne({ username:usrIndx });
+        newPetList = docs.pets
+        newPetList.push(petId)
+        UserM.findOneAndUpdate({username:usrIndx},{pets: newPetList},(error,result) => {
+          if(error){
+            console.log("Error: ", error)
+          }else{
+            console.log(result);
+          }
+        });
+
+        break
+      }
+  } while (isExist)
+
+  return petId
+}
+
+exports.getPet = async function (petId) {
+  let docs = await PetM.findOne({ PetId:petId });
+  return  docs;
+}
+
+exports.getUserPets = async function (usrIndex) {
+  let docs = await UserM.findOne({ username:usrIndex });
+  petArr = []
+
+  for (let i of docs.pets)
+  {
+    let petEntry = await PetM.findOne({ PetId:i });
+    petArr.push(petEntry)
+  }
+
+  return  petArr;
+}
+
+exports.updatePet = function(petInfo) {
+
+}
+
+exports.deletePet = async function(petId, userIndex) {
+  let ret = await PetM.findOneAndRemove({PetId:petId});
+  let docs = await UserM.findOne({ username:userIndex });
+
+  let index = -1
+  for (let i = 0; i < docs.pets.length; i++) {
+    if (petId == docs.pets[i]){
+      index = i
+      break
+    }
+  }
+  if (index > -1)
+    docs.pets.splice(index, 1);
+
+  UserM.findOneAndUpdate({username:userIndex},{pets: docs.pets},(error,result)=>{console.log("Successfully Updated User Pet Deletion!")})
+
+  return ret;
+}
+/*--------------------------------*/
