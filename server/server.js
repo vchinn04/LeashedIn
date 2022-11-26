@@ -56,6 +56,14 @@ app.post('/UserLogIn', async (req, res) => { //Get Event
   }
 });
 
+app.post('/UserCreateAccount', async (req, res) => { //Get Event
+  var inputDict = req.body;
+  console.log("Create account request!")
+  console.log(req.body)
+  console.log(req.body.email)
+  dataManager.addUser(req.body.email, req.body.displayName, req.body.password)
+});
+
 app.post('/PostTestEvent', (req, res) => {//Post Event, used to set data on server
   console.log(req.body);
 
