@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 
 
-
 class CreateAccount extends React.Component {
     static contextType = AuthContext;
     constructor(props) {
@@ -16,7 +15,7 @@ class CreateAccount extends React.Component {
         this.state =
         {
             email: '',
-            displayName: '',
+            username: '',
             password: ''
         };
 
@@ -39,8 +38,9 @@ class CreateAccount extends React.Component {
     async handleFormSubmit(event) {
         console.log(this.state.email)
         console.log(this.state.password)
-        console.log(this.state.displayName)
+        console.log(this.state.username)
   
+        //create the account
         fetch('/UserCreateAccount',
           {
             method: 'POST',
@@ -48,7 +48,7 @@ class CreateAccount extends React.Component {
               'Accept': 'application/json'
             },
             body: JSON.stringify({ email: this.state.email, password: this.state.password,
-                                displayName: this.state.displayName }),
+                                username: this.state.username }),
           }) .then((response) => response.json())
   
           .then((result) => {
@@ -67,6 +67,33 @@ class CreateAccount extends React.Component {
             console.log("Noo")
             console.error('Error:', error);
           });
+
+
+        //then login the user
+          fetch('/UserLogIn',
+        {
+          method: 'POST',
+          headers: { "Content-Type": "application/json",
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ email: this.state.email, password: this.state.password }),
+        }) .then((response) => response.json())
+
+        .then((result) => {
+          console.log('Success:', result.loginStatus);
+          if (!result.loginStatus)
+          {
+
+          }
+          else {
+          //  switchToMainPage()
+            this.props.setLoginState(result.username)
+          }
+        })
+        .catch((error) => {
+          console.log("Noo")
+          console.error('Error:', error);
+        });
       }
 
 
@@ -74,7 +101,7 @@ class CreateAccount extends React.Component {
         // mostly copied from react-bootstrap page examples
         // https://react-bootstrap.github.io/forms/overview/
         // slightly changed some css and centered it
-        return (
+        return (  
             <div className='loginContainer'>
                 <h1>Sign Up</h1>
                 <h2>Join the petwork</h2>
@@ -82,7 +109,7 @@ class CreateAccount extends React.Component {
                     <div>
                         <Form className="createAccountForm">
                             <Form.Group className="mb-3">
-                                <Form.Control required type="displayName" placeholder="Display Name" name="displayName" value={this.state.displayName} onChange={this.handleInputChange} />
+                                <Form.Control required type="username" placeholder="Username" name="username" value={this.state.username} onChange={this.handleInputChange} />
                             </Form.Group>
                             <Form.Group className="mb-3">
                                 <Form.Control required type="email" placeholder="Email" name="email" value={this.state.email} onChange={this.handleInputChange} />
@@ -90,8 +117,8 @@ class CreateAccount extends React.Component {
                             <Form.Group className="mb-3" controlId="formBasicPassword">
                                 <Form.Control required type="password" placeholder="Password" name="password" value={this.state.password} onChange={this.handleInputChange} />
                             </Form.Group>
-                            <Link to="/MoreInfoCreate">
-                                <Button type="button" disabled={(!this.state.email) || (!this.state.displayName) || (!this.state.password)} onClick={this.handleFormSubmit}>
+                            <Link to={`/MoreInfoCreate/${this.state.username}`}>
+                                <Button type="button" disabled={(!this.state.email) || (!this.state.username) || (!this.state.password)} onClick={this.handleFormSubmit}>
                                     Sign Up
                                 </Button>
                             </Link>
