@@ -60,10 +60,15 @@ app.get('/getUserProfileText', async (req, res) => { //Get Event
 });
 
 app.get('/getUserProfilePic', async (req, res) => { //Get Event
-  console.log(req.query)
+  console.log("Getting Profile Pic!")
   const userData = await dataManager.getUserData(req.query.username)
-  let imagePath = "/images/" + userData.profilePicture
-  res.sendFile(imagePath, { root: __dirname });
+  if (userData.profilePicture){
+    let imagePath = "/images/" + userData.profilePicture
+    res.sendFile(imagePath, { root: __dirname });
+  }
+  else {
+    res.send({result: false})
+  }
 });
 
 app.post('/UserLogIn', async (req, res) => { //Get Event
@@ -198,6 +203,49 @@ app.post('/CreatePet', pet_upload.single('petimage'), async (req, res) => {
   res.send(JSON.stringify(returnPet));
 });
 
+app.put('/CreatePet', pet_upload.single('petimage'), async (req, res) => {
+  console.log("Updating Pet!")
+  console.log(req.file)
+  console.log(req.body.PetType)
+  console.log(req.body.PetName)
+  console.log(req.body.PetDescription)
+  console.log(req.body.petId)
+
+  let oldPetEntry = await dataManager.getPet(req.body.petId)
+
+  if (!oldPetEntry)
+    res.send({ returnValue: false })
+
+  if (oldPetEntry.PetImage != "" && req.file)
+  {
+    const imagePath = __dirname + "/petpics/" + oldPetEntry.PetImage
+    fs.unlinkSync(imagePath)
+  }
+
+  const petEntry = {
+    PetId: req.body.petId,
+    PetType: req.body.PetType,
+    PetName: req.body.PetName,
+    PetDescription: req.body.PetDescription,
+    PetImage: ((req.file) ? req.file.filename : oldPetEntry.PetImage)
+  }
+
+  const success = await dataManager.updatePet(petEntry, req.body.petId);
+  let fileP = oldPetEntry.PetImage
+
+  if (req.file)
+    fileP = req.file.filename
+
+ returnPet = {
+    PetId: req.body.petId,
+    PetName: req.body.PetName,
+    PetImage: fileP
+  }
+
+  res.send(JSON.stringify(returnPet));
+});
+
+
 app.get('/getUserPets', async (req, res) => { //Get Event
   console.log(req.query)
   const petList = await dataManager.getUserPets(req.query.username)
@@ -222,7 +270,7 @@ app.delete('/DeletePet', async (req, res) => { //Get Event
     const imagePath = __dirname + "/petpics/" + petEntry.PetImage
     fs.unlinkSync(imagePath)
   }
-  
+
   let ret = await dataManager.deletePet(req.query.petId, req.query.userIndex)
   res.send({ returnValue: ret })
 });

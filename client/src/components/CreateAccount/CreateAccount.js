@@ -1,10 +1,15 @@
 import React from 'react';
-import { Form, Button, Container } from 'react-bootstrap';
-import '../Login/Login.css';
+import { Form, Container } from 'react-bootstrap';
+// import Button from 'react-bootstrap/Button';
 import './CreateAccount.css';
 import { AuthContext } from '../../context.js';
 import { Link } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
+import Divider from '@mui/material/Divider';
+import { styled } from '@mui/material/styles';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
 
 
 class CreateAccount extends React.Component {
@@ -98,42 +103,70 @@ class CreateAccount extends React.Component {
 
 
     render() {
-        // mostly copied from react-bootstrap page examples
-        // https://react-bootstrap.github.io/forms/overview/
-        // slightly changed some css and centered it
-        return (  
-            <div className='loginContainer'>
-                <h1>Sign Up</h1>
-                <h2>Join the petwork</h2>
-                <Container className='createAccountContainer' fluid>
-                    <div>
-                        <Form className="createAccountForm">
-                            <Form.Group className="mb-3">
-                                <Form.Control required type="username" placeholder="Username" name="username" value={this.state.username} onChange={this.handleInputChange} />
-                            </Form.Group>
-                            <Form.Group className="mb-3">
-                                <Form.Control required type="email" placeholder="Email" name="email" value={this.state.email} onChange={this.handleInputChange} />
-                            </Form.Group>
-                            <Form.Group className="mb-3" controlId="formBasicPassword">
-                                <Form.Control required type="password" placeholder="Password" name="password" value={this.state.password} onChange={this.handleInputChange} />
-                            </Form.Group>
-                            <Link to={`/MoreInfoCreate/${this.state.username}`}>
-                                <Button type="button" disabled={(!this.state.email) || (!this.state.username) || (!this.state.password)} onClick={this.handleFormSubmit}>
-                                    Sign Up
-                                </Button>
-                            </Link>
-                        </Form>
-                    </div>
-                </Container>
-
-                <Link to="/">
-                    <Button className="padTop" variant="secondary">
-                        Go back to login
-                    </Button>
-                </Link>
+      const disabledIf = (!this.state.email.length || !this.state.username.length || !this.state.password.length)
+        return (
+          <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+              }}> 
+            <div className='login-background-frame'>
+              <h1>Sign Up</h1>
+                  <h3>Join the petwork</h3>
+                  <Container className='createAccountContainer' fluid>
+                      <div>
+                          <Form className="createAccountForm">
+                              <Form.Group className="mb-1">
+                                  <TextField id="outlined-basic"
+                                  label="Username"
+                                  name="username"
+                                  margin = "normal"
+                                  value={this.state.username}
+                                  onChange={this.handleInputChange} />
+                              </Form.Group>
+                              <Form.Group className="mb-1">
+                                  <TextField id="outlined-basic"
+                                  label="Email"
+                                  name="email"
+                                  margin = "normal"
+                                  value={this.state.email}
+                                  onChange={this.handleInputChange} />
+                              </Form.Group>
+                              <Form.Group className="mb-1">
+                                  <TextField id="outlined-password-input"
+                                  label="Password"
+                                  name="password"
+                                  type="password"
+                                  margin = "normal"
+                                  value={this.state.password}
+                                  onChange={this.handleInputChange} />
+                              </Form.Group>
+                              <Button variant="contained"
+                              component={Link}
+                              to={`/MoreInfoCreate/${this.state.username}`}
+                              color="success"
+                              size="large"
+                              sx={{ fontWeight: 'bold' }}
+                              disabled={disabledIf}
+                                onClick={this.handleFormSubmit}>
+                                  Sign Up
+                              </Button>
+                          </Form>
+                      </div>
+                  </Container>
+                  <Divider variant="middle" sx={{ m: -0.5, mb: 3 }}/>
+                  <Button variant={disabledIf ? "contained" : "outlined"}
+                  component={Link}
+                  to="/"
+                  color="success"
+                  size="string"
+                  sx={{ fontWeight: 'bold' }}>
+                      Go back to login
+                  </Button>
             </div>
+          </div>
         );
     }
 };
-
 export default CreateAccount;

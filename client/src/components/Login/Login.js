@@ -54,11 +54,12 @@ class Login extends React.Component {
             [name]: value
         });
     }
+
     async handleFormSubmit(event) {
       console.log(this.state.email)
       console.log(this.state.password)
 
-      fetch('/UserLogIn',
+      fetch('/UserLogIn', // fire the server event to login user
         {
           method: 'POST',
           headers: { "Content-Type": "application/json",
@@ -74,8 +75,7 @@ class Login extends React.Component {
 
           }
           else {
-          //  switchToMainPage()
-            this.props.setLoginState(result.username)
+            this.props.setLoginState(result.username)  // login the user (will switch them to homepage)
           }
         })
         .catch((error) => {
