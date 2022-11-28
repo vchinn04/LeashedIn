@@ -64,11 +64,13 @@ const PetDisplay = (props) =>
               multiline
             />
         </Box>
-        <Box sx={{mt:2 ,textAlign:"center", height: '25',mb: 0, width: 0.85, mx: 'auto'}}>
+        {(props.canEdit) && <Box sx={{mt:2 ,textAlign:"center", height: '25',mb: 0, width: 0.85, mx: 'auto'}}>
           <Button className="delete-pet-button" variant="contained" size="large" color="error" onClick={() => {props.deletePet(props.petInfo)}} endIcon={<DeleteIcon  sx={{mt:0, width:25, height:25}} />}>
             Delete
           </Button>
+
         </Box>
+      }
       </div>
     </div>
   }

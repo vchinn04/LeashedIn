@@ -60,10 +60,15 @@ app.get('/getUserProfileText', async (req, res) => { //Get Event
 });
 
 app.get('/getUserProfilePic', async (req, res) => { //Get Event
-  console.log(req.query)
+  console.log("Getting Profile Pic!")
   const userData = await dataManager.getUserData(req.query.username)
-  let imagePath = "/images/" + userData.profilePicture
-  res.sendFile(imagePath, { root: __dirname });
+  if (userData.profilePicture){
+    let imagePath = "/images/" + userData.profilePicture
+    res.sendFile(imagePath, { root: __dirname });
+  }
+  else {
+    res.send({result: false})
+  }
 });
 
 app.post('/UserLogIn', async (req, res) => { //Get Event

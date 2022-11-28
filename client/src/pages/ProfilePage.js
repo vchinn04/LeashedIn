@@ -34,12 +34,14 @@ const EditSaveButton = (props) =>
     )
 }
 
-const ProfilePage = (props ) =>
+const ProfilePage = (props) =>
 {
   let { id } = useParams(); // access the query parameter passed in
+
+  const [currentId, setCurrentId] = useState(id);
   const [aboutState, setAboutState] = useState(""); // Stores the owners about me text
   const [isEditing, setEdit] = useState(false); // boolean that stores wether user is editing page or not
-  const [ownerName, setName] = useState("Victor Chinnappan"); // stores the owner's name
+  const [ownerName, setName] = useState(""); // stores the owner's name
   const [inputImage, setImage] = useState(null); // stores the processed image for use with avatar
   const [inputImagePath, setImagePath] = useState(null); // stores the path to uploaded image
   const [inputImageFile, setImageFile] = useState(null); // stores the image file
@@ -199,11 +201,11 @@ const ProfilePage = (props ) =>
     setCurrentPet(petName);
   }
 
-  useEffect(() => {
+  const setUpFunction = () => {
     const getData = async() => {
-      const url = '/getUserProfileText?' + new URLSearchParams({ username: props.loginStatus }).toString()
-      const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username: props.loginStatus }).toString()
-      const getPetListURL = '/getUserPets?' + new URLSearchParams({ username: props.loginStatus }).toString()
+      const url = '/getUserProfileText?' + new URLSearchParams({ username: id }).toString()
+      const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username: id }).toString()
+      const getPetListURL = '/getUserPets?' + new URLSearchParams({ username: id }).toString()
 
       fetch(getPetListURL).then((response) => response.json())
        .then((result) => {
@@ -246,11 +248,8 @@ const ProfilePage = (props ) =>
                  fetch(url).then((response) => response.json())
                  .then((result) => {
                    console.log('Info retrieval success!');
-                   if (result.aboutMe)
-                     setAboutState(result.aboutMe)
-
-                   if (result.ownerName)
-                     setName(result.ownerName)
+                   setAboutState(result.aboutMe)
+                   setName(result.ownerName)
                  })
                  .catch((error) => {
                    console.error('Error:', error);
@@ -274,14 +273,21 @@ const ProfilePage = (props ) =>
     }
 
     getData()
+  }
 
+  useEffect(() => {
+    setUpFunction()
   }, []);
 
+  if (id != currentId){
+    setUpFunction()
+    setCurrentId(id)
+  }
   return (
       <div className="profile-page-frame">
 
         <NavBar loginStatus={props.loginStatus} setLoginState={props.setLoginState} />
-        {currentPet && ((currentPet == "add") ? <CreatePet  handlePetAdd={handlePetAdd} petInfo={"add"} setCurrentPet={setCurrentPet}/> : <PetDisplay  handlePetUpdate={handlePetUpdate} deletePet={deletePet} petInfo={currentPet} canEdit={(props.loginStatus == id)} setCurrentPet={setCurrentPet}/>)}
+        {currentPet && ((currentPet == "add") ? <CreatePet  handlePetAdd={handlePetAdd} petInfo={"add"} setCurrentPet={setCurrentPet}/> : <PetDisplay  canEdit={(props.loginStatus == id)} handlePetUpdate={handlePetUpdate} deletePet={deletePet} petInfo={currentPet} canEdit={(props.loginStatus == id)} setCurrentPet={setCurrentPet}/>)}
         <div className="info-frame">
 
           <div className="pic-frame">
@@ -307,7 +313,7 @@ const ProfilePage = (props ) =>
               inputProps={{style: {fontSize: 32, color: '#825DD7', textAlign: 'center',fontFamily: 'Verdana', fontWeight: "bold"}}} onChange={(event) => {setName(event.target.value)}}
             />}
 
-            <h2 className="subname">@{props.loginStatus}</h2>
+            <h2 className="subname">@{id}</h2>
           </div>
 
           <div className="about-me-frame">
