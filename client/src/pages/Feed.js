@@ -30,25 +30,6 @@
 //   }
 // } */
 
-// class Feed extends React.Component
-// {
-//   constructor(props) {
-//     console.log("Constructor Feed called!")
-
-//     super(props);
-//   }
-
-//   render() {
-//     return (
-//         <Paper style={{maxHeight: 800, maxWidth: 800, overflow: 'auto', backgroundColor: '#FAF9F6', margin: 100}}>
-//           <View className = 'feed-frame'>
-//             <List style = {{margin: 100}}>
-//                 {temp.map((post, key) => (
-//                           <Post post = {post} key = {post.key}/>
-//                       ))}
-//             </List>
-//           </View>
-//       </Paper>
 
 //     );
 //   }
