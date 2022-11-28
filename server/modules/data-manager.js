@@ -147,8 +147,11 @@ exports.getUserPets = async function (usrIndex) {
   return  petArr;
 }
 
-exports.updatePet = function(petInfo) {
-
+exports.updatePet = async function(petInfo, petId) {
+  console.log(petInfo)
+  console.log(petId)
+  await PetM.findOneAndUpdate({PetId:petId}, petInfo);
+  return true
 }
 
 exports.deletePet = async function(petId, userIndex) {

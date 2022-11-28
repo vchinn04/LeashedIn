@@ -8,8 +8,9 @@ import CreateAccount from "../components/CreateAccount/CreateAccount"
 import MoreInfoCreate from "../components/CreateAccount/MoreInfoCreate"
 import Login from "../components/Login/Login"
 import ProfilePage from "./ProfilePage"
+
 const Router = () => {
-  const [loginStatus, setLoginState] = LoginState();
+  const [loginStatus, setLoginState] = LoginState();  //Create hook
 
   console.log(loginStatus)
 
