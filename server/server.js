@@ -93,6 +93,32 @@ app.post('/UserLogIn', async (req, res) => { //Get Event
   }
 });
 
+app.post('/UserCreateAccount', async (req, res) => { //Get Event
+  var inputDict = req.body;
+  console.log("Create account request!")
+  console.log(req.body)
+  console.log(req.body.email)
+  dataManager.addUser(req.body.email, req.body.username, req.body.password)
+});
+
+app.post('/MoreInfoCreateUpdateProfile', async (req, res) => {
+  console.log(req.body.entityType)
+  console.log(req.body.aboutMe)
+  console.log(req.body.ownerName)
+  console.log(req.body.username)
+
+  const userInfo = {
+    entityType: req.body.entityType,
+    aboutMe: req.body.aboutMe,
+    ownerName: req.body.ownerName,
+    username: req.body.username
+  }
+
+  dataManager.moreInfoCreateUpdateUser(userInfo);
+  res.send(JSON.stringify({ loginStatus: "ohh yea", errorMessage: 'No Errors!' }));
+
+});
+
 app.post('/PostTestEvent', (req, res) => {//Post Event, used to set data on server
   console.log(req.body);
 

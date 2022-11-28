@@ -6,9 +6,10 @@ const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
   email: String,
+  entityType: String, //whether they're a pet owner, event organizer, etc.
   password: String,
   aboutMe: String,
-  ownerName: String,
+  ownerName: String, //AKA displayName
   pets: Array,
   profilePicture: String,
   username: String
@@ -40,10 +41,10 @@ exports.setupMongo = async function () { //Connect to our database and output th
   }
 }
 
-exports.addUser = async function (usrIdV, usrNameV, usrHobbyV) {
+exports.addUser = async function (usrEmailV, usrNameV, usrPasswordV) {
   console.log("Adding user");
 
-  const userEntry = new UserM({ usrId: usrIdV, name: usrNameV, hobby: usrHobbyV }); //Create a model (documet) for user
+  const userEntry = new UserM({email: usrEmailV, username: usrNameV, password: usrPasswordV}); //Create a model (documet) for user
 
   await userEntry.save(); //Save to our database
 
@@ -80,6 +81,17 @@ exports.getUserList =  async function (searchParams) { //Getter function templat
   console.log(docs)
   console.log("------------------")
   return  docs;
+}
+
+exports.moreInfoCreateUpdateUser = function (userInfo) { //Function will be used for updating existing users data
+  console.log("Updating user");
+   UserM.findOneAndUpdate({username: userInfo.username},{entityType: userInfo.entityType, ownerName: userInfo.ownerName, aboutMe: userInfo.aboutMe},function(error,result){
+     if(error){
+       console.log("Error: ", error)
+     }else{
+       console.log(result);
+     }
+   });
 }
 
 exports.updateUser = function (userInfo) { //Function will be used for updating existing users data

@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 
 
-
 class CreateAccount extends React.Component {
     static contextType = AuthContext;
     constructor(props) {
@@ -17,7 +16,6 @@ class CreateAccount extends React.Component {
         {
             email: '',
             username: '',
-            displayName: '',
             password: ''
         };
 
@@ -38,55 +36,78 @@ class CreateAccount extends React.Component {
     }
 
     async handleFormSubmit(event) {
-        event.preventDefault();
-        // POST request using fetch with async/await
-        const requestOptions = {
-            credentials: 'include',
+        console.log(this.state.email)
+        console.log(this.state.password)
+        console.log(this.state.username)
+  
+        //create the account
+        fetch('/UserCreateAccount',
+          {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: this.state.email, username: this.state.username,
-                displayName: this.state.displayName, password: this.state.password })
-        };
-        const response = await fetch('http://localhost:4000/user/signup', requestOptions);
-        const data = await response.json();
-        console.log(data)
+            headers: { "Content-Type": "application/json",
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({ email: this.state.email, password: this.state.password,
+                                username: this.state.username }),
+          }) .then((response) => response.json())
+  
+          .then((result) => {
+            console.log('Success:', result.loginStatus);
+            if (!result.loginStatus)
+            {
+  
+            }
+            else {
+            //  switchToMainPage()
+             console.log(this.props)
+              this.props.setLoginState(true)
+            }
+          })
+          .catch((error) => {
+            console.log("Noo")
+            console.error('Error:', error);
+          });
 
-        if (data.errors || data.message) {
-            // alert to error
-            alert("Incorrect username or password.");
-        }
-        //auth token is saved as a cookie
-        // if it was successful
 
-        if (data.token) {
-            // dispatch() from AuthContext with auth token from response
-            console.log("Successful login...");
-            this.context.dispatch({
-                type: "LOGIN",
-                payload: {
-                    ...data,
-                    email: this.state.email
-                }
-            });
-        }
+        //then login the user
+          fetch('/UserLogIn',
+        {
+          method: 'POST',
+          headers: { "Content-Type": "application/json",
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ email: this.state.email, password: this.state.password }),
+        }) .then((response) => response.json())
 
-    }
+        .then((result) => {
+          console.log('Success:', result.loginStatus);
+          if (!result.loginStatus)
+          {
+
+          }
+          else {
+          //  switchToMainPage()
+            this.props.setLoginState(result.username)
+          }
+        })
+        .catch((error) => {
+          console.log("Noo")
+          console.error('Error:', error);
+        });
+      }
 
 
     render() {
         // mostly copied from react-bootstrap page examples
         // https://react-bootstrap.github.io/forms/overview/
         // slightly changed some css and centered it
-        return (
+        return (  
             <div className='loginContainer'>
                 <h1>Sign Up</h1>
                 <h2>Join the petwork</h2>
                 <Container className='createAccountContainer' fluid>
                     <div>
-                        <Form className="createAccountForm" onSubmit={this.handleFormSubmit}>
-                            <Form.Group className="mb-3">
-                                <Form.Control required type="displayName" placeholder="Display Name" name="displayName" value={this.state.displayName} onChange={this.handleInputChange} />
-                            </Form.Group>
+                        <Form className="createAccountForm">
                             <Form.Group className="mb-3">
                                 <Form.Control required type="username" placeholder="Username" name="username" value={this.state.username} onChange={this.handleInputChange} />
                             </Form.Group>
@@ -96,8 +117,8 @@ class CreateAccount extends React.Component {
                             <Form.Group className="mb-3" controlId="formBasicPassword">
                                 <Form.Control required type="password" placeholder="Password" name="password" value={this.state.password} onChange={this.handleInputChange} />
                             </Form.Group>
-                            <Link to="/MoreInfoCreate">
-                                <Button type="button" disabled={(!this.state.email) || (!this.state.displayName) || (!this.state.username) || (!this.state.password)}>
+                            <Link to={`/MoreInfoCreate/${this.state.username}`}>
+                                <Button type="button" disabled={(!this.state.email) || (!this.state.username) || (!this.state.password)} onClick={this.handleFormSubmit}>
                                     Sign Up
                                 </Button>
                             </Link>
