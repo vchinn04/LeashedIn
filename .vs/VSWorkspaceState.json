@@ -3,14 +3,11 @@
     "",
     "\\client",
     "\\client\\src",
-    "\\client\\src\\components",
-    "\\client\\src\\components\\Following",
+    "\\client\\src\\components\\Login",
     "\\client\\src\\components\\NavBar",
-    "\\client\\src\\images",
-    "\\client\\src\\pages",
     "\\server",
     "\\server\\modules"
   ],
-  "SelectedNode": "\\client\\src\\components\\Following\\Following.css",
+  "SelectedNode": "\\client\\src\\setupProxy.js",
   "PreviewInSolutionExplorer": false
 }
