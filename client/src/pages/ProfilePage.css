@@ -116,3 +116,7 @@
   right: 0px;
   left: auto;
 }
+
+.IconButton {
+  padding: EdgeInsets.zero;
+}

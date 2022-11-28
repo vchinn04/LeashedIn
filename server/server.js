@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({ extended: true })); //Does same as line above bu
 const multer  = require('multer')
 const fs = require('fs')
 
-const fileStorageEngine = multer.diskStorage({
+const pfpStorageEngine = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "./images");
   },
@@ -20,7 +20,17 @@ const fileStorageEngine = multer.diskStorage({
   }
 })
 
-const upload = multer({ storage: fileStorageEngine })
+const petStorageEngine = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./petpics");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "---" + file.originalname)
+  }
+})
+const upload = multer({ storage: pfpStorageEngine })
+const pet_upload = multer({ storage: petStorageEngine })
+
 testDict = { //IGNORE just used to make sure client-server communication worked!
   "vchinn04" : {
     "money": 0,
@@ -53,9 +63,8 @@ app.get('/getUserProfilePic', async (req, res) => { //Get Event
   console.log(req.query)
   const userData = await dataManager.getUserData(req.query.username)
   let imagePath = "/images/" + userData.profilePicture
-  res.sendfile(imagePath, { root: __dirname });
+  res.sendFile(imagePath, { root: __dirname });
 });
-
 
 app.post('/UserLogIn', async (req, res) => { //Get Event
   var inputDict = req.body;
@@ -82,6 +91,32 @@ app.post('/UserLogIn', async (req, res) => { //Get Event
     console.log(userData.username)
     res.send(JSON.stringify({ loginStatus: true, username: userObj.username, errorMessage: 'No Errors!' }));
   }
+});
+
+app.post('/UserCreateAccount', async (req, res) => { //Get Event
+  var inputDict = req.body;
+  console.log("Create account request!")
+  console.log(req.body)
+  console.log(req.body.email)
+  dataManager.addUser(req.body.email, req.body.username, req.body.password)
+});
+
+app.post('/MoreInfoCreateUpdateProfile', async (req, res) => {
+  console.log(req.body.entityType)
+  console.log(req.body.aboutMe)
+  console.log(req.body.ownerName)
+  console.log(req.body.username)
+
+  const userInfo = {
+    entityType: req.body.entityType,
+    aboutMe: req.body.aboutMe,
+    ownerName: req.body.ownerName,
+    username: req.body.username
+  }
+
+  dataManager.moreInfoCreateUpdateUser(userInfo);
+  res.send(JSON.stringify({ loginStatus: "ohh yea", errorMessage: 'No Errors!' }));
+
 });
 
 app.post('/PostTestEvent', (req, res) => {//Post Event, used to set data on server
@@ -128,6 +163,71 @@ app.post('/UpdateProfile', upload.single('image'), async (req, res) => {
   res.send(JSON.stringify({ loginStatus: "ohh yea", errorMessage: 'No Errors!' }));
 
 });
+
+
+/*-----------PET FUNCTIONS----------*/
+
+app.post('/CreatePet', pet_upload.single('petimage'), async (req, res) => {
+  console.log("Creating Pet!")
+  console.log(req.file)
+  console.log(req.body.PetType)
+  console.log(req.body.PetName)
+  console.log(req.body.PetDescription)
+
+  const petEntry = {
+    PetType: req.body.PetType,
+    PetName: req.body.PetName,
+    PetDescription: req.body.PetDescription,
+    PetImage: ((req.file) ? req.file.filename : "")
+  }
+
+  const petId = await dataManager.createPet(petEntry, req.body.userIndex);
+  let fileP = ""
+
+  if (req.file)
+    fileP = req.file.filename
+
+ returnPet = {
+    PetId: petId,
+    PetType: req.body.PetType,
+    PetName: req.body.PetName,
+    PetDescription: req.body.PetDescription,
+    PetImage: fileP
+  }
+
+  res.send(JSON.stringify(returnPet));
+});
+
+app.get('/getUserPets', async (req, res) => { //Get Event
+  console.log(req.query)
+  const petList = await dataManager.getUserPets(req.query.username)
+  res.send(petList)
+});
+
+app.get('/getPetPic', async (req, res) => { //Get Event
+  console.log(req.query)
+  let imagePath = "/petpics/" + req.query.imagePath
+  res.sendfile(imagePath, { root: __dirname });
+});
+
+app.delete('/DeletePet', async (req, res) => { //Get Event
+  console.log(req.query)
+  let petEntry = await dataManager.getPet(req.query.petId)
+
+  if (!petEntry)
+    res.send({ returnValue: false })
+
+  if (petEntry.PetImage != "")
+  {
+    const imagePath = __dirname + "/petpics/" + petEntry.PetImage
+    fs.unlinkSync(imagePath)
+  }
+  
+  let ret = await dataManager.deletePet(req.query.petId, req.query.userIndex)
+  res.send({ returnValue: ret })
+});
+/*--------------------------------*/
+
 
 dataManager.setupMongo().catch(err => console.log(err)); //Initialize the DataBase in the data-manager modules
 app.listen(port, () => console.log(`Server Up! Listening on port ${port}`)); //Binds server to localhost:5000

@@ -7,6 +7,11 @@ import { Link } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Select from "react-select";
+import { useParams } from "react-router-dom";
+
+function withParams(Component) {
+  return props => <Component {...props} params={useParams()} />;
+}
 
 class MoreInfoCreate extends React.Component {
     static contextType = AuthContext;
@@ -15,11 +20,12 @@ class MoreInfoCreate extends React.Component {
         // initialize username and password so form is controlled
         this.state =
         {
-            value: 'selectAccountType',
+            entityType: 'selectAccountType',
+            aboutMe: '', //contains petsArray (pet tags)
             pet: '',
             petsArray: [],
-            petName: '',
-            organizationName: '',
+            ownerName: '',
+            username: '',
             options: [
                 {value: 'amphibian', label: 'amphibian'},
                 {value: 'cat', label: 'cat'},
@@ -38,9 +44,18 @@ class MoreInfoCreate extends React.Component {
         };
 
         this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleFormSubmit = this.handleFormSubmit.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
         this.multiPetSelectHandleOnChange = this.multiPetSelectHandleOnChange.bind(this);
     }
+
+    componentDidMount() {
+        let { id } = this.props.params;
+        this.fetchData(id);
+    }
+
+    fetchData = id => {
+        this.setState({username: id})
+    };
 
     // neat trick to handle all changes to both forms
     // from React tutorial on forms
@@ -54,43 +69,48 @@ class MoreInfoCreate extends React.Component {
         });
     }
 
-    async handleFormSubmit(event) {
-        event.preventDefault();
-        // POST request using fetch with async/await
-        const requestOptions = {
-            credentials: 'include',
+    handleSubmit() {
+  
+        fetch('/MoreInfoCreateUpdateProfile',
+          {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: this.state.email, username: this.state.username,
-                displayName: this.state.displayName, password: this.state.password })
-        };
-        const response = await fetch('http://localhost:4000/user/signup', requestOptions);
-        const data = await response.json();
-        console.log(data)
-
-        if (data.errors || data.message) {
-            // alert to error
-            alert("Incorrect username or password.");
-        }
-        //auth token is saved as a cookie
-        // if it was successful
-
-        if (data.token) {
-            // dispatch() from AuthContext with auth token from response
-            console.log("Successful login...");
-            this.context.dispatch({
-                type: "LOGIN",
-                payload: {
-                    ...data,
-                    email: this.state.email
-                }
-            });
-        }
-
+            headers: { "Content-Type": "application/json",
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({ ownerName: this.state.ownerName, entityType: this.state.entityType,
+                                aboutMe: this.state.aboutMe, username: this.state.username}),
+          }) .then((response) => response.json())
+  
+          .then((result) => {
+            console.log('Success:', result.loginStatus);
+         })
+         .catch((error) => {
+           console.error('Error:', error);
+         });
     }
 
+    // handleSubmit() {
+    //   var data = new FormData()
+    //   data.append('ownerName', ownerName)
+    //   data.append('entityType', entityType)
+    //   data.append('aboutMe', aboutMe) //will contain petsArray
+  
+    //   fetch('/MoreInfoCreateUpdateProfile',
+    //     {
+    //       method: 'POST',
+    //       body: data
+    //     }).then((response) => response.json())
+  
+    //     .then((result) => {
+    //        console.log('Success:', result.loginStatus);
+    //     })
+    //     .catch((error) => {
+    //       console.error('Error:', error);
+    //     });
+    //   }
+
     entityHandleOnChange = (a) => {
-        this.setState({value: a.target.value});
+        this.setState({entityType: a.target.value});
     };
 
     petSelectHandleOnChange = (a) => {
@@ -106,10 +126,17 @@ class MoreInfoCreate extends React.Component {
     }
 
     render() {
-        const value = this.state.value;
+        const entityType = this.state.entityType;
+        // const { id } = useParams();
+        // this.setState({username: id});
         let createForm;
-        if (value == "eventOrganizer") {
+        console.log("THIS IS IT");
+        if (entityType == "eventOrganizer") {
             createForm = <div classname="mt-4">
+                                <Form.Group className="mb-3">
+                                    <Form.Control required type="ownerName" placeholder="Your First and Last Name" name="ownerName"
+                                    value={this.state.ownerName} onChange={this.handleInputChange}/>
+                                </Form.Group>
                                  <Container className='eventOrganizerPets' fluid>
                                 <div>
                                     <h>I plan to host events for</h>
@@ -120,9 +147,13 @@ class MoreInfoCreate extends React.Component {
                                 </div>
                             </Container>
                             </div>;
-        } else if (value == "petOwner") {
+        } else if (entityType == "petOwner") {
             createForm = <div classname="mt-4">
                             <Form.Group className="mb-3">
+                                <Form.Control required type="ownerName" placeholder="Your First and Last Name" name="ownerName"
+                                value={this.state.ownerName} onChange={this.handleInputChange}/>
+                            </Form.Group>
+                            {/* <Form.Group className="mb-3">
                                 <Form.Control required type="petName" placeholder="Pet Name" name="petName" value={this.state.petName} onChange={this.handleInputChange}/>
                             </Form.Group>
                             <Container className='petOwnerPet' fluid>
@@ -130,13 +161,13 @@ class MoreInfoCreate extends React.Component {
                                     <h>My pet is {(this.state.pet == "insect" || this.state.pet == "amphibian") ? "an" : "a"}</h>
                                     <Select className="form-select" onChange={this.petSelectHandleOnChange} options={this.state.options}/>
                                 </div>
-                            </Container>
+                            </Container> */}
                         </div>;
-        } else if (value == "shelterOrStore") {
+        } else if (entityType == "shelterOrStore") {
             createForm = <div classname="mt-4">
                             <Form.Group className="mb-3">
-                                <Form.Control required type="organizationName" placeholder="Name of Shelter or Store" name="organizationName"
-                                 value={this.state.organizationName} onChange={this.handleInputChange}/>
+                                <Form.Control required type="ownerName" placeholder="Name of Shelter or Store" name="ownerName"
+                                 value={this.state.ownerName} onChange={this.handleInputChange}/>
                             </Form.Group>
                             <Container className='shelterOrStorePets' fluid>
                                 <div>
@@ -154,8 +185,8 @@ class MoreInfoCreate extends React.Component {
                 <Container className='createAccountContainer' fluid>
                     <div>
                         <div className="mt-4">
-                            <h>I am {this.state.value == "eventOrganizer" ? "an" : "a"} </h>
-                            <select className="form-select" onChange={this.entityHandleOnChange} value={this.state.value}>
+                            <h>I am {this.state.entityType == "eventOrganizer" ? "an" : "a"} </h>
+                            <select className="form-select" onChange={this.entityHandleOnChange} entityHandleOnChange={this.state.entityType}>
                                 <option value="selectAccountType">select one</option>
                                 <option value="petOwner">pet owner</option>
                                 <option value="eventOrganizer">event organizer</option>
@@ -166,10 +197,10 @@ class MoreInfoCreate extends React.Component {
                 </Container>
                 {createForm}
                 <Link to="/">
-                    <Button type="button" disabled={(this.state.value == "petOwner" && ((! this.state.petName) || (! this.state.pet))) ||
-                                                    (this.state.value == "eventOrganizer" && (! this.state.petsArray.length)) ||
-                                                    (this.state.value == "shelterOrStore" && ((! this.state.organizationName) || (! this.state.petsArray.length))) ||
-                                                    (this.state.value == "selectAccountType")}>
+                    <Button type="button" disabled={(this.state.entityType == "petOwner" && (! this.state.ownerName)) ||
+                                                    (this.state.entityType == "eventOrganizer" && ((! this.state.ownerName) || (! this.state.petsArray.length))) ||
+                                                    (this.state.entityType == "shelterOrStore" && ((! this.state.ownerName) || (! this.state.petsArray.length))) ||
+                                                    (this.state.entityType == "selectAccountType")} onClick={this.handleSubmit}>
                         Let's Go
                     </Button>
                 </Link>
@@ -178,4 +209,4 @@ class MoreInfoCreate extends React.Component {
     }
 };
 
-export default MoreInfoCreate;
+export default withParams(MoreInfoCreate);
