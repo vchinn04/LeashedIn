@@ -1,49 +1,61 @@
-.main-frame {
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    left:0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+.login-background-frame {
+  width: 415px;
+  height: 65%;
+  border-radius: 5.5%;
 
-  .homepage-stripe-background {
-    width: 100%;
-    height: 625px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #EEEFF1;
+  background: #FFFFFF;
 
-  }
+  box-shadow: 0px 0px 13px #C5C5C5;
+  z-index: 20;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 
-  .description-frame {
-    width: 20%;
-    height: 50%;
-    clear: both;
-    position: relative;
-  }
+  position: relative;
 
-  .logo-text {
-    text-align: left;
-    font-family: Verdana, Aral, sans-serif;
-    font-size: 2.9vw;
-    color: #825DD7;
-    margin-bottom: 0px;
-    margin-top: 0px;
+}
 
-  }
-  .app-description span {
-    text-align: left;
-    display: block;
-    font-family: Verdana, Aral, sans-serif;
-    font-size: 0.95vw;
-    color: #515151;
-    margin-bottom: 0px;
-    margin-top: 0px;
-    margin-left: 1%;
-  }
+.loginContainer {
+  width: 75%;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+h3 {
+text-align: center;
+font-family: Verdana, Aral, sans-serif;
+
+color: #515151;
+
+}
   
+h3 {
+  text-align: center;
+  font-family: Verdana, Aral, sans-serif;
+
+  color: #515151;
+
+}
+
+h {
+  text-align: center;
+  font-family: Verdana, Aral, sans-serif;
+
+  color: #515151;
+
+}
+
+h1 {
+  text-align: center;
+  font-family: Verdana, Aral, sans-serif;
+
+  color: #825DD7;
+
+}
+
+.padTop {
+    margin-top: 40px;
+}
