@@ -57,7 +57,7 @@ exports.getUser =  async function (usrIndex) { //Getter function template
   console.log("Getting user");
   console.log(usrIndex)
 
-  let docs = await UserM.find({ email:usrIndex });
+  let docs = await UserM.find({ username:usrIndex });
   console.log("--------DOCS-----------")
   console.log(docs)
   console.log("------------------")

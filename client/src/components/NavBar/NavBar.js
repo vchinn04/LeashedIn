@@ -200,7 +200,7 @@ const NavBar = (props) =>
         </div>
 
         <IconButton color="primary" aria-label="profile"  component={Link} to={`/profile/${props.loginStatus}`}>
-          <Avatar src={inputImage} alt="Profile" />
+          <Avatar src={inputImage} />
         </IconButton>
 
         <IconButton aria-label="logout" onClick={() => props.setLoginState(false)} component={Link} to="/">
