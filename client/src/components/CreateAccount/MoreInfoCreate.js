@@ -133,14 +133,14 @@ class MoreInfoCreate extends React.Component {
     };
 
     multiPetSelectHandleOnChange(a) {
+        this.setState({ //add the pets to aboutme
+            aboutMe: JSON.stringify(this.state.petsArray)
+        });
         this.setState(state => {
             return {
               petsArray: a,
             };
           });
-        this.setState({
-            aboutMe: JSON.stringify(this.state.petsArray)
-        });
     }
 
     render() {
@@ -229,12 +229,6 @@ class MoreInfoCreate extends React.Component {
                                 onChange={this.entityHandleOnChange}
                                 value={{label: this.state.entityTypeName}}
                                 options={this.state.entityOptions}/>
-                                {/* <select className="form-select" onChange={this.entityHandleOnChange} entityHandleOnChange={this.state.entityType}>
-                                    <option value="selectAccountType">select one</option>
-                                    <option value="petOwner">pet owner</option>
-                                    <option value="eventOrganizer">event organizer</option>
-                                    <option value="shelterOrStore">pet shelter or store</option>
-                                </select> */}
                             </div>
                         </div>
                     </Container>

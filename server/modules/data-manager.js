@@ -41,18 +41,6 @@ exports.setupMongo = async function () { //Connect to our database and output th
   }
 }
 
-exports.addUser = async function (usrEmailV, usrNameV, usrPasswordV) {
-  console.log("Adding user");
-
-  const userEntry = new UserM({email: usrEmailV, username: usrNameV, password: usrPasswordV}); //Create a model (documet) for user
-
-  await userEntry.save(); //Save to our database
-
-  const userss = await UserM.find(); //Trying to retrieve all the Users collection  documents.
-  console.log(userss);
-  console.log(userEntry);
-}
-
 exports.getUser =  async function (usrIndex) { //Getter function template
   console.log("Getting user");
   console.log(usrIndex)
@@ -69,6 +57,7 @@ exports.getUserData =  async function (usrIndex) { //Getter function template
   console.log(usrIndex)
 
   let docs = await UserM.findOne({ username:usrIndex });
+  console.log("THE USER DATA:", docs)
   return  docs;
 }
 
@@ -81,6 +70,24 @@ exports.getUserList =  async function (searchParams) { //Getter function templat
   console.log(docs)
   console.log("------------------")
   return  docs;
+}
+
+exports.addUser = async function (usrEmailV, usrNameV, usrPasswordV) {
+  console.log("Attempting to add user");
+
+  if (await exports.getUserData(usrNameV) != null) { //check if the user already exists
+    console.log("USER ALREADY EXISTS! USER WON'T BE ADDED!")
+    return -1;
+  }
+  console.log("Username not taken! Will add user:", usrNameV)
+
+  const userEntry = new UserM({email: usrEmailV, username: usrNameV, password: usrPasswordV}); //Create a model (documet) for user
+
+  await userEntry.save(); //Save to our database
+
+  const userss = await UserM.find(); //Trying to retrieve all the Users collection  documents.
+  console.log(userss);
+  console.log(userEntry);
 }
 
 exports.moreInfoCreateUpdateUser = function (userInfo) { //Function will be used for updating existing users data

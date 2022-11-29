@@ -103,7 +103,12 @@ app.post('/UserCreateAccount', async (req, res) => { //Get Event
   console.log("Create account request!")
   console.log(req.body)
   console.log(req.body.email)
-  dataManager.addUser(req.body.email, req.body.username, req.body.password)
+  const CreateResult = dataManager.addUser(req.body.email, req.body.username, req.body.password)
+  if (CreateResult == -1) {
+    res.send(JSON.stringify({ IsSuccessful: false })) //was not able to create account, because one with given username already exists
+  } else {
+    res.send(JSON.stringify({ IsSuccessful: true })) //acount successfully created
+  }
 });
 
 app.post('/MoreInfoCreateUpdateProfile', async (req, res) => {

@@ -63,43 +63,38 @@ class CreateAccount extends React.Component {
   
             }
             else {
-            //  switchToMainPage()
-             console.log(this.props)
-              this.props.setLoginState(true)
+                   //then attempt to login the user
+                  fetch('/UserLogIn',
+                {
+                  method: 'POST',
+                  headers: { "Content-Type": "application/json",
+                    'Accept': 'application/json'
+                  },
+                  body: JSON.stringify({ email: this.state.email, password: this.state.password }),
+                }) .then((response) => response.json())
+
+                .then((result) => {
+                  console.log('Success:', result.loginStatus);
+                  if (!result.loginStatus)
+                  {
+
+                  }
+                  else {
+                  //  switchToMainPage()
+                    this.props.setLoginState(result.username)
+                  }
+                })
+                .catch((error) => {
+                  console.log("Noo")
+                  console.error('Error:', error);
+                });
             }
           })
           .catch((error) => {
             console.log("Noo")
             console.error('Error:', error);
           });
-
-
-        //then login the user
-          fetch('/UserLogIn',
-        {
-          method: 'POST',
-          headers: { "Content-Type": "application/json",
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({ email: this.state.email, password: this.state.password }),
-        }) .then((response) => response.json())
-
-        .then((result) => {
-          console.log('Success:', result.loginStatus);
-          if (!result.loginStatus)
-          {
-
-          }
-          else {
-          //  switchToMainPage()
-            this.props.setLoginState(result.username)
-          }
-        })
-        .catch((error) => {
-          console.log("Noo")
-          console.error('Error:', error);
-        });
-      }
+    }       
 
 
     render() {
@@ -122,6 +117,7 @@ class CreateAccount extends React.Component {
                                   label="Username"
                                   name="username"
                                   margin = "normal"
+                                  size="small"
                                   value={this.state.username}
                                   onChange={this.handleInputChange} />
                               </Form.Group>
@@ -130,6 +126,7 @@ class CreateAccount extends React.Component {
                                   label="Email"
                                   name="email"
                                   margin = "normal"
+                                  size="small"
                                   value={this.state.email}
                                   onChange={this.handleInputChange} />
                               </Form.Group>
@@ -139,6 +136,7 @@ class CreateAccount extends React.Component {
                                   name="password"
                                   type="password"
                                   margin = "normal"
+                                  size="small"
                                   value={this.state.password}
                                   onChange={this.handleInputChange} />
                               </Form.Group>
