@@ -171,7 +171,11 @@ app.post('/UpdateProfile', upload.single('image'), async (req, res) => {
   if (userData.profilePicture)
   {
     const imagePath = __dirname + "/images/" + userData.profilePicture
-    fs.unlinkSync(imagePath)
+    if (userData.profilePicture.length > 3)
+      fs.exists(imagePath,  (exists) => {
+        if (exists)
+          fs.unlinkSync(imagePath)
+      });
   }
 
   dataManager.updateUser(userInfo);
@@ -294,7 +298,12 @@ app.delete('/DeletePet', async (req, res) => { //Get Event
   if (petEntry.PetImage != "")
   {
     const imagePath = __dirname + "/petpics/" + petEntry.PetImage
-    fs.unlinkSync(imagePath)
+    if (petEntry.PetImage.length > 3)
+      fs.exists(imagePath,  (exists) => {
+        if (exists)
+          fs.unlinkSync(imagePath)
+      });
+
   }
 
   let ret = await dataManager.deletePet(req.query.petId, req.query.userIndex)
