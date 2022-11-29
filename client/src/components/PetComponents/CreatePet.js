@@ -31,11 +31,11 @@ const  options= [
 const CreatePet = (props) =>
 {
   const isEditing = props.petInfo == "add"
-  const [petsArray, setPetArray] = useState({value: 'dog', label: 'Dog'})
-  const [petNameValue, setPetName] = useState("")
-  const [petDescriptionValue, setPetDescription] = useState("")
+  const [petsArray, setPetArray] = useState({value: ((props.petObj) ? props.petObj.PetType.toLowerCase() : "dog"), label: ((props.petObj) ? props.petObj.PetType : "Dog")})
+  const [petNameValue, setPetName] = useState(((props.petObj) ? props.petObj.PetName : ""))
+  const [petDescriptionValue, setPetDescription] = useState(((props.petObj) ? props.petObj.PetDescription : ""))
+  const [inputImage, setImage] = useState(((props.petObj) ? props.petObj.DisplayImage : ""));
 
-  const [inputImage, setImage] = useState(null);
   const [inputImagePath, setImagePath] = useState(null);
   const [inputImageFile, setImageFile] = useState(null);
 
@@ -64,20 +64,24 @@ const CreatePet = (props) =>
 
   const handleCreate = () => {
     const petInformation = {
+      PetId: ((props.petObj) ? props.petObj.PetId : null),
       DisplayImage: inputImage,
       PetImage: ((inputImageFile) ? inputImageFile.name : ""),
       PetType: petsArray.label,
       PetName: petNameValue,
       PetDescription: petDescriptionValue
     }
-
-    props.handlePetAdd(petInformation, inputImageFile)
+    
+    if (props.isUpdating)
+      props.handlePetUpdate(petInformation, inputImageFile)
+    else
+      props.handlePetAdd(petInformation, inputImageFile)
   }
   return (
     <div className="pet-display-frame">
       <div className="pet-info-frame">
 
-        <h2 className="create-pet-frame-title">Create Pet.....</h2>
+        <h2 className="create-pet-frame-title">{(props.isUpdating) ? "Edit" : "Create"} Pet.....</h2>
 
         <IconButton className="pet-frame-close" centerRipple={false} color="primary" aria-label="profile" size="xlarge" onClick={() => {props.setCurrentPet(null)}}>
            <ClearIcon  sx={{color: "#C5C5C5", width:45, height:45}} />
@@ -126,7 +130,7 @@ const CreatePet = (props) =>
 
         <Box sx={{mt:2 ,textAlign:"center", height: '25',mb: 0, width: 0.85, mx: 'auto'}}>
           <Button className="delete-pet-button" variant="contained" size="large" color="success"  onClick={handleCreate} endIcon={<CheckIcon  sx={{mt:0, width:25, height:25}} />}>
-            Create
+            {(props.isUpdating) ? "Save" : "Create"}
           </Button>
         </Box>
       </div>

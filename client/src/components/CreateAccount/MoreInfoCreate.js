@@ -1,6 +1,5 @@
 import React from 'react';
-import { Form, Button, Container } from 'react-bootstrap';
-import '../Login/Login.css';
+import { Form, Container } from 'react-bootstrap';
 import './CreateAccount.css';
 import { AuthContext } from '../../context.js';
 import { Link } from 'react-router-dom';
@@ -8,8 +7,13 @@ import { Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Select from "react-select";
 import { useParams } from "react-router-dom";
+import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
+import TextField from '@mui/material/TextField';
 
-function withParams(Component) {
+
+
+function paramChecker(Component) {
   return props => <Component {...props} params={useParams()} />;
 }
 
@@ -21,6 +25,7 @@ class MoreInfoCreate extends React.Component {
         this.state =
         {
             entityType: 'selectAccountType',
+            entityTypeName: 'select one',
             aboutMe: '', //contains petsArray (pet tags)
             pet: '',
             petsArray: [],
@@ -39,8 +44,13 @@ class MoreInfoCreate extends React.Component {
                 {value: 'lizard', label: 'lizard'},
                 {value: 'rabbit', label: 'rabbit'},
                 {value: 'turtle', label: 'turtle'}
+            ],
+            entityOptions: [
+                {value: "selectAccountType", label: "select one"},
+                {value: 'petOwner', label: 'pet owner'},
+                {value: 'eventOrganizer', label: 'event organizer'},
+                {value: 'shelterOrStore', label: 'pet shelter or store'},
             ]
-
         };
 
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -110,8 +120,13 @@ class MoreInfoCreate extends React.Component {
     //   }
 
     entityHandleOnChange = (a) => {
-        this.setState({entityType: a.target.value});
-    };
+        this.setState(state => {
+            return {
+              entityType: a.value,
+              entityTypeName: a.label,
+            };
+          });    
+        };
 
     petSelectHandleOnChange = (a) => {
         this.setState({pet: a.value});
@@ -120,29 +135,40 @@ class MoreInfoCreate extends React.Component {
     multiPetSelectHandleOnChange(a) {
         this.setState(state => {
             return {
-              petsArray: a
+              petsArray: a,
             };
           });
+        this.setState({
+            aboutMe: JSON.stringify(this.state.petsArray)
+        });
     }
 
     render() {
         const entityType = this.state.entityType;
-        // const { id } = useParams();
-        // this.setState({username: id});
+        const disabledIf = (this.state.entityType == "petOwner" && (! this.state.ownerName)) ||
+        (this.state.entityType == "eventOrganizer" && ((! this.state.ownerName) || (! this.state.petsArray.length))) ||
+        (this.state.entityType == "shelterOrStore" && ((! this.state.ownerName) || (! this.state.petsArray.length))) ||
+        (this.state.entityType == "selectAccountType")
         let createForm;
-        console.log("THIS IS IT");
         if (entityType == "eventOrganizer") {
             createForm = <div classname="mt-4">
                                 <Form.Group className="mb-3">
-                                    <Form.Control required type="ownerName" placeholder="Your First and Last Name" name="ownerName"
+                                    <TextField id="outlined-basic"
+                                    label="First and Last Name"
+                                    name="ownerName"
+                                    style={{zIndex:0}}
                                     value={this.state.ownerName} onChange={this.handleInputChange}/>
                                 </Form.Group>
                                  <Container className='eventOrganizerPets' fluid>
                                 <div>
                                     <h>I plan to host events for</h>
                                     <div>
-                                        <Select className="form-select" onChange={this.multiPetSelectHandleOnChange}
-                                         value={this.state.petsArray} options={this.state.options} isMulti/>
+                                        <Select
+                                        className="form-select"
+                                        onChange={this.multiPetSelectHandleOnChange}
+                                        value={this.state.petsArray}
+                                        options={this.state.options}
+                                        isMulti/>
                                     </div>
                                 </div>
                             </Container>
@@ -150,8 +176,11 @@ class MoreInfoCreate extends React.Component {
         } else if (entityType == "petOwner") {
             createForm = <div classname="mt-4">
                             <Form.Group className="mb-3">
-                                <Form.Control required type="ownerName" placeholder="Your First and Last Name" name="ownerName"
-                                value={this.state.ownerName} onChange={this.handleInputChange}/>
+                                <TextField id="outlined-basic"
+                                    label="First and Last Name"
+                                    name="ownerName"
+                                    style={{zIndex:0}}
+                                    value={this.state.ownerName} onChange={this.handleInputChange}/>
                             </Form.Group>
                             {/* <Form.Group className="mb-3">
                                 <Form.Control required type="petName" placeholder="Pet Name" name="petName" value={this.state.petName} onChange={this.handleInputChange}/>
@@ -166,8 +195,11 @@ class MoreInfoCreate extends React.Component {
         } else if (entityType == "shelterOrStore") {
             createForm = <div classname="mt-4">
                             <Form.Group className="mb-3">
-                                <Form.Control required type="ownerName" placeholder="Name of Shelter or Store" name="ownerName"
-                                 value={this.state.ownerName} onChange={this.handleInputChange}/>
+                                <TextField id="outlined-basic"
+                                    label="Store or Shelter Name"
+                                    name="ownerName"
+                                    style={{zIndex:0}}
+                                    value={this.state.ownerName} onChange={this.handleInputChange}/>
                             </Form.Group>
                             <Container className='shelterOrStorePets' fluid>
                                 <div>
@@ -180,33 +212,49 @@ class MoreInfoCreate extends React.Component {
         }
 
         return (
-            <div className='loginContainer'>
-                <h1>Tell us more about yourself</h1>
-                <Container className='createAccountContainer' fluid>
-                    <div>
-                        <div className="mt-4">
-                            <h>I am {this.state.entityType == "eventOrganizer" ? "an" : "a"} </h>
-                            <select className="form-select" onChange={this.entityHandleOnChange} entityHandleOnChange={this.state.entityType}>
-                                <option value="selectAccountType">select one</option>
-                                <option value="petOwner">pet owner</option>
-                                <option value="eventOrganizer">event organizer</option>
-                                <option value="shelterOrStore">pet shelter or store</option>
-                            </select>
+            <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+              }}>
+                <div className='login-background-frame'>
+                    <h1>Tell us more about yourself</h1>
+                    <Divider variant="middle" sx={{ m: -0.5, mb: 5 }}/>
+                    <Container className='createAccountContainer' fluid>
+                        <div>
+                            <div className="mt-4">
+                                <h>I am {this.state.entityType == "eventOrganizer" ? "an" : "a"} </h>
+                                <Select className="form-select"
+                                onChange={this.entityHandleOnChange}
+                                value={{label: this.state.entityTypeName}}
+                                options={this.state.entityOptions}/>
+                                {/* <select className="form-select" onChange={this.entityHandleOnChange} entityHandleOnChange={this.state.entityType}>
+                                    <option value="selectAccountType">select one</option>
+                                    <option value="petOwner">pet owner</option>
+                                    <option value="eventOrganizer">event organizer</option>
+                                    <option value="shelterOrStore">pet shelter or store</option>
+                                </select> */}
+                            </div>
                         </div>
-                    </div>
-                </Container>
-                {createForm}
-                <Link to="/">
-                    <Button type="button" disabled={(this.state.entityType == "petOwner" && (! this.state.ownerName)) ||
-                                                    (this.state.entityType == "eventOrganizer" && ((! this.state.ownerName) || (! this.state.petsArray.length))) ||
-                                                    (this.state.entityType == "shelterOrStore" && ((! this.state.ownerName) || (! this.state.petsArray.length))) ||
-                                                    (this.state.entityType == "selectAccountType")} onClick={this.handleSubmit}>
+                    </Container>
+                    <Divider variant="middle" sx={{ m: -0.5, mb: 2 }}/>
+                    {createForm}
+                    <Divider variant="middle" sx={{ m: -0.5, mb: 5 }}/>
+                    <Button
+                    variant="contained"
+                    component={Link}
+                    to="/"
+                    disabled={disabledIf}
+                    color="success"
+                    size="large"
+                    sx={{ fontWeight: 'bold' }}
+                    onClick={this.handleSubmit}>
                         Let's Go
                     </Button>
-                </Link>
+                </div>
             </div>
         );
     }
 };
-
-export default withParams(MoreInfoCreate);
+export default paramChecker(MoreInfoCreate);

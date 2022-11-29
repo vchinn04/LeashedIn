@@ -28,7 +28,6 @@ import { useState, useEffect } from 'react';
 const SearchListBox = (props) => //List that displays found profile buttons
 {
   const userArr = props.userArr;
-
   return (
     <Box sx={{boxShadow: 2, width: 1, mx: 'auto', mt:1,  maxWidth: 479, bgcolor: '#EEEFF1', borderRadius: '7.5px'}}>
       <List>
@@ -39,16 +38,17 @@ const SearchListBox = (props) => //List that displays found profile buttons
                   <ListItem  component="div" disablePadding>
                     <ListItemButton
                         disabled={(item._id==-1)? true : false}
-                        component={Link} to={`/profile/${item.name}`}
+                        component={Link} to={`/profile/${item.username}`}
                         sx={{
                            ".Mui-disabled": {
                             bgcolor: "green"
                           }
-                          }}>
+                          }}
+                    >
                             <ListItemIcon>
-                              {(item._id!=-1) ? <Avatar src='/Eduardo.jpeg' alt={item.name} /> : <ErrorIcon /> }
+                              {(item._id!=-1) ? <Avatar src={props.userImages[item.username]} alt={item.username} /> : <ErrorIcon /> }
                             </ListItemIcon>
-                            <ListItemText primary={item.name} />
+                            <ListItemText primary={item.username} />
                     </ListItemButton>
                   </ListItem>
 
@@ -67,14 +67,44 @@ const NavBar = (props) =>
   const [searchState, setSearchState] = useState("");
   const [userArrObj, setUserArr] = useState([]);
   const [inputImage, setImage] = useState(null);
-
+  const [userImages, setUserImages] = useState({});
   const getResponse = async(searchString) => {
     const url = '/getUserArr?' + new URLSearchParams({ searchEntry: searchString }).toString() //Fire get event to find users with search string in their usernames
     const response = await fetch(url);
     const body = await response.json();
     if (response.status !== 200) throw Error(body.message);
 
-    return body;
+    let promiseArr = []
+    let userArray = JSON.parse(body.userList)
+    var userImagesT = userImages
+    for (let i of userArray)
+    {
+        if (userImagesT[i.username] == undefined)
+        {
+          const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username: i.username }).toString()
+
+          promiseArr.push(fetch(getPfpURL)
+                         .then(async (result) => {
+                           console.log('File retrieval success!');
+                           let myBlob = await result.blob()
+
+                           var reader  = new FileReader();
+                           reader.onload = function(e)  {
+                              userImagesT[i.username] = e.target.result
+                           }
+                           reader.readAsDataURL(myBlob);
+                         })
+                         .catch((error) => {
+                           console.error('Error:', error);
+                         })
+                       )
+         }
+    }
+
+    await Promise.all(promiseArr)
+
+    setUserImages(userImagesT)
+    return userArray;
   }
 
    function handleInputChange(event) { //Fires everytime search textfield changes
@@ -85,14 +115,14 @@ const NavBar = (props) =>
             getResponse(target.value)
               .then(res => {
                 const someData = res;
-                let userArray = JSON.parse(res.userList)
+                let userArray = res
 
                 if (userArray.length == 0) //If no users found then push a "fake" user to display that no users found
                 {
                   userArray.push(
                     {
                       _id: -1, //assign _id to -1 in order for the button to be disabled
-                      name: "Oops...no results found!"
+                      username: "Oops...no results found!"
                     }
                   )
                 }
@@ -109,6 +139,7 @@ const NavBar = (props) =>
   }
 
   useEffect(() => {
+    console.log("SBASB")
     const getData = async() => {
       const url = '/getUserProfilePic?' + new URLSearchParams({ username: props.loginStatus }).toString()
 
@@ -164,7 +195,7 @@ const NavBar = (props) =>
              />
 
              {
-               (userArrObj.length > 0) && <SearchListBox userArr={userArrObj} />
+               (userArrObj.length > 0) && <SearchListBox userImages={userImages} userArr={userArrObj} />
              }
         </div>
 

@@ -10,7 +10,12 @@ import Login from "../components/Login/Login"
 import ProfilePage from "./ProfilePage"
 
 const Router = () => {
+<<<<<<< HEAD
   const [loginStatus, setLoginState] = LoginState();
+=======
+  const [loginStatus, setLoginState] = LoginState();  //Create hook
+
+>>>>>>> 0739a74854c48e5990e93ada91b3d3ef33134f5d
   console.log(loginStatus)
 
   return (
