@@ -38,6 +38,7 @@ class Login extends React.Component {
           email: '',
           password: '',
           resultV: '',
+          incorrectEntry: false
       };
 
       this.handleInputChange = this.handleInputChange.bind(this);
@@ -72,7 +73,9 @@ class Login extends React.Component {
           console.log('Success:', result.loginStatus);
           if (!result.loginStatus)
           {
-
+            this.setState({
+                incorrectEntry: true
+            });
           }
           else {
             this.props.setLoginState(result.username)  // login the user (will switch them to homepage)
@@ -100,8 +103,9 @@ class Login extends React.Component {
                 <Container className='loginContainer' fluid>
                     <Form className="loginForm" onSubmit={this.handleFormSubmit}>
                           <TextField id="outlined-basic"
+                             error={this.state.incorrectEntry}
                              name="email"
-                             label="Username"
+                             label="Email"
                              variant="outlined"
                              fullWidth
                              margin="normal"
@@ -117,6 +121,8 @@ class Login extends React.Component {
                           />
 
                           <TextField id="outlined-password-input"
+                             error={this.state.incorrectEntry}
+                             helperText={(this.state.incorrectEntry)? "Incorrect email or password!" : ""}
                              label="Password"
                              name="password"
                              fullWidth

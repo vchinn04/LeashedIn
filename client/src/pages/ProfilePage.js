@@ -60,8 +60,9 @@ const ProfilePage = (props ) =>
 
   const handleSubmit = () =>
   {
-    var data = new FormData()
-    data.append('image',inputImageFile, inputImageFile.name)
+    var data = new FormData() // This way we can pass an image file and other args to server
+    if (inputImageFile)
+      data.append('image',inputImageFile, inputImageFile.name)
     data.append('username', props.loginStatus)
     data.append('ownername', ownerName)
     data.append('aboutme', aboutState)
@@ -115,7 +116,43 @@ const ProfilePage = (props ) =>
       });
   }
 
-  const deletePet = (petEntry) =>
+  const handlePetUpdate = (petInformation, inputImageFile) => { // this handles the updating function of pet
+    var data = new FormData()
+
+    if (petInformation.PetImage)
+      data.append('petimage', inputImageFile, inputImageFile.name)
+
+    data.append('PetType', petInformation.PetType)
+    data.append('PetName', petInformation.PetName)
+    data.append('PetDescription', petInformation.PetDescription)
+    data.append('userIndex', props.loginStatus)
+    data.append('petId',petInformation.PetId)
+    data.append('fileRemoved',petInformation.fileRemoved)
+
+    // update pet locally
+    currentPet.PetType = petInformation.PetType
+    currentPet.PetName = petInformation.PetName
+    currentPet.PetDescription = petInformation.PetDescription
+    currentPet.PetImage = petInformation.PetImage
+    currentPet.DisplayImage = petInformation.DisplayImage
+
+    fetch('/CreatePet', // fire a PUT event for server
+      {
+        method: 'PUT',
+        body: data
+      }).then((response) => response.json())
+
+      .then((result) => {
+        console.log('Success:', result.PetName);
+        currentPet.PetImage = result.PetImage // if it was successful, update the local image
+        setCurrentPet(null) // remove current pet to remove the pet component
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  }
+
+  const deletePet = (petEntry) => // handle the deletion of a pet
   {
     console.log("Delete pet!")
 
@@ -159,7 +196,14 @@ const ProfilePage = (props ) =>
     setUpFile(event.target.files[0])
   }
 
-  const handlePetOpen = (ev, petName) =>
+  const removeFile = (event) => // in charge of handling a file when its uploaded
+  {
+    setImagePath("") // update the image path
+    setImage(null)
+    setImageFile(null)
+   }
+
+  const handlePetOpen = (ev, petName) => // this simply sets current pet to the sepcified pet entry, when current pet is not empty, the pet component is rendered for that pet
   {
     setCurrentPet(petName);
   }
@@ -254,15 +298,18 @@ const ProfilePage = (props ) =>
             {(props.loginStatus == id) && <EditSaveButton isEditing={isEditing} setEdit={setEdit} handleSubmit={handleSubmit}/>}
 
             <Avatar
-              alt="vchinn"
-              src={(inputImage) ? inputImage : '/Eduardo.jpeg'}
+              src={inputImage}
               sx={{mx: 'auto', mt: avatarMarginTop, pt: 0, width: 175, height: 175, border: '5px solid #825DD7'}}
             />
 
-            {isEditing && <Button variant="contained" component="label" color="primary"  size="small" sx={{position: 'absolute', top: '35%', mb:0, left: '60%' ,fontWeight: 'bold' }}>
+            {isEditing && <Button variant="contained" component="label" color="primary"  size="small" sx={{position: 'absolute', top: '29.5%', mb:0, left: '60%' ,fontWeight: 'bold' }}>
               Upload
               <input hidden accept="image/*" type="file" onChange={handleFile}/>
              </Button>}
+
+             {isEditing && <Button variant="contained" component="label" color="error"  size="small" sx={{position: 'absolute', top: '42.5%', mb:0, left: '60%' ,fontWeight: 'bold' }} onClick={removeFile}>
+               Remove
+              </Button>}
 
              {isEditing && <h3 className="path-text">{inputImagePath}</h3>}
 
@@ -306,7 +353,7 @@ const ProfilePage = (props ) =>
                       return (
                        <Grid key={element.PetId} item xs={1.75}>
                            <IconButton className="gridButton" centerRipple={false} color="primary" aria-label="profile" style={{backgroundColor:'rgba(130, 93, 215, 0'}} onClick={(event) => {handlePetOpen(event, element)}} >
-                                <Avatar className="grid-avatar" src={element.DisplayImage} alt="Profile" variant="rounded" sx={{  width: 95, height: 95 }} />
+                                <Avatar className="grid-avatar" src={element.DisplayImage} variant="rounded" sx={{  width: 95, height: 95 }} />
                               <Chip  className="name-chip" size="small"  color="secondary"  style={{backgroundColor:'rgba(130, 93, 215, 0.7'}} label={element.PetName} sx={{ zIndex: 20 }}/>
                            </IconButton>
                        </Grid>

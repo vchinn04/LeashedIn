@@ -164,11 +164,11 @@ app.post('/UpdateProfile', upload.single('image'), async (req, res) => {
     username: req.body.username,
     ownername: req.body.ownername,
     aboutme: req.body.aboutme,
-    profilepic: req.file.filename
+    profilepic: (req.file) ? req.file.filename : null
   }
 
   const userData = await dataManager.getUserData(req.body.username)
-  if (userData.profilePicture != "")
+  if (userData.profilePicture)
   {
     const imagePath = __dirname + "/images/" + userData.profilePicture
     fs.unlinkSync(imagePath)
@@ -221,24 +221,39 @@ app.put('/CreatePet', pet_upload.single('petimage'), async (req, res) => {
   console.log(req.body.PetName)
   console.log(req.body.PetDescription)
   console.log(req.body.petId)
+  console.log(typeof req.body.fileRemoved)
 
   let oldPetEntry = await dataManager.getPet(req.body.petId)
 
   if (!oldPetEntry)
     res.send({ returnValue: false })
 
-  if (oldPetEntry.PetImage != "" && req.file)
+  if ((oldPetEntry.PetImage && req.body.fileRemoved === 'true') || (req.file))
   {
     const imagePath = __dirname + "/petpics/" + oldPetEntry.PetImage
-    fs.unlinkSync(imagePath)
+
+    if (oldPetEntry.PetImage.length > 3)
+      fs.exists(imagePath,  (exists) => {
+        if (exists)
+          fs.unlinkSync(imagePath)
+      });
   }
 
+  var petImageTemp = oldPetEntry.PetImage
+
+  if (req.file)
+  {
+    petImageTemp = req.file.filename
+  }  else if(req.body.fileRemoved === 'true')
+  {
+    petImageTemp = ""
+  }
   const petEntry = {
     PetId: req.body.petId,
     PetType: req.body.PetType,
     PetName: req.body.PetName,
     PetDescription: req.body.PetDescription,
-    PetImage: ((req.file) ? req.file.filename : oldPetEntry.PetImage)
+    PetImage: petImageTemp
   }
 
   const success = await dataManager.updatePet(petEntry, req.body.petId);
