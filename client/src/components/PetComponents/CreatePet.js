@@ -35,9 +35,9 @@ const CreatePet = (props) =>
   const [petNameValue, setPetName] = useState(((props.petObj) ? props.petObj.PetName : ""))
   const [petDescriptionValue, setPetDescription] = useState(((props.petObj) ? props.petObj.PetDescription : ""))
   const [inputImage, setImage] = useState(((props.petObj) ? props.petObj.DisplayImage : ""));
-
   const [inputImagePath, setImagePath] = useState(null);
   const [inputImageFile, setImageFile] = useState(null);
+  const [fileRemoved, setfileRemoved] = useState(false);
 
   const multiPetSelectHandleOnChange = (a) => {
       setPetArray(a)
@@ -49,6 +49,7 @@ const CreatePet = (props) =>
       return
 
     setImagePath(event.target.value)
+    setfileRemoved(false)
     setUpFile(event.target.files[0])
   }
 
@@ -62,6 +63,13 @@ const CreatePet = (props) =>
     reader.readAsDataURL(file);
   }
 
+  const removeFile = (event) => // in charge of handling a file when its uploaded
+  {
+    setImagePath("")
+    setImage(null)
+    setImageFile(null)
+    setfileRemoved(true)
+   }
   const handleCreate = () => {
     const petInformation = {
       PetId: ((props.petObj) ? props.petObj.PetId : null),
@@ -69,9 +77,10 @@ const CreatePet = (props) =>
       PetImage: ((inputImageFile) ? inputImageFile.name : ""),
       PetType: petsArray.label,
       PetName: petNameValue,
-      PetDescription: petDescriptionValue
+      PetDescription: petDescriptionValue,
+      fileRemoved: fileRemoved
     }
-    
+
     if (props.isUpdating)
       props.handlePetUpdate(petInformation, inputImageFile)
     else
@@ -88,16 +97,19 @@ const CreatePet = (props) =>
         </IconButton>
 
         <Avatar
-          alt={null}
           src={inputImage}
           sx={{mx: 'auto', mt: -5, pt: 0, width: 175, height: 175, border: '5px solid #825DD7'}}
         />
 
 
-        <Button variant="contained" component="label" color="primary"  size="small" sx={{position: 'absolute', top: '12.5%', mb:0, left: '63%' ,fontWeight: 'bold' }}>
+        <Button variant="contained" component="label" color="primary"  size="small" sx={{position: 'absolute', top: '10.5%', mb:0, left: '63%' ,fontWeight: 'bold' }}>
           Upload
           <input hidden accept="image/*" type="file" onChange={handleFile}/>
          </Button>
+
+         <Button variant="contained" component="label" color="error"  size="small" sx={{position: 'absolute', top: '15.5%', mb:0, left: '63%' ,fontWeight: 'bold' }} onClick={removeFile}>
+           Remove
+          </Button>
 
          <h3 className="path-text">{inputImagePath}</h3>
 

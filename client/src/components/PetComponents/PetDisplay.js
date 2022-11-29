@@ -38,7 +38,6 @@ const PetDisplay = (props) =>
         </IconButton>
 
         <Avatar
-          alt="vchinn"
           src={props.petInfo.DisplayImage}
           sx={{mx: 'auto', mt: -5, pt: 0, width: 175, height: 175, border: '5px solid #825DD7'}}
         />
