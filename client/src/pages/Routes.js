@@ -11,7 +11,6 @@ import ProfilePage from "./ProfilePage"
 
 const Router = () => {
   const [loginStatus, setLoginState] = LoginState();
-
   console.log(loginStatus)
 
   return (

@@ -176,7 +176,6 @@ const ProfilePage = (props ) =>
          if (result)
            var finalArr = []
            var promiseArr = [];
-
            for (let i of result)
            {
              if (i["PetImage"] == "")
