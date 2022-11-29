@@ -87,10 +87,13 @@ const MakeAPost = props => {
       reader.readAsDataURL(file);
     }
 
+
+
     const handlePostCreate = () => {
 
         const postInformation = {
             PostImage: ((inputImageFile) ? inputImageFile.name : ""),
+            DisplayImage: inputImage,
             PostDescription: postDescription,
           }
 

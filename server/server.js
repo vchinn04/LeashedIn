@@ -312,6 +312,7 @@ app.post('/UserCreatePost', post_upload.single('postimage'), async (req, res) =>
     postLikes: 0,
     postImage: ((req.file) ? req.file.filename : "")
   }
+  console.log(postEntry.postImage)
   console.log(req.body)
   console.log(req.body.PostDescription)
   const postId = await dataManager.addPost(postEntry, req.body.userIndex);
@@ -342,9 +343,10 @@ app.get('/getEveryUserPosts', async (req, res) => { //Get Event
 });
 
 app.get('/getPostPic', async (req, res) => { //Get Event
-  let imagePath = "/petpics/" + req.query.imagePath
+  let imagePath = "/postpics/" + req.query.imagePath
   res.sendfile(imagePath, { root: __dirname });
 });
+
 
 app.get('/getPostLikes', async (req, res) => { //Get Event
   let likes = await dataManager.getPostLikes(req.query.postId)
@@ -393,3 +395,23 @@ app.delete('/DeletePost', async (req, res) => { //Get Event
 
 dataManager.setupMongo().catch(err => console.log(err)); //Initialize the DataBase in the data-manager modules
 app.listen(port, () => console.log(`Server Up! Listening on port ${port}`)); //Binds server to localhost:5000
+
+
+app.post('/UserCreateComment', upload.single('image'), async (req, res) => { //Get Event
+  console.log("Creating Comment!")
+  console.log(req.body.postIndex)
+
+  const commentEntry = {
+    commentDescription: req.body.commentDescription,
+
+  }
+  const commentId = await dataManager.addComment(commentEntry, req.body.postIndex);
+
+
+ returnComment = {
+    commentId: commentId,
+    commentDescription: req.body.commentDescription,
+  }
+  console.log(returnComment)
+  res.send(JSON.stringify(returnComment));
+});

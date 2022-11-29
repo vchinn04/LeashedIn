@@ -29,6 +29,7 @@ import CreatePet from "../components/PetComponents/CreatePet"
 
 const postListT = []
 const totalListT = []
+const totalListTwo = []
 
 const EditSaveButton = (props) =>
 {
@@ -71,8 +72,8 @@ const Feed = (props ) =>
 
   const addPost = (postInformation, inputImageFile) => {
     var data = new FormData()
-  //  if (postInformation.PostImage)
-   //   data.append('postimage', inputImageFile, inputImageFile.name)
+    if (postInformation.PostImage)
+      data.append('postimage', inputImageFile, inputImageFile.name)
 
     console.log(inputImageFile)
     console.log(postInformation.PostImage)
@@ -87,6 +88,7 @@ const Feed = (props ) =>
       .then((result) => {
 
         let postListNew = postList
+        result["DisplayImage"] = postInformation.DisplayImage
         postListNew.push(result)
         const results = postListNew.filter(element => {
             return element !== null;
@@ -94,7 +96,6 @@ const Feed = (props ) =>
         setPostList(results)
         let likes = result.postLikes
         console.log(likes)
-        console.log(postList)
         setCurrentPost(null)
       })
       .catch((error) => {
@@ -104,17 +105,24 @@ const Feed = (props ) =>
 
       .then((result) => {
 
-        let totalPostListNew = []
+        let totalPostListNew = totalPostList
+        let totalPostListNew2 = []
         result.forEach((element) => {
             if (element !== null) {
-              totalPostListNew.push(element);
+              totalPostListNew2.push(element);
             }
           });
+          result.forEach((element) => {
+            if (element !== null && !totalListTwo.includes(element)) {
+              totalListTwo.push(element);
+            }
+          });
+        totalPostListNew = totalPostListNew2
         setTotalPostList(totalPostListNew)
 
         console.log(result)
         console.log(totalPostListNew)
-        console.log(totalPostList)
+        console.log(totalListTwo)
 
       })
       .catch((error) => {
@@ -161,7 +169,6 @@ const Feed = (props ) =>
     setCurrentPost(null);
     setPostList(postList)
 
-    window.location.reload();
 
   }
 
@@ -195,7 +202,28 @@ const Feed = (props ) =>
            var promiseArr = [];
            for (let i of result)
            {
- 
+             if (i["DisplayImage"])
+                continue
+
+              const postPicURL = '/getPostPic?' + new URLSearchParams({ imagePath: i["postImage"] }).toString()
+
+              promiseArr.push(fetch(postPicURL)
+                 .then(async (result) => {
+                   console.log('File retrieval success!');
+                   let myBlob = await result.blob()
+
+                   var reader  = new FileReader();
+                   reader.onload = function(e)  {
+                     i["DisplayImage"] = e.target.result
+                   }
+
+                   reader.readAsDataURL(myBlob);
+                 })
+
+                .catch((error) => {
+                  console.error('Error:', error);
+                })
+             );
               finalArr.push(i)
             }
 

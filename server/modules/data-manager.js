@@ -32,11 +32,11 @@ const postSchema = new mongoose.Schema({
   postDescription: String,
   postImage: String,
   postLikes: { type: Number, default: 0 },
-  postComments: Array,
+  postComments: Array
 });
 
 var commentSchema = new mongoose.Schema({
-  commentID: String,
+  commentId: String,
   commentDescription: String
 });
 
@@ -356,4 +356,44 @@ exports.deletePost = async function(postId, userIndex) {
   UserM.findOneAndUpdate({username:userIndex},{posts: docs.posts},(error,result)=>{console.log("Successfully Updated User Post Deletion!")})
 
   return ret;
+}
+
+// Comment functions
+
+exports.addComment = async function (commentEntry, postIndx) {
+  commentId = ""
+  let isExist = false
+  do
+  {
+      commentId = await crypto.randomBytes(20)
+      commentId = commentId.toString('hex')
+      isExist = await CommentM.exists({ commentId: commentId });
+
+      if (!isExist)
+      {
+        commentEntry["commentId"] = commentId
+        const commentDatEntry = new CommentM(commentEntry)
+        
+        await commentDatEntry.save()
+        console.log(postIndx)
+        let docs = await PostM.findOne({ postId:postIndx });
+        console.log(docs)
+        console.log("bro")
+        newCommentList = docs.postComments
+        newCommentList.push(commentId)
+
+          
+        PostM.findOneAndUpdate({postId:postIndx},{postComments: newCommentList}, (error,result) => {
+          if(error){
+            console.log("Error: ", error)
+          }else{
+            console.log(result);
+          }
+        });
+
+        break
+      }
+  } while (isExist)
+
+  return commentId
 }
