@@ -31,7 +31,7 @@ const petStorageEngine = multer.diskStorage({
 
 const postStorageEngine = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./petpics");
+    cb(null, "./postpics");
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + "---" + file.originalname)
@@ -294,22 +294,22 @@ app.post('/UserCreatePost', post_upload.single('postimage'), async (req, res) =>
 
   const postEntry = {
     postDescription: req.body.PostDescription,
-    postLikes: 0
-   // postImage: ((req.file) ? req.file.filename : "")
+    postLikes: 0,
+    postImage: ((req.file) ? req.file.filename : "")
   }
   console.log(req.body)
   console.log(req.body.PostDescription)
   const postId = await dataManager.addPost(postEntry, req.body.userIndex);
   let fileP = ""
 
- // if (req.file)
-   // fileP = req.file.filename
+  if (req.file)
+    fileP = req.file.filename
 
  returnPost = {
     postId: postId,
     postDescription: req.body.PostDescription,
-    postLikes: 0
-  //  postImage: fileP
+    postLikes: 0,
+    postImage: fileP
   }
   console.log(returnPost)
   res.send(JSON.stringify(returnPost));

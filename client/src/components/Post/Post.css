@@ -13,8 +13,21 @@ html {
     left:20;
     display: flex;
   }
- 
 
+form .input-group {
+    margin-bottom: 15px;
+}
+
+.submit-btn {
+    width: 100%;
+    border: none;
+    background: rgb(37, 83, 3);
+    font-size: 18px;
+    color: white;
+    border-radius: 3px;
+    padding: 20px;
+    text-align: center;
+}
 .postContainer {
     width: 100%;
     text-align: center;
@@ -89,7 +102,7 @@ html {
   }
 
 .row {
-    display: inline;
+    display: inline-block;
  }
 
 

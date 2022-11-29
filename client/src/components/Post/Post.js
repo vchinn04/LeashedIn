@@ -12,10 +12,12 @@ import { useEffect, useState } from 'react';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { trusted } from 'mongoose';
+import Avatar from '@mui/material/Avatar';
 import Grid from '@mui/material/Grid';
 import './Post.css';
 import DeleteIcon from '@mui/icons-material/Delete';
-
+import EditIcon from '@mui/icons-material/Edit';
+import IconButton from '@mui/material/IconButton';
 import styled from "styled-components";
 
 import { Link } from 'react-router-dom';
@@ -79,13 +81,18 @@ const Post = (props) => {
       }
     return (
             <Container className = "Post" style={{ width: 500, height: 300}}>
+                <div className = 'row'>
+                    <IconButton className = 'row' color="primary" aria-label="profile"  component={Link} to={`/profile/${props.loginStatus}`}>
+                        <Avatar src={props.profilePic} alt="Profile" />
+                     </IconButton>
                     <div className = 'row' style = {{color: 'black', fontWeight: '700', }} > 
                                         {props.username} 
                                 </div> 
 
-                    <Button onClick={() => {props.deletePost(props.postInfo)}} color = "error" style={{maxWidth: '30px', maxHeight: '30px', minWidth: '30px', minHeight: '30px', marginLeft: 400}}>
+                    <Button className = 'row' onClick={() => {props.deletePost(props.postInfo)}} color = "error" style={{marginLeft: 400}}>
                         <DeleteIcon/>
                     </Button>
+                </div>
                     
   
             <Divider component="li" sx={{borderBottomWidth: 2, color: 'purple'}}/>
@@ -124,7 +131,6 @@ const Post = (props) => {
                                 label="Description"
                                 fullWidth
                                 margin="normal"
-                                isDense
                                 sx={{height:'10%'}}
                             /> : <div/>}
                 </div>

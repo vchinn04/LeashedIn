@@ -17,7 +17,7 @@ const Comments = ({
             credentials: 'include',
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ postID: id, comment: val })
+            body: JSON.stringify({ postId: id, comment: val })
         };
         const response = await fetch('http://localhost:4000/comment/post', requestOptions);
         const data = await response.json();

@@ -66,16 +66,15 @@ const Feed = (props ) =>
   }
   const [postList, setPostList] = useState(postListT);
   const [currentPost, setCurrentPost] = useState(null);
-
   const [totalPostList, setTotalPostList] = useState(totalListT);
 
 
   const addPost = (postInformation, inputImageFile) => {
     var data = new FormData()
-    if (postInformation.PostImage)
-      data.append('PostImage', inputImageFile, inputImageFile.name)
+  //  if (postInformation.PostImage)
+   //   data.append('postimage', inputImageFile, inputImageFile.name)
 
-    console.log(postInformation.PostDescription)
+    console.log(inputImageFile)
     console.log(postInformation.PostImage)
     data.append('PostDescription', postInformation.PostDescription)
     data.append('userIndex', props.loginStatus)
@@ -89,7 +88,10 @@ const Feed = (props ) =>
 
         let postListNew = postList
         postListNew.push(result)
-        setPostList(postListNew)
+        const results = postListNew.filter(element => {
+            return element !== null;
+          });
+        setPostList(results)
         let likes = result.postLikes
         console.log(likes)
         console.log(postList)
@@ -154,8 +156,13 @@ const Feed = (props ) =>
 
     }
 
+
+
     setCurrentPost(null);
     setPostList(postList)
+
+    window.location.reload();
+
   }
 
   const handleFile = (event) =>
@@ -214,6 +221,22 @@ const Feed = (props ) =>
          console.error('Error:', error);
        });
 
+
+       fetch(url)
+       .then(async (result) => {
+         console.log('File retrieval success!');
+         let myBlob = await result.blob()
+ 
+          var reader  = new FileReader();
+          reader.onload = function(e)  {
+              setImage(e.target.result)
+           }
+           reader.readAsDataURL(myBlob);
+       })
+       .catch((error) => {
+         console.error('Error:', error);
+       });
+
        
     }
 
@@ -229,9 +252,9 @@ const Feed = (props ) =>
             <List style = {{margin: 100, alignContent:'center', width: 800, height: 700}}>
                 <MakeAPost  addPost={addPost} setCurrentPost={setCurrentPost}/>
                     {
-                        postList.map((element, key) => {
+                        postList.map((element) => {
                             return (
-                            <Post key={element.postId} postInfo = {element} username = {props.loginStatus} deletePost={deletePost} likes = {element.postLikes}>
+                            <Post key={element.postId} postInfo = {element} username = {props.loginStatus} deletePost={deletePost} likes = {element.postLikes} profilePic = {inputImage}>
                             </Post>
                             )
                             })

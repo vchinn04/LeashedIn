@@ -93,7 +93,6 @@ const MakeAPost = props => {
             PostImage: ((inputImageFile) ? inputImageFile.name : ""),
             PostDescription: postDescription,
           }
-          console.log(postDescription);
 
           props.addPost(postInformation, inputImageFile)
           togglePopup()
@@ -124,7 +123,7 @@ const MakeAPost = props => {
                     <img className = "image"
                         src={inputImage} 
                     />
-                    <ColorButton2 variant="contained" component="label" color="primary"  size="small" sx={{fontWeight: 'bold', marginBottom: 5, marginLeft: 45}}>
+                    <ColorButton2 variant="contained" component="label" color="primary"  size="small" sx={{fontWeight: 'bold', marginBottom: 5}}>
                         Image Upload
                     <input hidden accept="image/*" type="file" onChange={handleFile}/>
                     </ColorButton2>
