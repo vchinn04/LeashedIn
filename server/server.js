@@ -85,21 +85,21 @@ app.post('/UserLogIn', async (req, res) => { //Get Event
   var inputDict = req.body;
   console.log("Log In request!")
   console.log(req.body)
-  console.log(req.body.email)
+  console.log(req.body.username)
 
-  const userData = await dataManager.getUser(req.body.email)
+  const userData = await dataManager.getUser(req.body.username)
 
   console.log(userData)
   userObj = userData[0];
   console.log(userObj)
   if (userObj == undefined){
-    console.log("Bad email!")
+    console.log("Bad username!")
 
-    res.send({ loginStatus: false, errorMessage: 'Invalid email or password!' });
+    res.send({ loginStatus: false, errorMessage: 'Invalid username or password!' });
   }
   else if (userObj.password != req.body.password) {
     console.log("Bad passowrd!")
-    res.send({ loginStatus: false, errorMessage: 'Invalid email or password!' });
+    res.send({ loginStatus: false, errorMessage: 'Invalid username or password!' });
   }
   else {
     console.log("Success!")

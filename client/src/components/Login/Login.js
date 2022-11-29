@@ -35,7 +35,7 @@ class Login extends React.Component {
       // initialize username and password so form is controlled
       this.state =
       {
-          email: '',
+          username: '',
           password: '',
           resultV: '',
           incorrectEntry: false
@@ -57,7 +57,7 @@ class Login extends React.Component {
     }
 
     async handleFormSubmit(event) {
-      console.log(this.state.email)
+      console.log(this.state.username)
       console.log(this.state.password)
 
       fetch('/UserLogIn', // fire the server event to login user
@@ -66,7 +66,7 @@ class Login extends React.Component {
           headers: { "Content-Type": "application/json",
             'Accept': 'application/json'
           },
-          body: JSON.stringify({ email: this.state.email, password: this.state.password }),
+          body: JSON.stringify({ username: this.state.username, password: this.state.password }),
         }) .then((response) => response.json())
 
         .then((result) => {
@@ -104,8 +104,8 @@ class Login extends React.Component {
                     <Form className="loginForm" onSubmit={this.handleFormSubmit}>
                           <TextField id="outlined-basic"
                              error={this.state.incorrectEntry}
-                             name="email"
-                             label="Email"
+                             name="username"
+                             label="Username"
                              variant="outlined"
                              fullWidth
                              margin="normal"
@@ -116,13 +116,13 @@ class Login extends React.Component {
                                        </InputAdornment>
                                      ),
                              }}
-                             value={this.state.email}
+                             value={this.state.username}
                              onChange={this.handleInputChange}
                           />
 
                           <TextField id="outlined-password-input"
                              error={this.state.incorrectEntry}
-                             helperText={(this.state.incorrectEntry)? "Incorrect email or password!" : ""}
+                             helperText={(this.state.incorrectEntry)? "Incorrect username or password!" : ""}
                              label="Password"
                              name="password"
                              fullWidth
