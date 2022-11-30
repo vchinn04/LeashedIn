@@ -1,88 +1,60 @@
-import { Container, Button, ButtonGroup } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './Following.css'
-import Image from 'react-bootstrap/Image';
-import React, { Component } from 'react';
+import React, { useState, useEffect } from "react";
+import { Avatar, Tooltip, Paper, Divider } from "@material-ui/core";
+import { Scrollbars } from "react-custom-scrollbars";
+import SearchIcon from "@material-ui/icons/Search";
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import NavBar from "../NavBar/NavBar.js";
+import Style from "./Style";
+import axios from "axios";
 
+const Followings = () => {
+    const classes = Style();
 
+    const [users, setUsers] = useState([]);
 
-const Following = () => {
-    const [accountsArr, setAccounts] = React.useState([])
-    const [set, setT] = React.useState(false)
-    let accountNames = []
-    React.useEffect(() => {
-        async function getImages() {
-            // POST request using fetch with async/await
-            const requestOptions = {
-                credentials: 'include',
-                method: 'GET',
-            };
-            const response = await fetch('http://localhost:4000/user/me', requestOptions);
-            const data = await response.json();
-            console.log(data)
-
-            let arr = data.following
-            console.log(arr)
-            for (const element of arr) {
-                const requestOptions = {
-                    credentials: 'include',
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: element })
-                };
-                const response = await fetch('http://localhost:4000/user/get', requestOptions);
-                const data = await response.json();
-                const requestOptions2 = {
-                    credentials: 'include',
-                    method: 'GET',
-
-                };
-                console.log(data._id)
-                const response2 = await fetch('http://localhost:4000/images/image/' + data.profilePic + ".png", requestOptions2).then((res) => res.blob());
-                console.log(response2)
-                let img = await URL.createObjectURL(response2)
-                if (!accountNames.includes(element.toString())) {
-                    setAccounts(accountsArr => [...accountsArr, <div className="child" key={element}>
-                        <Container>
-                            <Button href={"/search/" + data.username}>
-                                <Image width="200" height="200" src={img} fluid />
-                            </Button>
-                            <div>
-                                <p className="Name">{data.username}</p>
-                            </div>
-                        </Container>
-                    </div>
-                    ]);
-                    console.log(element.toString())
-                    accountNames.push(element.toString())
-                }
-                //console.log(data)
-                console.log(accountNames)
-            }
-        }
-
-        if (!set) {
-            getImages()
-            setT(true)
-        }
-    },)
+    useEffect(() => {
+        const fetchUsers = async () => {
+            const response = await axios.get("https://breakingbadapi.com/api/characters");
+            //Breaking Bad character as filler
+            setUsers(response.data);
+        };
+        fetchUsers();
+    }, []);
 
     return (
-        <div className="Library">
-            <Container fluid>
-                <div className="libraryButtonGroup">
-                    <ButtonGroup>
-                        <div className="libraryButtonSelected">
-                            <Button className="bg-transparent " href="/following" variant="link">Following</Button>
-                        </div>
-                    </ButtonGroup>
+        <Paper elevation={0} className={classes.followings}>
+            <Scrollbars autoHide autoHideDuration={200}>
+                <Divider />
+                <div className={classes.followings__tab}>
+                    <h4>Your Pages</h4>
+                    <MoreHorizIcon />
                 </div>
-            </Container>
-            <hr style={{ width: "100%" }} />
-            <div className="wrapper">
-                <div>{accountsArr}</div>
-            </div>
-        </div>
-    )
-}
-export default Following;
+                <Divider />
+                <div className={classes.followings__tab}>
+                    <h4>Followings</h4>
+                    <SearchIcon />
+                    <MoreHorizIcon />
+                </div>
+                {users.map(({ char_id, name, img }) => (
+                    <NavBar
+                        key={char_id}
+                        Source={
+                            <Tooltip placement="left" title={name} arrow>
+                                <Avatar src={img} size={100} />
+                            </Tooltip>
+                        }
+                        title={name}
+                        online={true}
+                        lastSeen={
+                            Math.floor(Math.random() * (3 - 1 + 1)) + 1 === 2 &&
+                            `${Math.floor(Math.random() * 10) + 1} h`
+                        }
+                        noTransform={true}
+                    />
+                ))}
+            </Scrollbars>
+        </Paper>
+    );
+};
+
+export default Followings;
