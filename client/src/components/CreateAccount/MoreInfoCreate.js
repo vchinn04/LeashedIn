@@ -80,7 +80,6 @@ class MoreInfoCreate extends React.Component {
     }
 
     handleSubmit() {
-  
         fetch('/MoreInfoCreateUpdateProfile',
           {
             method: 'POST',
@@ -133,14 +132,15 @@ class MoreInfoCreate extends React.Component {
     };
 
     multiPetSelectHandleOnChange(a) {
-        this.setState({ //add the pets to aboutme
-            aboutMe: JSON.stringify(this.state.petsArray)
-        });
         this.setState(state => {
             return {
               petsArray: a,
+              aboutMe: a.value
             };
           });
+        // this.setState({ //add the pets to aboutme
+        //     aboutMe: JSON.stringify(this.state.petsArray)
+        // });
     }
 
     render() {

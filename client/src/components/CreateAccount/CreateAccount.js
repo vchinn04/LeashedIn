@@ -10,6 +10,7 @@ import { styled } from '@mui/material/styles';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import { redirect } from 'react-router-dom';
 
 
 class CreateAccount extends React.Component {
@@ -21,11 +22,13 @@ class CreateAccount extends React.Component {
         {
             email: '',
             username: '',
-            password: ''
+            password: '',
+            usernameTaken: '',
         };
 
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleFormSubmit = this.handleFormSubmit.bind(this);
+        this.handleUsernameChange = this.handleUsernameChange.bind(this);
     }
 
     // neat trick to handle all changes to both forms
@@ -57,8 +60,7 @@ class CreateAccount extends React.Component {
           }) .then((response) => response.json())
   
           .then((result) => {
-            console.log('Success:', result.loginStatus);
-            if (!result.loginStatus)
+            if (!result.IsSuccessful)
             {
   
             }
@@ -94,11 +96,48 @@ class CreateAccount extends React.Component {
             console.log("Noo")
             console.error('Error:', error);
           });
-    }       
+    }
+    
+    handleUsernameChange(a) {
+      // this.setState({ username: a.value}, () => {
+      //   console.log(this.state.username);
+      // });
+
+    //   this.setState({
+    //     username: a.target.value
+    // }, () => {
+    //     console.log(this.state.username)
+    // })
+
+      this.setState({username: a.target.value});
+
+      fetch('/CheckUserExistence',
+        {
+          method: 'POST',
+          headers: { "Content-Type": "application/json",
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({username: a.target.value}),
+        }) .then((response) => response.json())
+
+        .then((result) => {
+          if (!result.doesExist) //if username doesn't exist
+          {
+            this.setState({
+              usernameTaken: "Username available!"
+            })
+          }
+          else { //if username does exist
+            this.setState({
+              usernameTaken: "Username taken!"
+            })
+          }
+        });
+  }       
 
 
     render() {
-      const disabledIf = (!this.state.email.length || !this.state.username.length || !this.state.password.length)
+      const disabledIf = (!this.state.email.length || !this.state.username.length || !this.state.password.length || (this.state.usernameTaken != "Username available!"))
         return (
           <div style={{
                 display: 'flex',
@@ -109,6 +148,11 @@ class CreateAccount extends React.Component {
             <div className='login-background-frame'>
               <h1>Sign Up</h1>
                   <h3>Join the petwork</h3>
+                  <h5
+                    style={{
+                      color: this.state.usernameTaken != "Username available!" ? 'red' : 'green'
+                    }}
+                    >{this.state.usernameTaken}</h5>
                   <Container className='createAccountContainer' fluid>
                       <div>
                           <Form className="createAccountForm">
@@ -119,7 +163,7 @@ class CreateAccount extends React.Component {
                                   margin = "normal"
                                   size="small"
                                   value={this.state.username}
-                                  onChange={this.handleInputChange} />
+                                  onChange={this.handleUsernameChange} />
                               </Form.Group>
                               <Form.Group className="mb-1">
                                   <TextField id="outlined-basic"

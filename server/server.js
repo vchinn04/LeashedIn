@@ -98,6 +98,15 @@ app.post('/UserLogIn', async (req, res) => { //Get Event
   }
 });
 
+app.post('/CheckUserExistence', async (req, res) => {
+  const checkResult = await dataManager.checkIfUserExists(req.body.username)
+  if (checkResult == true) {
+    res.send(JSON.stringify({ doesExist: true }))
+  } else {
+    res.send(JSON.stringify({ doesExist: false }))
+  }
+});
+
 app.post('/UserCreateAccount', async (req, res) => { //Get Event
   var inputDict = req.body;
   console.log("Create account request!")

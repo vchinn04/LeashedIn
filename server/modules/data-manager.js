@@ -57,7 +57,6 @@ exports.getUserData =  async function (usrIndex) { //Getter function template
   console.log(usrIndex)
 
   let docs = await UserM.findOne({ username:usrIndex });
-  console.log("THE USER DATA:", docs)
   return  docs;
 }
 
@@ -70,6 +69,16 @@ exports.getUserList =  async function (searchParams) { //Getter function templat
   console.log(docs)
   console.log("------------------")
   return  docs;
+}
+
+exports.checkIfUserExists = async function (usrNameV) {
+  if (await UserM.findOne({ username: usrNameV }) != null) { //check if the user already exists
+    console.log("Username DOES exist: ", usrNameV)
+    return true;
+  } else {
+    console.log("Username doesn't exist: ", usrNameV)
+    return false;
+  }
 }
 
 exports.addUser = async function (usrEmailV, usrNameV, usrPasswordV) {
