@@ -47,7 +47,7 @@ class CreateAccount extends React.Component {
         console.log(this.state.email)
         console.log(this.state.password)
         console.log(this.state.username)
-  
+
         //create the account
         fetch('/UserCreateAccount',
           {
@@ -58,11 +58,11 @@ class CreateAccount extends React.Component {
             body: JSON.stringify({ email: this.state.email, password: this.state.password,
                                 username: this.state.username }),
           }) .then((response) => response.json())
-  
+
           .then((result) => {
             if (!result.IsSuccessful)
             {
-  
+
             }
             else {
                    //then attempt to login the user
@@ -144,7 +144,7 @@ class CreateAccount extends React.Component {
                 justifyContent: 'center',
                 alignItems: 'center',
                 height: '100vh',
-              }}> 
+              }}>
             <div className='login-background-frame'>
               <h1>Sign Up</h1>
                   <h3>Join the petwork</h3>

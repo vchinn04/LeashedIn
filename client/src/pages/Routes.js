@@ -12,8 +12,6 @@ import ProfilePage from "./ProfilePage"
 const Router = () => {
   const [loginStatus, setLoginState] = LoginState();  //Create hook
 
-  console.log(loginStatus)
-
   return (
     <Routes>
       <Route exact path="/" element={(loginStatus) ? <MainPage loginStatus={loginStatus} setLoginState={setLoginState} /> : <HomePage setLoginState={setLoginState} /> } /> //Render either login page or main page depending on login status.
