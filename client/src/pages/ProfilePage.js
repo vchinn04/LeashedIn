@@ -262,6 +262,7 @@ const ProfilePage = (props) =>
                    var reader  = new FileReader();
                    reader.onload = function(e)  {
                      i["DisplayImage"] = e.target.result
+                     console.log(i["DisplayImage"])
                    }
 
                    reader.readAsDataURL(myBlob);

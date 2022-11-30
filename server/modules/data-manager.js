@@ -32,6 +32,7 @@ const postSchema = new mongoose.Schema({
   postId: String,
   postDescription: String,
   postImage: String,
+  DisplayImage: String,
   postLikes: { type: Number, default: 0 },
   postComments: Array
 });
@@ -244,15 +245,11 @@ exports.addPost = async function (postEntry, usrIndx) {
 
         await postDatEntry.save()
         let docs = await UserM.findOne({ username:usrIndx });
-        console.log(docs)
-        console.log("bro")
         newPostList = docs.posts
         newPostList.push(postId)
         let totalPosts = await PostM.find();
         totalPostList = totalPosts
         totalPostList.push(postDatEntry)
-        console.log("total")
-        console.log(totalPostList)
           
         UserM.findOneAndUpdate({username:usrIndx},{posts: newPostList}, {allPosts: totalPostList},(error,result) => {
           if(error){
@@ -281,36 +278,45 @@ exports.getPostLikes = async function (postId) {
 }
 
 exports.updatePost = async function(postInfo, postId) {
-  console.log(petInfo)
-  console.log(petId)
   await PostM.findOneAndUpdate({postId:postId}, postInfo);
   return true
-
 }
 
 exports.getUserPosts = async function (usrIndex) {
   let docs = await UserM.findOne({ username:usrIndex });
   postArr = []
-  console.log(docs)
-  console.log("bro")
 
   for (let i of docs.posts)
   {
-    console.log(i)
     let postEntry = await PostM.findOne({ postId:i });
-    console.log(postEntry)
     postArr.push(postEntry)
   }
 
   return postArr;
 }
 
+exports.updateLikedPosts = async function (postIndex, usrIndex) {
+  let postDocs = await PostM.findOne({ postIndex:postIndex });
+  let docs = await UserM.findOne({ username:usrIndex });
+  newLikedList = docs.likedPosts
+  newLikedList.push(postDocs)
+  UserM.findOneAndUpdate({username: usrIndex}, {likedPosts: newLikedList},function(error,result){
+    if(error){
+      console.log("Error: ", error)
+    }else{
+      console.log(result);
+      console.log("hello")
+    }
+  });
+  console.log("LIKED INFO")
+  console.log(docs2)
 
+
+}
 
 
 exports.updateLikes = function (postInfo) { //Function will be used for updating existing users data
   console.log("Updating post");
-  console.log(postInfo.postId)
    PostM.findOneAndUpdate({postId: postInfo.postId}, {$inc : {'postLikes' : 1}},function(error,result){
      if(error){
        console.log("Error: ", error)
@@ -336,7 +342,6 @@ exports.decreaseLikes = function (postInfo) { //Function will be used for updati
   }
 
   exports.getPostData =  async function (postIndex) { //Getter function template
-    console.log("Getting post data");
     console.log(postIndex)
   
     let docs = await PostM.findOne({ postId:postIndex });
@@ -388,10 +393,7 @@ exports.addComment = async function (commentEntry, postIndx) {
         const commentDatEntry = new CommentM(commentEntry)
 
         await commentDatEntry.save()
-        console.log(postIndx)
         let docs = await PostM.findOne({ postId:postIndx });
-        console.log(docs)
-        console.log("bro")
         newCommentList = docs.postComments
         newCommentList.push(commentDatEntry)
 

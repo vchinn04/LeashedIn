@@ -51,7 +51,6 @@ const Feed = (props ) =>
   let { id } = useParams();
   const [aboutState, setAboutState] = useState("");
   const [isEditing, setEdit] = useState(false);
-  const [ownerName, setName] = useState("Victor Chinnappan");
   const [inputImage, setImage] = useState(null);
   const [inputImagePath, setImagePath] = useState(null);
   const [inputImageFile, setImageFile] = useState(null);
@@ -92,8 +91,10 @@ const Feed = (props ) =>
     if (postInformation.PostImage)
       data.append('postimage', inputImageFile, inputImageFile.name)
 
-    console.log(inputImageFile)
-    console.log(postInformation.PostImage)
+
+    if (postInformation.DisplayImage)
+        data.append('inputImage', postInformation.DisplayImage)
+
     data.append('PostDescription', postInformation.PostDescription)
     data.append('userIndex', props.loginStatus)
     fetch('/UserCreatePost',
@@ -107,7 +108,8 @@ const Feed = (props ) =>
         
         let postListNew = postList
         console.log(postList)
-        result["DisplayImage"] = postInformation.DisplayImage
+        result["DisplayImage"] = postInformation.DisplayImage // if it was succesful add the image sent back from server to pet entry
+
         postListNew.push(result)
 
         setPostList(postListNew)
@@ -220,31 +222,32 @@ const Feed = (props ) =>
         })
       const url = '/getUserProfileText?' + new URLSearchParams({ username: props.loginStatus }).toString()
       const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username: props.loginStatus }).toString()
-      const getPostListURL = '/getUserPosts?' + new URLSearchParams({ username: props.loginStatus }).toString()
+      const getPostListURL = '/getPostList?'
 
 
       fetch(getPostListURL).then((response) => response.json())
        .then((result) => {
          console.log('Info retrieval success!');
          if (result)
+           console.log(result)
            var finalArr = []
            var promiseArr = [];
            for (let i of result)
            {
-             if (i["DisplayImage"])
+             console.log(i["postImage"])
+             if (i.postImage == '')
                 continue
-
               const postPicURL = '/getPostPic?' + new URLSearchParams({ imagePath: i["postImage"] }).toString()
 
               promiseArr.push(fetch(postPicURL)
                  .then(async (result) => {
                    console.log('File retrieval success!');
                    let myBlob = await result.blob()
-
                    var reader  = new FileReader();
                    reader.onload = function(e)  {
-                     i["DisplayImage"] = e.target.result
-                     console.log(i)
+                    i["DisplayImage"] = e.target.result
+                    console.log(i["DisplayImage"])
+
                    }
 
                    reader.readAsDataURL(myBlob);

@@ -56,7 +56,6 @@ app.get('/getUserProfileText', async (req, res) => { // return the profile info 
 });
 
 app.get('/getUserProfilePic', async (req, res) => { // return the profile picture of a specified user
-  console.log("Getting Profile Pic!")
   const userData = await dataManager.getUserData(req.query.username)
   if (userData.profilePicture){
     let imagePath = "/images/" + userData.profilePicture
@@ -297,17 +296,15 @@ app.delete('/Pets', async (req, res) => { // delete a pet
 
 app.post('/UserCreatePost', post_upload.single('postimage'), async (req, res) => { //Get Event
   console.log("Creating Post!")
-
+  console.log(req.file)
   const postEntry = {
     username: req.body.userIndex,
     postDescription: req.body.PostDescription,
     postLikes: 0,
+    DisplayImage: req.body.inputImage,
     postImage: ((req.file) ? req.file.filename : "")
   }
-  console.log(postEntry.postImage)
-  console.log(req.body)
-  console.log(req.body.PostDescription)
-  console.log(req.body.userIndex)
+
   const postId = await dataManager.addPost(postEntry, req.body.userIndex);
   let fileP = ""
 
@@ -319,8 +316,10 @@ app.post('/UserCreatePost', post_upload.single('postimage'), async (req, res) =>
     postId: postId,
     postDescription: req.body.PostDescription,
     postLikes: 0,
+    DisplayImage: req.body.inputImage,
     postImage: fileP
   }
+  console.log("HIII")
   console.log(returnPost)
   res.send(JSON.stringify(returnPost));
 });
@@ -331,11 +330,19 @@ app.get('/getUserPosts', async (req, res) => { //Get Event
   res.send(postList)
 });
 
+app.get('/getPostList', async (req, res) => { //Get Event
+  const postListData = await dataManager.getPostList()
+  res.send(postListData)
+
+});
+
 
 app.get('/getPostPic', async (req, res) => { //Get Event
   if (req.query.imagePath) {
-    let imagePath = "/postpics/" + req.query.imagePath
-    res.sendfile(imagePath, { root: __dirname });
+    let imagePath2 = "/postpics/" + req.query.imagePath
+    console.log("IMAGEE")
+    console.log(imagePath2)
+    res.sendfile(imagePath2, { root: __dirname });
   }
   else {
     res.send({result: false})
@@ -348,6 +355,24 @@ app.get('/getPostPic', async (req, res) => { //Get Event
 app.get('/getPostLikes', async (req, res) => { //Get Event
   let likes = await dataManager.getPostLikes(req.query.postId)
   return likes
+});
+
+app.post('/UpdatePostLikes', upload.single('image'), async (req, res) => {
+
+  const postInfo = {
+    postId: req.body.postId,
+    postLikes: req.body.postLikes
+  }
+
+
+  dataManager.updateLikes(postInfo);
+  res.send(JSON.stringify({ loginStatus: "ohh yea", errorMessage: 'No Errors!' }));
+
+});
+
+app.post('/updateLikedPosts', async (req, res) => { //Get Event
+  console.log("erm okay")
+  dataManager.updateLikedPosts(req.body.postId, req.body.userId);
 });
 
 app.post('/UpdatePostLikes', upload.single('image'), async (req, res) => {
@@ -383,21 +408,31 @@ app.delete('/DeletePost', async (req, res) => { //Get Event
   if (!postEntry)
     res.send({ returnValue: false })
 
+  if (postEntry.postImage != "")
+  {
+    const imagePath = __dirname + "/postpics/" + postEntry.postImage
+    if (postEntry.postImage.length > 3)
+      fs.exists(imagePath,  (exists) => {
+        if (exists)
+          fs.unlinkSync(imagePath)
+      });
 
+  }
   let ret = await dataManager.deletePost(req.query.postId, req.query.userIndex)
   res.send({ returnValue: ret })
 });
 
 
+
 app.get('/getPostArr', async (req, res) => { //Get Event
   const postListData = await dataManager.getPostList()
-
+  console.log("POST LIST")
+  console.log(postListData)
   res.send({ express: 'heye from Express', postList: JSON.stringify(postListData)  });
 });
 
 app.post('/UserCreateComment', upload.single('image'), async (req, res) => { //Get Event
   console.log("Creating Comment!")
-  console.log(req.body.postIndex)
 
   const commentEntry = {
     username: req.body.userIndex,
@@ -412,7 +447,6 @@ app.post('/UserCreateComment', upload.single('image'), async (req, res) => { //G
     username: req.body.userIndex,
     commentDescription: req.body.commentDescription,
   }
-  console.log(returnComment)
   res.send(JSON.stringify(returnComment));
 });
 

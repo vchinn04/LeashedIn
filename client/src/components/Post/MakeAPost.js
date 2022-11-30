@@ -83,6 +83,7 @@ const MakeAPost = props => {
       reader.onload = function(e)  {
          setImage(e.target.result)
       }
+      console.log(file)
       setImageFile(file)
       reader.readAsDataURL(file);
     }
@@ -97,7 +98,6 @@ const MakeAPost = props => {
             DisplayImage: inputImage,
             PostDescription: postDescription,
           }
-
           props.addPost(postInformation, inputImageFile)
           togglePopup()
 

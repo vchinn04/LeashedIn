@@ -71,7 +71,7 @@ const Post = (props) => {
 
     const updateLikes = (postInformation) => {
         var data = new FormData()
-    
+        
         console.log(postInformation.postId)
         console.log(postInformation.postLikes)
         data.append('postId', postInformation.postId)
@@ -89,7 +89,24 @@ const Post = (props) => {
           .catch((error) => {
             console.error('Error:', error);
           });
+
+/*           data.append('userId', props.username)
+          fetch('/UpdateLikedPosts',
+            {
+              method: 'POST',
+              body: data
+            }).then((response) => response.json())
+      
+            .then((result) => {
+              window.location.reload(false);
+              
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            }); */
       }
+
+  
 
       const updateLikes2 = (postInformation) => {
         var data = new FormData()
@@ -172,6 +189,7 @@ const Post = (props) => {
           const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username:  props.postInfo.username}).toString()
 
           console.log(props.postInfo.username)
+          console.log(props.postInfo.DisplayImage)
     
            fetch(getPfpURL)
            .then(async (result) => {
@@ -206,20 +224,20 @@ const Post = (props) => {
                                         {props.postInfo.username} 
                                 </div> 
 
-                    <Button className = 'row' onClick={() => {props.deletePost(props.postInfo)}} color = "error" style={{marginLeft: 600}}>
-                        <DeleteIcon/>
-                    </Button>
+                    { (props.username == props.postInfo.username) && <Button className = 'row' onClick={() => {props.deletePost(props.postInfo)}} color = "error" style={{marginLeft: 600}}>
+                        <DeleteIcon/> 
+                    </Button>}
                 </div>
                     
   
             <Divider component="li" sx={{borderBottomWidth: 2, color: 'purple'}}/>
 
-            <Box sx={{  mb: 0, mx: 'auto', color: "#7150BC",textAlign:"left", borderRadius: '15px' , marginTop: '15'}}>
+            <Box sx={{ mb: 0, mx: 'auto', color: "#7150BC",textAlign:"left", borderRadius: '15px' , marginTop: '15'}}>
                 <Container style={{marginBottom: '30'}}>
                     <div style = {{color: 'black', fontWeight: 'normal', justifyContent: 'space-between'}} > 
                         {props.postInfo.postDescription} 
                     </div>
-                    {props.postInfo.DisplayImage &&                     
+                    {(props.postInfo.DisplayImage !== null) &&                     
                     <img className = "image" sx = {{height: '20', width: '20'}}
                         src={props.postInfo.DisplayImage} /> }
 
@@ -263,9 +281,9 @@ const Post = (props) => {
                                     <div className = 'row'>
                                         {element.commentDescription}
                                     </div>
-                                    <Button className = 'row' onClick={() => {deleteComment(element)}} color = "error" style={{marginLeft: 70, fontSize: 10, fontWeight: '700'}}>
+                                    {(props.username == element.username) && <Button className = 'row' onClick={() => {deleteComment(element)}} color = "error" style={{marginLeft: 70, fontSize: 10, fontWeight: '700'}}>
                                         Delete
-                                    </Button>
+                                    </Button>}
                                 </Box>
                             </div>
                             )
