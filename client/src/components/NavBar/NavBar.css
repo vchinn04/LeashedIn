@@ -19,8 +19,6 @@
 }
 
 
-div Box, div TextField
-{
+div Box, div TextField {
   position:absolute;
-
 }

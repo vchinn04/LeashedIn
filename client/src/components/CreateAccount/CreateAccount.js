@@ -44,7 +44,7 @@ class CreateAccount extends React.Component {
         console.log(this.state.email)
         console.log(this.state.password)
         console.log(this.state.username)
-  
+
         //create the account
         fetch('/UserCreateAccount',
           {
@@ -55,12 +55,12 @@ class CreateAccount extends React.Component {
             body: JSON.stringify({ email: this.state.email, password: this.state.password,
                                 username: this.state.username }),
           }) .then((response) => response.json())
-  
+
           .then((result) => {
             console.log('Success:', result.loginStatus);
             if (!result.loginStatus)
             {
-  
+
             }
             else {
             //  switchToMainPage()
@@ -73,32 +73,27 @@ class CreateAccount extends React.Component {
             console.error('Error:', error);
           });
 
+          const loginURL = '/UserLogIn?' + new URLSearchParams({ email: this.state.email, password: this.state.password }).toString()
 
-        //then login the user
-          fetch('/UserLogIn',
-        {
-          method: 'POST',
-          headers: { "Content-Type": "application/json",
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({ email: this.state.email, password: this.state.password }),
-        }) .then((response) => response.json())
+          //then login the user
+          fetch(loginURL).then((response) => response.json())
 
-        .then((result) => {
-          console.log('Success:', result.loginStatus);
-          if (!result.loginStatus)
-          {
+          .then((result) => {
+            console.log('Success:', result.loginStatus);
+            if (!result.loginStatus)
+            {
 
-          }
-          else {
-          //  switchToMainPage()
-            this.props.setLoginState(result.username)
-          }
-        })
-        .catch((error) => {
-          console.log("Noo")
-          console.error('Error:', error);
-        });
+            }
+            else {
+            //  switchToMainPage()
+              this.props.setLoginState(result.username)
+            }
+          })
+          .catch((error) => {
+            console.log("Noo")
+            console.error('Error:', error);
+          });
+  
       }
 
 
@@ -110,7 +105,7 @@ class CreateAccount extends React.Component {
                 justifyContent: 'center',
                 alignItems: 'center',
                 height: '100vh',
-              }}> 
+              }}>
             <div className='login-background-frame'>
               <h1>Sign Up</h1>
                   <h3>Join the petwork</h3>
