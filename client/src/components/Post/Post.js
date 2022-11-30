@@ -30,22 +30,24 @@ const Post = (props) => {
     const [comment, setComment] = useState(false)
     const [commentList, setCommentList] = useState(commentListT);
     const [commentDescription, setCommentDescription] = useState("")
+    const [inputImage, setImage] = useState(null);
 
-    useEffect(() => {
+
+/*     useEffect(() => {
         setClicked(JSON.parse(window.localStorage.getItem('clicked')));
       }, []);
     
       useEffect(() => {
         window.localStorage.setItem('clicked', clicked);
       }, [clicked]);
-    
-      const addComment = (commentInformation, postIndx) => {
+     */
+      const addComment = (commentInformation) => {
         var data = new FormData()
     
         data.append('commentDescription', commentInformation.CommentDescription)
-        data.append('postIndex', postIndx)
-
-        console.log(commentInformation.commentDescription)
+        data.append('postIndex', props.postInfo.postId)
+        data.append('userIndex', props.username)
+        console.log(props.postInfo.postId)
         fetch('/UserCreateComment',
           {
             method: 'POST',
@@ -59,11 +61,14 @@ const Post = (props) => {
 
             setCommentList(commentListNew)
             console.log(commentList)
+            window.location.reload(false);
+
           })
           .catch((error) => {
             console.error('Error:', error);
           });
       }
+
     const updateLikes = (postInformation) => {
         var data = new FormData()
     
@@ -78,7 +83,8 @@ const Post = (props) => {
           }).then((response) => response.json())
     
           .then((result) => {
-    
+            window.location.reload(false);
+            
           })
           .catch((error) => {
             console.error('Error:', error);
@@ -102,6 +108,8 @@ const Post = (props) => {
     
             let postLikes = result
             console.log(postLikes)
+            window.location.reload(false);
+            
           })
           .catch((error) => {
             console.error('Error:', error);
@@ -113,21 +121,89 @@ const Post = (props) => {
         const commentInformation = {
             CommentDescription: commentDescription,
           }
+        console.log(props.postInfo.postComments)
 
-        console.log(props.key)
-
-          addComment(commentInformation, props.key)
+          addComment(commentInformation)
           setComment(false)
 
     }
+
+    const deleteComment = (commentEntry) =>
+    {
+      console.log("Delete comment!")
+      console.log("hello")
+
+  
+      let index = -1
+      for (let i = 0; i < props.postInfo.postComments.length; i++) {
+        if (props.postInfo.postComments[i].commentId == commentEntry.commentId){
+            if (props.username == props.postInfo.postComments[i].username) {
+                    index = i
+                    break
+            }
+        }
+      }
+  
+      if (index > -1)
+      {
+        const url = '/DeleteComment?' + new URLSearchParams({ commentId: props.postInfo.postComments[index].commentId, postIndex: props.postInfo.postId }).toString()
+  
+        fetch(url, {
+          method: 'DELETE',
+        }).then((response) => response.json())
+  
+        .then((result) => {
+           console.log('Success:', result.returnValue);
+           window.location.reload(false);
+           window.location.reload(false);
+
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+  
+      }
+    }
+  
+      useEffect(() => {
+        const getData = async() => {
+    
+  
+          const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username:  props.postInfo.username}).toString()
+
+          console.log(props.postInfo.username)
+    
+           fetch(getPfpURL)
+           .then(async (result) => {
+             console.log('File retrieval success!');
+             let myBlob = await result.blob()
+     
+              var reader  = new FileReader();
+              reader.onload = function(e)  {
+                  setImage(e.target.result)
+               }
+               reader.readAsDataURL(myBlob);
+           })
+           .catch((error) => {
+             console.error('Error:', error);
+           });
+    
+           
+        }
+
+    getData()
+
+  }, []);
+  
+
     return (
             <Container className = "Post" >
                 <div className = 'row'>
-                    <IconButton className = 'row' color="primary" aria-label="profile"  component={Link} to={`/profile/${props.loginStatus}`}>
-                        <Avatar src={props.profilePic} alt="Profile" />
+                    <IconButton className = 'row' color="primary" aria-label="profile"  component={Link} to={`/profile/${props.postInfo.username}`}>
+                        <Avatar src={inputImage} alt="Profile" />
                      </IconButton>
                     <div className = 'row' style = {{color: 'black', fontWeight: '700', }} > 
-                                        {props.username} 
+                                        {props.postInfo.username} 
                                 </div> 
 
                     <Button className = 'row' onClick={() => {props.deletePost(props.postInfo)}} color = "error" style={{marginLeft: 600}}>
@@ -143,8 +219,10 @@ const Post = (props) => {
                     <div style = {{color: 'black', fontWeight: 'normal', justifyContent: 'space-between'}} > 
                         {props.postInfo.postDescription} 
                     </div>
+                    {props.postInfo.DisplayImage &&                     
                     <img className = "image" sx = {{height: '20', width: '20'}}
-                        src={props.postInfo.DisplayImage} /> 
+                        src={props.postInfo.DisplayImage} /> }
+
                     
                 </Container> 
             </Box>
@@ -157,6 +235,7 @@ const Post = (props) => {
                         {{if (clicked == false) {updateLikes(props.postInfo); setClicked(true)} else {updateLikes2(props.postInfo); setClicked(false)}}}} style={{maxWidth: '30px', maxHeight: '30px', minWidth: '30px', minHeight: '30px'}}>
                         {clicked ? <ThumbUpIcon style = {{color: "black"}}/> : <ThumbUpOffAltIcon style = {{color: "black"}}/>}
                     </Button>
+                
                     <div className='row' style = {{color: 'black', fontWeight: '700', marginRight: 15}} > 
                         Like 
                     </div> 
@@ -171,7 +250,29 @@ const Post = (props) => {
                     <Container className = 'row' style = {{color: 'black', fontWeight: 'normal', justifyContent: 'space-between', marginLeft: 700}}>
                      Likes: {props.likes} 
                     </Container>
-{/*                     {comment ? <TextField id="outlined-basic"
+                    <Divider component="li" sx={{borderBottomWidth: 2}}/>
+
+                    {
+                        props.postInfo.postComments && props.postInfo.postComments.map((element) => {
+                            return (
+                            <div key={element.commentId} >
+                                <Box sx={{  mb: 0, mx: 'auto', color: "#7150BC",textAlign:"left", borderRadius: '30px' , marginTop: '15'}}>
+                                    <div className = 'row' style={{fontWeight: '700', marginRight: 20}}>
+                                        {element.username}     
+                                    </div>
+                                    <div className = 'row'>
+                                        {element.commentDescription}
+                                    </div>
+                                    <Button className = 'row' onClick={() => {deleteComment(element)}} color = "error" style={{marginLeft: 70, fontSize: 10, fontWeight: '700'}}>
+                                        Delete
+                                    </Button>
+                                </Box>
+                            </div>
+                            )
+                            })
+                    }
+
+                    {comment ? <TextField id="outlined-basic"
                                 name="Comment"
                                 label="Comment"
                                 fullWidth
@@ -179,19 +280,12 @@ const Post = (props) => {
                                 sx={{height:'10%'}}
                                 onChange={(event) => {setCommentDescription(event.target.value)}}
                             /> : <div/>}
-                    {comment ?   <Button variant="contained" size="small" sx={{ width: 1, fontWeight: 'bold', alignContent: 'center', marginBottom: 3}} onClick={handleCommentCreate()}>
+                    {comment ?   <Button variant="contained" size="small" sx={{ width: 1, fontWeight: 'bold', alignContent: 'center', marginBottom: 3}} onClick={() => 
+                        {handleCommentCreate()}}>
                                 Comment
                     </Button> : <div/>}
 
-                    {
-                        commentList.map((element) => {
-                            return (
-                            <div key={element.commentId}>
-                                {element.commentDescription}
-                            </div>
-                            )
-                            })
-                    } */}
+
 
                 </div>
             </Container>

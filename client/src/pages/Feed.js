@@ -30,6 +30,8 @@ import CreatePet from "../components/PetComponents/CreatePet"
 const postListT = []
 const totalListT = []
 const totalListTwo = []
+const postArrT = []
+
 
 const EditSaveButton = (props) =>
 {
@@ -68,10 +70,25 @@ const Feed = (props ) =>
   const [postList, setPostList] = useState(postListT);
   const [currentPost, setCurrentPost] = useState(null);
   const [totalPostList, setTotalPostList] = useState(totalListT);
+  const [postArr, setPostArr] = useState([]);
+
+  const getPosts = async() => {
+    const url = '/getPostArr?' //Fire get event to find users with search string in their usernames
+    const response = await fetch(url);
+    const body= await response.json();
+
+    let postArray = JSON.parse(body.postList)
+
+    return postArray
+
+}
 
 
   const addPost = (postInformation, inputImageFile) => {
     var data = new FormData()
+
+   console.log("hello")
+
     if (postInformation.PostImage)
       data.append('postimage', inputImageFile, inputImageFile.name)
 
@@ -87,47 +104,37 @@ const Feed = (props ) =>
 
       .then((result) => {
 
+        
         let postListNew = postList
+        console.log(postList)
         result["DisplayImage"] = postInformation.DisplayImage
         postListNew.push(result)
-        const results = postListNew.filter(element => {
-            return element !== null;
-          });
-        setPostList(results)
-        let likes = result.postLikes
-        console.log(likes)
-        setCurrentPost(null)
+
+        setPostList(postListNew)
       })
       .catch((error) => {
         console.error('Error:', error);
       });
-      fetch('/GetEveryUserPosts').then((response) => response.json())
 
-      .then((result) => {
-
-        let totalPostListNew = totalPostList
-        let totalPostListNew2 = []
-        result.forEach((element) => {
-            if (element !== null) {
-              totalPostListNew2.push(element);
+      getPosts()
+      .then(res => {
+        const someData = res;
+        let postArray = res
+        console.log(postArray)
+        if (postArray.length == 0) //If no users found then push a "fake" user to display that no users found
+        {
+          postArray.push(
+            {
+              _id: -1, //assign _id to -1 in order for the button to be disabled
             }
-          });
-          result.forEach((element) => {
-            if (element !== null && !totalListTwo.includes(element)) {
-              totalListTwo.push(element);
-            }
-          });
-        totalPostListNew = totalPostListNew2
-        setTotalPostList(totalPostListNew)
-
-        console.log(result)
-        console.log(totalPostListNew)
-        console.log(totalListTwo)
-
+          )
+        }
+        setPostArr(postArray)
       })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
+      window.location.reload(false)
+
+
+
   }
 
 
@@ -138,17 +145,22 @@ const Feed = (props ) =>
     console.log("Delete post!")
 
     let index = -1
-    for (let i = 0; i < postList.length; i++) {
-      if (postList[i].postId == postEntry.postId){
-        index = i
-        break
+    for (let i = 0; i < postArr.length; i++) {
+      if (postArr[i].postId == postEntry.postId){
+        if (postArr[i].username == props.loginStatus) {
+            index = i
+            break
+        }
       }
     }
+
+    console.log(postEntry.postId)
+
 
 
     if (index > -1)
     {
-      const url = '/DeletePost?' + new URLSearchParams({ postId: postList[index].postId, userIndex: props.loginStatus }).toString()
+      const url = '/DeletePost?' + new URLSearchParams({ postId: postArr[index].postId, userIndex: props.loginStatus }).toString()
 
       fetch(url, {
         method: 'DELETE',
@@ -156,18 +168,20 @@ const Feed = (props ) =>
 
       .then((result) => {
          console.log('Success:', result.returnValue);
+         window.location.reload(false);
       })
       .catch((error) => {
         console.error('Error:', error);
       });
-        postList.splice(index, 1);
+        postArr.splice(index, 1);
+
 
     }
 
 
 
-    setCurrentPost(null);
-    setPostList(postList)
+    setPostArr(postArr)
+
 
 
   }
@@ -188,10 +202,25 @@ const Feed = (props ) =>
 
   useEffect(() => {
     const getData = async() => {
+
+    getPosts()
+        .then(res => {
+          const someData = res;
+          let postArray = res
+          if (postArray.length == 0) //If no users found then push a "fake" user to display that no users found
+          {
+            postArray.push(
+              {
+                _id: -1, //assign _id to -1 in order for the button to be disabled
+              }
+            )
+          }
+          setPostArr(postArray)
+          console.log(postArray)
+        })
       const url = '/getUserProfileText?' + new URLSearchParams({ username: props.loginStatus }).toString()
       const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username: props.loginStatus }).toString()
       const getPostListURL = '/getUserPosts?' + new URLSearchParams({ username: props.loginStatus }).toString()
-      const getEveryPostListURL = '/getEveryUserPosts?'
 
 
       fetch(getPostListURL).then((response) => response.json())
@@ -215,6 +244,7 @@ const Feed = (props ) =>
                    var reader  = new FileReader();
                    reader.onload = function(e)  {
                      i["DisplayImage"] = e.target.result
+                     console.log(i)
                    }
 
                    reader.readAsDataURL(myBlob);
@@ -227,30 +257,13 @@ const Feed = (props ) =>
               finalArr.push(i)
             }
 
-               Promise.all(promiseArr).then(() =>
-               {
-                 setPostList(result)
-
-                 fetch(url).then((response) => response.json())
-                 .then((result) => {
-                   console.log('Info retrieval success!');
-                   if (result.PostDescription)
-                     setAboutState(result.postDescription)
-
-                 //  if (result.ownerName)
-                   //  setName(result.ownerName)
-                 })
-                 .catch((error) => {
-                   console.error('Error:', error);
-                 });
-               })
        })
        .catch((error) => {
          console.error('Error:', error);
        });
 
 
-       fetch(url)
+       fetch(getPfpURL)
        .then(async (result) => {
          console.log('File retrieval success!');
          let myBlob = await result.blob()
@@ -279,14 +292,23 @@ const Feed = (props ) =>
         <Container style={{alignContent: 'center'}}>
             <List style = {{margin: 100, alignContent:'center', width: 800, height: 700}}>
                 <MakeAPost  addPost={addPost} setCurrentPost={setCurrentPost}/>
-                    {
-                        postList.map((element) => {
+{/*                     {
+                        postList.reverse().map((element) => {
                             return (
                             <Post key={element.postId} postInfo = {element} username = {props.loginStatus} deletePost={deletePost} likes = {element.postLikes} profilePic = {inputImage}>
                             </Post>
                             )
                             })
-                    }
+                    } */}
+
+                    {
+                        (postArr.length > 0) && (postArr[0]._id != -1) && postArr.slice(0).reverse().map((element) => {
+                            return (
+                            <Post key={element.postId} postInfo = {element} username = {props.loginStatus} deletePost={deletePost} likes = {element.postLikes} profilePic = {inputImage}>
+                            </Post>
+                            )
+                            }) 
+                    } 
                 </List>
             </Container>
         </Paper>

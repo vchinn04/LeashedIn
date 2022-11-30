@@ -317,6 +317,7 @@ app.post('/UserCreatePost', post_upload.single('postimage'), async (req, res) =>
   console.log("Creating Post!")
 
   const postEntry = {
+    username: req.body.userIndex,
     postDescription: req.body.PostDescription,
     postLikes: 0,
     postImage: ((req.file) ? req.file.filename : "")
@@ -324,6 +325,7 @@ app.post('/UserCreatePost', post_upload.single('postimage'), async (req, res) =>
   console.log(postEntry.postImage)
   console.log(req.body)
   console.log(req.body.PostDescription)
+  console.log(req.body.userIndex)
   const postId = await dataManager.addPost(postEntry, req.body.userIndex);
   let fileP = ""
 
@@ -331,6 +333,7 @@ app.post('/UserCreatePost', post_upload.single('postimage'), async (req, res) =>
     fileP = req.file.filename
 
  returnPost = {
+    username: req.body.userIndex,
     postId: postId,
     postDescription: req.body.PostDescription,
     postLikes: 0,
@@ -346,15 +349,18 @@ app.get('/getUserPosts', async (req, res) => { //Get Event
   res.send(postList)
 });
 
-app.get('/getEveryUserPosts', async (req, res) => { //Get Event
-  const postList = await dataManager.getEveryUserPosts()
-  res.send(postList)
-});
 
 app.get('/getPostPic', async (req, res) => { //Get Event
-  let imagePath = "/postpics/" + req.query.imagePath
-  res.sendfile(imagePath, { root: __dirname });
+  if (req.query.imagePath) {
+    let imagePath = "/postpics/" + req.query.imagePath
+    res.sendfile(imagePath, { root: __dirname });
+  }
+  else {
+    res.send({result: false})
+  }
+
 });
+
 
 
 app.get('/getPostLikes', async (req, res) => { //Get Event
@@ -371,7 +377,6 @@ app.post('/UpdatePostLikes', upload.single('image'), async (req, res) => {
 
 
   dataManager.updateLikes(postInfo);
-  console.log(postInfo.postLikes)
   res.send(JSON.stringify({ loginStatus: "ohh yea", errorMessage: 'No Errors!' }));
 
 });
@@ -385,8 +390,7 @@ app.post('/DecreaseLikes', upload.single('image'), async (req, res) => {
 
 
   dataManager.decreaseLikes(postInfo);
-  console.log("LIKEs")
-  console.log(postInfo.postLikes)
+
   res.send(JSON.stringify({ loginStatus: "ohh yea", errorMessage: 'No Errors!' }));
 
 });
@@ -402,15 +406,19 @@ app.delete('/DeletePost', async (req, res) => { //Get Event
   res.send({ returnValue: ret })
 });
 
-dataManager.setupMongo().catch(err => console.log(err)); //Initialize the DataBase in the data-manager modules
-app.listen(port, () => console.log(`Server Up! Listening on port ${port}`)); //Binds server to localhost:5000
 
+app.get('/getPostArr', async (req, res) => { //Get Event
+  const postListData = await dataManager.getPostList()
+
+  res.send({ express: 'heye from Express', postList: JSON.stringify(postListData)  });
+});
 
 app.post('/UserCreateComment', upload.single('image'), async (req, res) => { //Get Event
   console.log("Creating Comment!")
   console.log(req.body.postIndex)
 
   const commentEntry = {
+    username: req.body.userIndex,
     commentDescription: req.body.commentDescription,
 
   }
@@ -419,8 +427,25 @@ app.post('/UserCreateComment', upload.single('image'), async (req, res) => { //G
 
  returnComment = {
     commentId: commentId,
+    username: req.body.userIndex,
     commentDescription: req.body.commentDescription,
   }
   console.log(returnComment)
   res.send(JSON.stringify(returnComment));
 });
+
+app.delete('/DeleteComment', async (req, res) => { //Get Event
+  let commentEntry = await dataManager.getComment(req.query.commentId)
+
+  if (!commentEntry)
+    res.send({ returnValue: false })
+
+  
+  let ret = await dataManager.deleteComment(req.query.commentId, req.query.postIndex)
+  res.send({ returnValue: ret })
+});
+
+dataManager.setupMongo().catch(err => console.log(err)); //Initialize the DataBase in the data-manager modules
+app.listen(port, () => console.log(`Server Up! Listening on port ${port}`)); //Binds server to localhost:5000
+
+
