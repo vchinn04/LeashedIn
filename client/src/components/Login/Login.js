@@ -20,7 +20,7 @@ import { Link } from 'react-router-dom';
 
 
 
-const ColorButton = styled(Button)(({ theme }) => ({
+const ColorButton = styled(Button)(({ theme }) => ({ // Button with custom color
   backgroundColor: "#825DD7",
   '&:hover': {
     backgroundColor: "#7150BC",
@@ -37,7 +37,6 @@ class Login extends React.Component {
       {
           username: '',
           password: '',
-          resultV: '',
           incorrectEntry: false
       };
 
@@ -59,41 +58,35 @@ class Login extends React.Component {
     async handleFormSubmit(event) {
       console.log(this.state.username)
       console.log(this.state.password)
+      const loginURL = '/UserLogIn?' + new URLSearchParams({ username: this.state.username, password: this.state.password }).toString()
 
-      fetch('/UserLogIn', // fire the server event to login user
+      fetch(loginURL).then((response) => response.json())
+      .then((result) => {
+        console.log('Success:', result.loginStatus);
+        if (!result.loginStatus)
         {
-          method: 'POST',
-          headers: { "Content-Type": "application/json",
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({ username: this.state.username, password: this.state.password }),
-        }) .then((response) => response.json())
+          this.setState({
+              incorrectEntry: true
+          });
+        }
+        else {
+          this.props.setLoginState(result.username)  // login the user (will switch them to homepage)
+        }
+      })
+      .catch((error) => {
+        console.log("Noo")
+        console.error('Error:', error);
+      });
 
-        .then((result) => {
-          console.log('Success:', result.loginStatus);
-          if (!result.loginStatus)
-          {
-            this.setState({
-                incorrectEntry: true
-            });
-          }
-          else {
-            this.props.setLoginState(result.username)  // login the user (will switch them to homepage)
-          }
-        })
-        .catch((error) => {
-          console.log("Noo")
-          console.error('Error:', error);
-        });
     }
 
 
     render() {
       // mostly copied from react-bootstrap page examples
-     // https://react-bootstrap.github.io/forms/overview/
-     // slightly changed some css and centered it
+      // https://react-bootstrap.github.io/forms/overview/
+      // slightly changed some css and centered it
 
-     // Changed to use MUI and Bootstrap together and added custom sx to mui buttons
+      // Changed to use MUI and Bootstrap together and added custom sx to mui buttons
         return (
             <div className='login-background-frame'>
                 <h3>Please Log In</h3>
@@ -150,9 +143,6 @@ class Login extends React.Component {
                 <Button variant="contained" color="success" size="large" sx={{ fontWeight: 'bold' }} component={Link} to="/CreateAccount">
                     Create Account
                 </Button>
-                  {
-                    this.state.redirect && <Navigate to='/main' replace={true}/>
-                  }
             </div>
         );
     }

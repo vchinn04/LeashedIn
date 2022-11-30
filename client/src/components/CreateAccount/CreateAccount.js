@@ -10,6 +10,7 @@ import { styled } from '@mui/material/styles';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import { redirect } from 'react-router-dom';
 
 
 class CreateAccount extends React.Component {
@@ -21,11 +22,13 @@ class CreateAccount extends React.Component {
         {
             email: '',
             username: '',
-            password: ''
+            password: '',
+            usernameTaken: '',
         };
 
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleFormSubmit = this.handleFormSubmit.bind(this);
+        this.handleUsernameChange = this.handleUsernameChange.bind(this);
     }
 
     // neat trick to handle all changes to both forms
@@ -44,7 +47,7 @@ class CreateAccount extends React.Component {
         console.log(this.state.email)
         console.log(this.state.password)
         console.log(this.state.username)
-  
+
         //create the account
         fetch('/UserCreateAccount',
           {
@@ -55,65 +58,101 @@ class CreateAccount extends React.Component {
             body: JSON.stringify({ email: this.state.email, password: this.state.password,
                                 username: this.state.username }),
           }) .then((response) => response.json())
-  
+
           .then((result) => {
-            console.log('Success:', result.loginStatus);
-            if (!result.loginStatus)
+            if (!result.IsSuccessful)
             {
-  
+
             }
             else {
-            //  switchToMainPage()
-             console.log(this.props)
-              this.props.setLoginState(true)
+                   //then attempt to login the user
+                  fetch('/UserLogIn',
+                {
+                  method: 'POST',
+                  headers: { "Content-Type": "application/json",
+                    'Accept': 'application/json'
+                  },
+                  body: JSON.stringify({ email: this.state.email, password: this.state.password }),
+                }) .then((response) => response.json())
+
+                .then((result) => {
+                  console.log('Success:', result.loginStatus);
+                  if (!result.loginStatus)
+                  {
+
+                  }
+                  else {
+                  //  switchToMainPage()
+                    this.props.setLoginState(result.username)
+                  }
+                })
+                .catch((error) => {
+                  console.log("Noo")
+                  console.error('Error:', error);
+                });
             }
           })
           .catch((error) => {
             console.log("Noo")
             console.error('Error:', error);
           });
+    }
+    
+    handleUsernameChange(a) {
+      // this.setState({ username: a.value}, () => {
+      //   console.log(this.state.username);
+      // });
 
+    //   this.setState({
+    //     username: a.target.value
+    // }, () => {
+    //     console.log(this.state.username)
+    // })
 
-        //then login the user
-          fetch('/UserLogIn',
+      this.setState({username: a.target.value});
+
+      fetch('/CheckUserExistence',
         {
           method: 'POST',
           headers: { "Content-Type": "application/json",
             'Accept': 'application/json'
           },
-          body: JSON.stringify({ email: this.state.email, password: this.state.password }),
+          body: JSON.stringify({username: a.target.value}),
         }) .then((response) => response.json())
 
         .then((result) => {
-          console.log('Success:', result.loginStatus);
-          if (!result.loginStatus)
+          if (!result.doesExist) //if username doesn't exist
           {
-
+            this.setState({
+              usernameTaken: "Username available!"
+            })
           }
-          else {
-          //  switchToMainPage()
-            this.props.setLoginState(result.username)
+          else { //if username does exist
+            this.setState({
+              usernameTaken: "Username taken!"
+            })
           }
-        })
-        .catch((error) => {
-          console.log("Noo")
-          console.error('Error:', error);
         });
-      }
+  }       
 
 
     render() {
-      const disabledIf = (!this.state.email.length || !this.state.username.length || !this.state.password.length)
+      const disabledIf = (!this.state.email.length || !this.state.username.length || !this.state.password.length || (this.state.usernameTaken != "Username available!"))
         return (
           <div style={{
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
                 height: '100vh',
-              }}> 
+              }}>
             <div className='login-background-frame'>
               <h1>Sign Up</h1>
                   <h3>Join the petwork</h3>
+                  <h5
+                    style={{
+                      color: this.state.usernameTaken != "Username available!" ? 'red' : 'green'
+                    }}
+                    >{this.state.usernameTaken}</h5>
                   <Container className='createAccountContainer' fluid>
                       <div>
                           <Form className="createAccountForm">
@@ -122,14 +161,16 @@ class CreateAccount extends React.Component {
                                   label="Username"
                                   name="username"
                                   margin = "normal"
+                                  size="small"
                                   value={this.state.username}
-                                  onChange={this.handleInputChange} />
+                                  onChange={this.handleUsernameChange} />
                               </Form.Group>
                               <Form.Group className="mb-1">
                                   <TextField id="outlined-basic"
                                   label="Email"
                                   name="email"
                                   margin = "normal"
+                                  size="small"
                                   value={this.state.email}
                                   onChange={this.handleInputChange} />
                               </Form.Group>
@@ -139,6 +180,7 @@ class CreateAccount extends React.Component {
                                   name="password"
                                   type="password"
                                   margin = "normal"
+                                  size="small"
                                   value={this.state.password}
                                   onChange={this.handleInputChange} />
                               </Form.Group>

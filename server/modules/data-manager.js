@@ -12,7 +12,9 @@ const userSchema = new mongoose.Schema({
   ownerName: String, //AKA displayName
   pets: Array,
   posts: Array,
-  followerPosts: Array,
+  allPosts: Array,
+  likedPosts: Array,
+  userComments: Array,
   profilePicture: String,
   username: String
 });
@@ -25,9 +27,8 @@ const petSchema = new mongoose.Schema({
   PetImage: String
 })
 
-
-
 const postSchema = new mongoose.Schema({
+  username: String,
   postId: String,
   postDescription: String,
   postImage: String,
@@ -36,6 +37,7 @@ const postSchema = new mongoose.Schema({
 });
 
 var commentSchema = new mongoose.Schema({
+  username: String,
   commentId: String,
   commentDescription: String
 });
@@ -64,18 +66,6 @@ exports.setupMongo = async function () { //Connect to our database and output th
   }
 }
 
-exports.addUser = async function (usrEmailV, usrNameV, usrPasswordV) {
-  console.log("Adding user");
-
-  const userEntry = new UserM({email: usrEmailV, username: usrNameV, password: usrPasswordV}); //Create a model (documet) for user
-
-  await userEntry.save(); //Save to our database
-
-  const userss = await UserM.find(); //Trying to retrieve all the Users collection  documents.
-  console.log(userss);
-  console.log(userEntry);
-}
-
 exports.getUser =  async function (usrIndex) { //Getter function template
   console.log("Getting user");
   console.log(usrIndex)
@@ -87,7 +77,7 @@ exports.getUser =  async function (usrIndex) { //Getter function template
   return  docs;
 }
 
-exports.getUserData =  async function (usrIndex) { //Getter function template
+exports.getUserData =  async function (usrIndex) { //Get the data of a single specified user
   console.log("Getting user data");
   console.log(usrIndex)
 
@@ -95,7 +85,7 @@ exports.getUserData =  async function (usrIndex) { //Getter function template
   return  docs;
 }
 
-exports.getUserList =  async function (searchParams) { //Getter function template
+exports.getUserList =  async function (searchParams) { // get a list of max length 5 based on search parameters
   console.log("Getting user list");
   console.log(searchParams)
   const regExVar = "/"+searchParams+"/"
@@ -104,6 +94,34 @@ exports.getUserList =  async function (searchParams) { //Getter function templat
   console.log(docs)
   console.log("------------------")
   return  docs;
+}
+
+exports.checkIfUserExists = async function (usrNameV) {
+  if (await UserM.findOne({ username: usrNameV }) != null) { //check if the user already exists
+    console.log("Username DOES exist: ", usrNameV)
+    return true;
+  } else {
+    console.log("Username doesn't exist: ", usrNameV)
+    return false;
+  }
+}
+
+exports.addUser = async function (usrEmailV, usrNameV, usrPasswordV) {
+  console.log("Attempting to add user");
+
+  if (await exports.getUserData(usrNameV) != null) { //check if the user already exists
+    console.log("USER ALREADY EXISTS! USER WON'T BE ADDED!")
+    return -1;
+  }
+  console.log("Username not taken! Will add user:", usrNameV)
+
+  const userEntry = new UserM({email: usrEmailV, username: usrNameV, password: usrPasswordV}); //Create a model (documet) for user
+
+  await userEntry.save(); //Save to our database
+
+  const userss = await UserM.find(); //Trying to retrieve all the Users collection  documents.
+  console.log(userss);
+  console.log(userEntry);
 }
 
 exports.moreInfoCreateUpdateUser = function (userInfo) { //Function will be used for updating existing users data
@@ -130,17 +148,17 @@ exports.updateUser = function (userInfo) { //Function will be used for updating 
 
 
 /*-----------PET FUNCTIONS----------*/
-exports.createPet = async function(petEntry, usrIndx)  {
+exports.createPet = async function(petEntry, usrIndx)  { // adds a new pet entry to database
   petId = ""
   let isExist = false
   do
   {
-      petId = await crypto.randomBytes(20)
+      petId = await crypto.randomBytes(20) // generate a random hash for the pet key
       petId = petId.toString('hex')
 
-      isExist = await PetM.exists({ PetId: petId });
+      isExist = await PetM.exists({ PetId: petId }); // check if such a hash already exists
 
-      if (!isExist)
+      if (!isExist) // if it doesn't exit, then
       {
         petEntry["PetId"] = petId
         const petDatEntry = new PetM(petEntry)
@@ -164,12 +182,12 @@ exports.createPet = async function(petEntry, usrIndx)  {
   return petId
 }
 
-exports.getPet = async function (petId) {
+exports.getPet = async function (petId) { // return a specified pet entry
   let docs = await PetM.findOne({ PetId:petId });
   return  docs;
 }
 
-exports.getUserPets = async function (usrIndex) {
+exports.getUserPets = async function (usrIndex) { // return an array of the users pets
   let docs = await UserM.findOne({ username:usrIndex });
   petArr = []
 
@@ -181,14 +199,14 @@ exports.getUserPets = async function (usrIndex) {
   return  petArr;
 }
 
-exports.updatePet = async function(petInfo, petId) {
+exports.updatePet = async function(petInfo, petId) { // update an exisiting pet
   console.log(petInfo)
   console.log(petId)
   await PetM.findOneAndUpdate({PetId:petId}, petInfo);
   return true
 }
 
-exports.deletePet = async function(petId, userIndex) {
+exports.deletePet = async function(petId, userIndex) { // delete a pet
   let ret = await PetM.findOneAndRemove({PetId:petId});
   let docs = await UserM.findOne({ username:userIndex });
 
@@ -223,25 +241,20 @@ exports.addPost = async function (postEntry, usrIndx) {
         postEntry["postId"] = postId
         postEntry["postLikes"] = 0
         const postDatEntry = new PostM(postEntry)
-        
+
         await postDatEntry.save()
         let docs = await UserM.findOne({ username:usrIndx });
         console.log(docs)
         console.log("bro")
         newPostList = docs.posts
         newPostList.push(postId)
-        let totalDocs = await UserM.find();
-        totalPostList = []
-        for (let user of totalDocs) {
-          for (let i of user.posts) {
-            totalPostList.push(i)
-
-          }
-        }
-        totalPostList.push(postId)
+        let totalPosts = await PostM.find();
+        totalPostList = totalPosts
+        totalPostList.push(postDatEntry)
+        console.log("total")
         console.log(totalPostList)
           
-        UserM.findOneAndUpdate({username:usrIndx},{posts: newPostList}, {followerPosts: totalPostList},(error,result) => {
+        UserM.findOneAndUpdate({username:usrIndx},{posts: newPostList}, {allPosts: totalPostList},(error,result) => {
           if(error){
             console.log("Error: ", error)
           }else{
@@ -292,23 +305,7 @@ exports.getUserPosts = async function (usrIndex) {
   return postArr;
 }
 
-exports.getEveryUserPosts = async function () {
-  let docs = await UserM.find();
-  postArr = []
-  console.log(docs)
-  console.log("bro")
-  for (let user of docs) {
-    for (let i of user.posts)
-      {
-        console.log(i)
-        let postEntry = await PostM.findOne({ postId:i });
-        console.log(postEntry)
-        postArr.push(postEntry)
-      }
-  }
 
-  return postArr;
-}
 
 
 exports.updateLikes = function (postInfo) { //Function will be used for updating existing users data
@@ -338,6 +335,22 @@ exports.decreaseLikes = function (postInfo) { //Function will be used for updati
      });
   }
 
+  exports.getPostData =  async function (postIndex) { //Getter function template
+    console.log("Getting post data");
+    console.log(postIndex)
+  
+    let docs = await PostM.findOne({ postId:postIndex });
+    return  docs;
+  }
+
+  exports.getPostList =  async function () { //Getter function template
+    console.log("Getting post list");
+    let docs = await PostM.find();
+    console.log("--------DOCS-----------")
+    console.log(docs)
+    console.log("------------------")
+    return  docs;
+  }
 
 exports.deletePost = async function(postId, userIndex) {
   let ret = await PostM.findOneAndRemove({postId:postId});
@@ -373,16 +386,16 @@ exports.addComment = async function (commentEntry, postIndx) {
       {
         commentEntry["commentId"] = commentId
         const commentDatEntry = new CommentM(commentEntry)
-        
+
         await commentDatEntry.save()
         console.log(postIndx)
         let docs = await PostM.findOne({ postId:postIndx });
         console.log(docs)
         console.log("bro")
         newCommentList = docs.postComments
-        newCommentList.push(commentId)
+        newCommentList.push(commentDatEntry)
 
-          
+
         PostM.findOneAndUpdate({postId:postIndx},{postComments: newCommentList}, (error,result) => {
           if(error){
             console.log("Error: ", error)
@@ -396,4 +409,29 @@ exports.addComment = async function (commentEntry, postIndx) {
   } while (isExist)
 
   return commentId
+}
+
+
+exports.deleteComment = async function(commentId, postIndex) {
+  let ret = await CommentM.findOneAndRemove({commentId:commentId});
+  let docs = await PostM.findOne({ postId:postIndex });
+
+  let index = -1
+  for (let i = 0; i < docs.postComments.length; i++) {
+    if (commentId == docs.postComments[i].commentId){
+      index = i
+      break
+    }
+  }
+  if (index > -1)
+    docs.postComments.splice(index, 1);
+
+  PostM.findOneAndUpdate({postId:postIndex},{postComments: docs.postComments},(error,result)=>{console.log("Successfully Updated User Post Deletion!")})
+
+  return ret;
+}
+
+exports.getComment = async function (commentId) {
+  let docs = await CommentM.findOne({ commentId:commentId });
+  return  docs;
 }
