@@ -34,23 +34,21 @@ const EditSaveButton = (props) =>
     )
 }
 
-const ProfilePage = (props) =>
+const ProfilePage = (props ) =>
 {
-  let { id } = useParams(); // access the query parameter passed in
+  let { id } = useParams();
+  const [aboutState, setAboutState] = useState("");
+  const [isEditing, setEdit] = useState(false);
+  const [ownerName, setName] = useState("Victor Chinnappan");
+  const [inputImage, setImage] = useState(null);
+  const [inputImagePath, setImagePath] = useState(null);
+  const [inputImageFile, setImageFile] = useState(null);
+  const [petList, setPetList] = useState(petListT);
+  const [currentPet, setCurrentPet] = useState(null);
 
-  const [currentId, setCurrentId] = useState(id);
-  const [aboutState, setAboutState] = useState(""); // Stores the owners about me text
-  const [isEditing, setEdit] = useState(false); // boolean that stores wether user is editing page or not
-  const [ownerName, setName] = useState(""); // stores the owner's name
-  const [inputImage, setImage] = useState(null); // stores the processed image for use with avatar
-  const [inputImagePath, setImagePath] = useState(null); // stores the path to uploaded image
-  const [inputImageFile, setImageFile] = useState(null); // stores the image file
-  const [petList, setPetList] = useState(petListT); // stores a list of pet entries
-  const [currentPet, setCurrentPet] = useState(null); // stores a pet entry (when selected)
+  const avatarMarginTop = (props.loginStatus == id) ? -2 : 4
 
-  const avatarMarginTop = (props.loginStatus == id) ? -2 : 4 // just stores the top margin of avatar
-
-  const setUpFile = (file) => // handles the processing of image file/blob and stores it in "inputImage"
+  const setUpFile = (file) =>
   {
     var reader  = new FileReader();
     reader.onload = function(e)  {
@@ -63,18 +61,19 @@ const ProfilePage = (props) =>
   const handleSubmit = () =>
   {
     var data = new FormData() // This way we can pass an image file and other args to server
-    data.append('image',inputImageFile, inputImageFile.name)
+    if (inputImageFile)
+      data.append('image',inputImageFile, inputImageFile.name)
     data.append('username', props.loginStatus)
     data.append('ownername', ownerName)
     data.append('aboutme', aboutState)
 
-    fetch('/UpdateProfile', // Update server event fired
+    fetch('/UpdateProfile',
       {
         method: 'POST',
         body: data
       }).then((response) => response.json())
 
-      .then((result) => { // if it was successful, exit editing and remove image path
+      .then((result) => {
          console.log('Success:', result.loginStatus);
          setEdit(false)
          setImagePath(null)
@@ -84,7 +83,7 @@ const ProfilePage = (props) =>
       });
     }
 
-  const handlePetAdd = (petInformation, inputImageFile) => { // handle the creation of a new pet
+  const handlePetAdd = (petInformation, inputImageFile) => {
     var data = new FormData()
 
     if (petInformation.PetImage)
@@ -95,7 +94,7 @@ const ProfilePage = (props) =>
     data.append('PetDescription', petInformation.PetDescription)
     data.append('userIndex', props.loginStatus)
 
-    fetch('/CreatePet', // fire server event
+    fetch('/CreatePet',
       {
         method: 'POST',
         body: data
@@ -106,10 +105,10 @@ const ProfilePage = (props) =>
 
         let petListNew = petList
 
-        result["DisplayImage"] = petInformation.DisplayImage // if it was succesful add the image sent back from server to pet entry
-        petListNew.push(result) // add it to the list of pet entries
+        result["DisplayImage"] = petInformation.DisplayImage
+        petListNew.push(result)
 
-        setPetList(petListNew) // update state
+        setPetList(petListNew)
         setCurrentPet(null)
       })
       .catch((error) => {
@@ -128,6 +127,7 @@ const ProfilePage = (props) =>
     data.append('PetDescription', petInformation.PetDescription)
     data.append('userIndex', props.loginStatus)
     data.append('petId',petInformation.PetId)
+    data.append('fileRemoved',petInformation.fileRemoved)
 
     // update pet locally
     currentPet.PetType = petInformation.PetType
@@ -157,7 +157,7 @@ const ProfilePage = (props) =>
     console.log("Delete pet!")
 
     let index = -1
-    for (let i = 0; i < petList.length; i++) { // find the index
+    for (let i = 0; i < petList.length; i++) {
       if (petList[i].PetId == petEntry.PetId){
         index = i
         break
@@ -165,11 +165,11 @@ const ProfilePage = (props) =>
     }
 
 
-    if (index > -1) // if index found
+    if (index > -1)
     {
       const url = '/DeletePet?' + new URLSearchParams({ petId: petList[index].PetId, userIndex: props.loginStatus }).toString()
 
-      fetch(url, { // fire a delete server event
+      fetch(url, {
         method: 'DELETE',
       }).then((response) => response.json())
 
@@ -184,28 +184,35 @@ const ProfilePage = (props) =>
     }
 
     setCurrentPet(null);
-    setPetList(petList) // update list
+    setPetList(petList)
   }
 
-  const handleFile = (event) => // in charge of handling a file when its uploaded
+  const handleFile = (event) =>
   {
-    if (!event.target.files[0]) // if there wasnt a file uploaded, just return
+    if (!event.target.files[0])
       return
 
-    setImagePath(event.target.value) // update the image path
-    setUpFile(event.target.files[0]) // process the file
+    setImagePath(event.target.value)
+    setUpFile(event.target.files[0])
   }
+
+  const removeFile = (event) => // in charge of handling a file when its uploaded
+  {
+    setImagePath("") // update the image path
+    setImage(null)
+    setImageFile(null)
+   }
 
   const handlePetOpen = (ev, petName) => // this simply sets current pet to the sepcified pet entry, when current pet is not empty, the pet component is rendered for that pet
   {
     setCurrentPet(petName);
   }
 
-  const setUpFunction = () => {
+  useEffect(() => {
     const getData = async() => {
-      const url = '/getUserProfileText?' + new URLSearchParams({ username: id }).toString()
-      const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username: id }).toString()
-      const getPetListURL = '/getUserPets?' + new URLSearchParams({ username: id }).toString()
+      const url = '/getUserProfileText?' + new URLSearchParams({ username: props.loginStatus }).toString()
+      const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username: props.loginStatus }).toString()
+      const getPetListURL = '/getUserPets?' + new URLSearchParams({ username: props.loginStatus }).toString()
 
       fetch(getPetListURL).then((response) => response.json())
        .then((result) => {
@@ -248,8 +255,11 @@ const ProfilePage = (props) =>
                  fetch(url).then((response) => response.json())
                  .then((result) => {
                    console.log('Info retrieval success!');
-                   setAboutState(result.aboutMe)
-                   setName(result.ownerName)
+                   if (result.aboutMe)
+                     setAboutState(result.aboutMe)
+
+                   if (result.ownerName)
+                     setName(result.ownerName)
                  })
                  .catch((error) => {
                    console.error('Error:', error);
@@ -273,21 +283,14 @@ const ProfilePage = (props) =>
     }
 
     getData()
-  }
 
-  useEffect(() => {
-    setUpFunction()
   }, []);
 
-  if (id != currentId){
-    setUpFunction()
-    setCurrentId(id)
-  }
   return (
       <div className="profile-page-frame">
 
         <NavBar loginStatus={props.loginStatus} setLoginState={props.setLoginState} />
-        {currentPet && ((currentPet == "add") ? <CreatePet  handlePetAdd={handlePetAdd} petInfo={"add"} setCurrentPet={setCurrentPet}/> : <PetDisplay  canEdit={(props.loginStatus == id)} handlePetUpdate={handlePetUpdate} deletePet={deletePet} petInfo={currentPet} canEdit={(props.loginStatus == id)} setCurrentPet={setCurrentPet}/>)}
+        {currentPet && ((currentPet == "add") ? <CreatePet  handlePetAdd={handlePetAdd} petInfo={"add"} setCurrentPet={setCurrentPet}/> : <PetDisplay  deletePet={deletePet} petInfo={currentPet} setCurrentPet={setCurrentPet}/>)}
         <div className="info-frame">
 
           <div className="pic-frame">
@@ -295,15 +298,18 @@ const ProfilePage = (props) =>
             {(props.loginStatus == id) && <EditSaveButton isEditing={isEditing} setEdit={setEdit} handleSubmit={handleSubmit}/>}
 
             <Avatar
-              alt="vchinn"
-              src={(inputImage) ? inputImage : '/Eduardo.jpeg'}
+              src={inputImage}
               sx={{mx: 'auto', mt: avatarMarginTop, pt: 0, width: 175, height: 175, border: '5px solid #825DD7'}}
             />
 
-            {isEditing && <Button variant="contained" component="label" color="primary"  size="small" sx={{position: 'absolute', top: '35%', mb:0, left: '60%' ,fontWeight: 'bold' }}>
+            {isEditing && <Button variant="contained" component="label" color="primary"  size="small" sx={{position: 'absolute', top: '29.5%', mb:0, left: '60%' ,fontWeight: 'bold' }}>
               Upload
               <input hidden accept="image/*" type="file" onChange={handleFile}/>
              </Button>}
+
+             {isEditing && <Button variant="contained" component="label" color="error"  size="small" sx={{position: 'absolute', top: '42.5%', mb:0, left: '60%' ,fontWeight: 'bold' }} onClick={removeFile}>
+               Remove
+              </Button>}
 
              {isEditing && <h3 className="path-text">{inputImagePath}</h3>}
 
@@ -313,7 +319,7 @@ const ProfilePage = (props) =>
               inputProps={{style: {fontSize: 32, color: '#825DD7', textAlign: 'center',fontFamily: 'Verdana', fontWeight: "bold"}}} onChange={(event) => {setName(event.target.value)}}
             />}
 
-            <h2 className="subname">@{id}</h2>
+            <h2 className="subname">@{props.loginStatus}</h2>
           </div>
 
           <div className="about-me-frame">
@@ -343,11 +349,11 @@ const ProfilePage = (props) =>
             <Box className="pet-buttons" sx={{ width: 0.9, flexWrap: 'wrap', mx: 'auto'}}>
                <Grid className="grid-contain" container sx={{alignItems: 'center', justifyContent: 'center', mb: 'auto', mx: 'auto'}} spacing={1}>
                   {
-                   petList.map((element) => { // generate buttons for pets
+                   petList.map((element) => {
                       return (
                        <Grid key={element.PetId} item xs={1.75}>
                            <IconButton className="gridButton" centerRipple={false} color="primary" aria-label="profile" style={{backgroundColor:'rgba(130, 93, 215, 0'}} onClick={(event) => {handlePetOpen(event, element)}} >
-                                <Avatar className="grid-avatar" src={element.DisplayImage} alt="Profile" variant="rounded" sx={{  width: 95, height: 95 }} />
+                                <Avatar className="grid-avatar" src={element.DisplayImage} variant="rounded" sx={{  width: 95, height: 95 }} />
                               <Chip  className="name-chip" size="small"  color="secondary"  style={{backgroundColor:'rgba(130, 93, 215, 0.7'}} label={element.PetName} sx={{ zIndex: 20 }}/>
                            </IconButton>
                        </Grid>
@@ -356,7 +362,7 @@ const ProfilePage = (props) =>
                   }
 
                   {
-                    ((props.loginStatus == id) && (petList.length < 12)) && ( // this is the add more pets button that appears when a user has less than 12 pets
+                    (petList.length < 12) && (
                         <Grid item xs={1.75}>
                            <IconButton className="IconButton" centerRipple={false} color="primary" aria-label="profile" size="xlarge" onClick={() => {setCurrentPet("add")}} >
                               <AddBoxIcon sx={{color: "#825DD7", width:'95px', height:95}} />

@@ -28,8 +28,18 @@ const petStorageEngine = multer.diskStorage({
     cb(null, Date.now() + "---" + file.originalname)
   }
 })
+
+const postStorageEngine = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./postpics");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "---" + file.originalname)
+  }
+})
 const upload = multer({ storage: pfpStorageEngine })
 const pet_upload = multer({ storage: petStorageEngine })
+const post_upload = multer({ storage: postStorageEngine })
 
 testDict = { //IGNORE just used to make sure client-server communication worked!
   "vchinn04" : {
@@ -75,21 +85,21 @@ app.post('/UserLogIn', async (req, res) => { //Get Event
   var inputDict = req.body;
   console.log("Log In request!")
   console.log(req.body)
-  console.log(req.body.email)
+  console.log(req.body.username)
 
-  const userData = await dataManager.getUser(req.body.email)
+  const userData = await dataManager.getUser(req.body.username)
 
   console.log(userData)
   userObj = userData[0];
   console.log(userObj)
   if (userObj == undefined){
-    console.log("Bad email!")
+    console.log("Bad username!")
 
-    res.send({ loginStatus: false, errorMessage: 'Invalid email or password!' });
+    res.send({ loginStatus: false, errorMessage: 'Invalid username or password!' });
   }
   else if (userObj.password != req.body.password) {
     console.log("Bad passowrd!")
-    res.send({ loginStatus: false, errorMessage: 'Invalid email or password!' });
+    res.send({ loginStatus: false, errorMessage: 'Invalid username or password!' });
   }
   else {
     console.log("Success!")
@@ -154,14 +164,18 @@ app.post('/UpdateProfile', upload.single('image'), async (req, res) => {
     username: req.body.username,
     ownername: req.body.ownername,
     aboutme: req.body.aboutme,
-    profilepic: req.file.filename
+    profilepic: (req.file) ? req.file.filename : null
   }
 
   const userData = await dataManager.getUserData(req.body.username)
-  if (userData.profilePicture != "")
+  if (userData.profilePicture)
   {
     const imagePath = __dirname + "/images/" + userData.profilePicture
-    fs.unlinkSync(imagePath)
+    if (userData.profilePicture.length > 3)
+      fs.exists(imagePath,  (exists) => {
+        if (exists)
+          fs.unlinkSync(imagePath)
+      });
   }
 
   dataManager.updateUser(userInfo);
@@ -178,6 +192,7 @@ app.post('/CreatePet', pet_upload.single('petimage'), async (req, res) => {
   console.log(req.body.PetType)
   console.log(req.body.PetName)
   console.log(req.body.PetDescription)
+  console.log(req.body.userIndex)
 
   const petEntry = {
     PetType: req.body.PetType,
@@ -210,24 +225,39 @@ app.put('/CreatePet', pet_upload.single('petimage'), async (req, res) => {
   console.log(req.body.PetName)
   console.log(req.body.PetDescription)
   console.log(req.body.petId)
+  console.log(typeof req.body.fileRemoved)
 
   let oldPetEntry = await dataManager.getPet(req.body.petId)
 
   if (!oldPetEntry)
     res.send({ returnValue: false })
 
-  if (oldPetEntry.PetImage != "" && req.file)
+  if ((oldPetEntry.PetImage && req.body.fileRemoved === 'true') || (req.file))
   {
     const imagePath = __dirname + "/petpics/" + oldPetEntry.PetImage
-    fs.unlinkSync(imagePath)
+
+    if (oldPetEntry.PetImage.length > 3)
+      fs.exists(imagePath,  (exists) => {
+        if (exists)
+          fs.unlinkSync(imagePath)
+      });
   }
 
+  var petImageTemp = oldPetEntry.PetImage
+
+  if (req.file)
+  {
+    petImageTemp = req.file.filename
+  }  else if(req.body.fileRemoved === 'true')
+  {
+    petImageTemp = ""
+  }
   const petEntry = {
     PetId: req.body.petId,
     PetType: req.body.PetType,
     PetName: req.body.PetName,
     PetDescription: req.body.PetDescription,
-    PetImage: ((req.file) ? req.file.filename : oldPetEntry.PetImage)
+    PetImage: petImageTemp
   }
 
   const success = await dataManager.updatePet(petEntry, req.body.petId);
@@ -268,7 +298,12 @@ app.delete('/DeletePet', async (req, res) => { //Get Event
   if (petEntry.PetImage != "")
   {
     const imagePath = __dirname + "/petpics/" + petEntry.PetImage
-    fs.unlinkSync(imagePath)
+    if (petEntry.PetImage.length > 3)
+      fs.exists(imagePath,  (exists) => {
+        if (exists)
+          fs.unlinkSync(imagePath)
+      });
+
   }
 
   let ret = await dataManager.deletePet(req.query.petId, req.query.userIndex)
@@ -276,6 +311,116 @@ app.delete('/DeletePet', async (req, res) => { //Get Event
 });
 /*--------------------------------*/
 
+// Post functions
+
+app.post('/UserCreatePost', post_upload.single('postimage'), async (req, res) => { //Get Event
+  console.log("Creating Post!")
+
+  const postEntry = {
+    postDescription: req.body.PostDescription,
+    postLikes: 0,
+    postImage: ((req.file) ? req.file.filename : "")
+  }
+  console.log(postEntry.postImage)
+  console.log(req.body)
+  console.log(req.body.PostDescription)
+  const postId = await dataManager.addPost(postEntry, req.body.userIndex);
+  let fileP = ""
+
+  if (req.file)
+    fileP = req.file.filename
+
+ returnPost = {
+    postId: postId,
+    postDescription: req.body.PostDescription,
+    postLikes: 0,
+    postImage: fileP
+  }
+  console.log(returnPost)
+  res.send(JSON.stringify(returnPost));
+});
+
+
+app.get('/getUserPosts', async (req, res) => { //Get Event
+  const postList = await dataManager.getUserPosts(req.query.username)
+  res.send(postList)
+});
+
+app.get('/getEveryUserPosts', async (req, res) => { //Get Event
+  const postList = await dataManager.getEveryUserPosts()
+  res.send(postList)
+});
+
+app.get('/getPostPic', async (req, res) => { //Get Event
+  let imagePath = "/postpics/" + req.query.imagePath
+  res.sendfile(imagePath, { root: __dirname });
+});
+
+
+app.get('/getPostLikes', async (req, res) => { //Get Event
+  let likes = await dataManager.getPostLikes(req.query.postId)
+  return likes
+});
+
+app.post('/UpdatePostLikes', upload.single('image'), async (req, res) => {
+
+  const postInfo = {
+    postId: req.body.postId,
+    postLikes: req.body.postLikes
+  }
+
+
+  dataManager.updateLikes(postInfo);
+  console.log(postInfo.postLikes)
+  res.send(JSON.stringify({ loginStatus: "ohh yea", errorMessage: 'No Errors!' }));
+
+});
+
+app.post('/DecreaseLikes', upload.single('image'), async (req, res) => {
+
+  const postInfo = {
+    postId: req.body.postId,
+    postLikes: req.body.postLikes
+  }
+
+
+  dataManager.decreaseLikes(postInfo);
+  console.log("LIKEs")
+  console.log(postInfo.postLikes)
+  res.send(JSON.stringify({ loginStatus: "ohh yea", errorMessage: 'No Errors!' }));
+
+});
+
+app.delete('/DeletePost', async (req, res) => { //Get Event
+  let postEntry = await dataManager.getPost(req.query.postId)
+
+  if (!postEntry)
+    res.send({ returnValue: false })
+
+  
+  let ret = await dataManager.deletePost(req.query.postId, req.query.userIndex)
+  res.send({ returnValue: ret })
+});
 
 dataManager.setupMongo().catch(err => console.log(err)); //Initialize the DataBase in the data-manager modules
 app.listen(port, () => console.log(`Server Up! Listening on port ${port}`)); //Binds server to localhost:5000
+
+
+app.post('/UserCreateComment', upload.single('image'), async (req, res) => { //Get Event
+  console.log("Creating Comment!")
+  console.log(req.body.postIndex)
+
+  const commentEntry = {
+    commentDescription: req.body.commentDescription,
+
+  }
+  const commentId = await dataManager.addComment(commentEntry, req.body.postIndex);
+
+
+ returnComment = {
+    commentId: commentId,
+    commentDescription: req.body.commentDescription,
+  }
+  console.log(returnComment)
+  res.send(JSON.stringify(returnComment));
+});

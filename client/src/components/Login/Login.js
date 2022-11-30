@@ -35,9 +35,10 @@ class Login extends React.Component {
       // initialize username and password so form is controlled
       this.state =
       {
-          email: '',
+          username: '',
           password: '',
           resultV: '',
+          incorrectEntry: false
       };
 
       this.handleInputChange = this.handleInputChange.bind(this);
@@ -56,7 +57,7 @@ class Login extends React.Component {
     }
 
     async handleFormSubmit(event) {
-      console.log(this.state.email)
+      console.log(this.state.username)
       console.log(this.state.password)
 
       fetch('/UserLogIn', // fire the server event to login user
@@ -65,14 +66,16 @@ class Login extends React.Component {
           headers: { "Content-Type": "application/json",
             'Accept': 'application/json'
           },
-          body: JSON.stringify({ email: this.state.email, password: this.state.password }),
+          body: JSON.stringify({ username: this.state.username, password: this.state.password }),
         }) .then((response) => response.json())
 
         .then((result) => {
           console.log('Success:', result.loginStatus);
           if (!result.loginStatus)
           {
-
+            this.setState({
+                incorrectEntry: true
+            });
           }
           else {
             this.props.setLoginState(result.username)  // login the user (will switch them to homepage)
@@ -100,7 +103,8 @@ class Login extends React.Component {
                 <Container className='loginContainer' fluid>
                     <Form className="loginForm" onSubmit={this.handleFormSubmit}>
                           <TextField id="outlined-basic"
-                             name="email"
+                             error={this.state.incorrectEntry}
+                             name="username"
                              label="Username"
                              variant="outlined"
                              fullWidth
@@ -112,11 +116,13 @@ class Login extends React.Component {
                                        </InputAdornment>
                                      ),
                              }}
-                             value={this.state.email}
+                             value={this.state.username}
                              onChange={this.handleInputChange}
                           />
 
                           <TextField id="outlined-password-input"
+                             error={this.state.incorrectEntry}
+                             helperText={(this.state.incorrectEntry)? "Incorrect username or password!" : ""}
                              label="Password"
                              name="password"
                              fullWidth
