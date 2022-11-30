@@ -90,6 +90,7 @@ const MakeAPost = props => {
 
 
     const handlePostCreate = () => {
+        console.log("hiii")
 
         const postInformation = {
             PostImage: ((inputImageFile) ? inputImageFile.name : ""),

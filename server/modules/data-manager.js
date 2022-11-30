@@ -12,7 +12,9 @@ const userSchema = new mongoose.Schema({
   ownerName: String, //AKA displayName
   pets: Array,
   posts: Array,
-  followerPosts: Array,
+  allPosts: Array,
+  likedPosts: Array,
+  userComments: Array,
   profilePicture: String,
   username: String
 });
@@ -26,6 +28,7 @@ const petSchema = new mongoose.Schema({
 })
 
 const postSchema = new mongoose.Schema({
+  username: String,
   postId: String,
   postDescription: String,
   postImage: String,
@@ -34,6 +37,7 @@ const postSchema = new mongoose.Schema({
 });
 
 var commentSchema = new mongoose.Schema({
+  username: String,
   commentId: String,
   commentDescription: String
 });
@@ -244,18 +248,13 @@ exports.addPost = async function (postEntry, usrIndx) {
         console.log("bro")
         newPostList = docs.posts
         newPostList.push(postId)
-        let totalDocs = await UserM.find();
-        totalPostList = []
-        for (let user of totalDocs) {
-          for (let i of user.posts) {
-            totalPostList.push(i)
-
-          }
-        }
-        totalPostList.push(postId)
+        let totalPosts = await PostM.find();
+        totalPostList = totalPosts
+        totalPostList.push(postDatEntry)
+        console.log("total")
         console.log(totalPostList)
-
-        UserM.findOneAndUpdate({username:usrIndx},{posts: newPostList}, {followerPosts: totalPostList},(error,result) => {
+          
+        UserM.findOneAndUpdate({username:usrIndx},{posts: newPostList}, {allPosts: totalPostList},(error,result) => {
           if(error){
             console.log("Error: ", error)
           }else{
@@ -306,23 +305,7 @@ exports.getUserPosts = async function (usrIndex) {
   return postArr;
 }
 
-exports.getEveryUserPosts = async function () {
-  let docs = await UserM.find();
-  postArr = []
-  console.log(docs)
-  console.log("bro")
-  for (let user of docs) {
-    for (let i of user.posts)
-      {
-        console.log(i)
-        let postEntry = await PostM.findOne({ postId:i });
-        console.log(postEntry)
-        postArr.push(postEntry)
-      }
-  }
 
-  return postArr;
-}
 
 
 exports.updateLikes = function (postInfo) { //Function will be used for updating existing users data
@@ -352,6 +335,22 @@ exports.decreaseLikes = function (postInfo) { //Function will be used for updati
      });
   }
 
+  exports.getPostData =  async function (postIndex) { //Getter function template
+    console.log("Getting post data");
+    console.log(postIndex)
+  
+    let docs = await PostM.findOne({ postId:postIndex });
+    return  docs;
+  }
+
+  exports.getPostList =  async function () { //Getter function template
+    console.log("Getting post list");
+    let docs = await PostM.find();
+    console.log("--------DOCS-----------")
+    console.log(docs)
+    console.log("------------------")
+    return  docs;
+  }
 
 exports.deletePost = async function(postId, userIndex) {
   let ret = await PostM.findOneAndRemove({postId:postId});
@@ -394,7 +393,7 @@ exports.addComment = async function (commentEntry, postIndx) {
         console.log(docs)
         console.log("bro")
         newCommentList = docs.postComments
-        newCommentList.push(commentId)
+        newCommentList.push(commentDatEntry)
 
 
         PostM.findOneAndUpdate({postId:postIndx},{postComments: newCommentList}, (error,result) => {
@@ -410,4 +409,29 @@ exports.addComment = async function (commentEntry, postIndx) {
   } while (isExist)
 
   return commentId
+}
+
+
+exports.deleteComment = async function(commentId, postIndex) {
+  let ret = await CommentM.findOneAndRemove({commentId:commentId});
+  let docs = await PostM.findOne({ postId:postIndex });
+
+  let index = -1
+  for (let i = 0; i < docs.postComments.length; i++) {
+    if (commentId == docs.postComments[i].commentId){
+      index = i
+      break
+    }
+  }
+  if (index > -1)
+    docs.postComments.splice(index, 1);
+
+  PostM.findOneAndUpdate({postId:postIndex},{postComments: docs.postComments},(error,result)=>{console.log("Successfully Updated User Post Deletion!")})
+
+  return ret;
+}
+
+exports.getComment = async function (commentId) {
+  let docs = await CommentM.findOne({ commentId:commentId });
+  return  docs;
 }
