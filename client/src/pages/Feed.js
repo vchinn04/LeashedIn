@@ -138,7 +138,7 @@ const Feed = (props ) =>
   }
 
 
-  
+
 
   const deletePost = (postEntry) =>
   {
@@ -267,7 +267,7 @@ const Feed = (props ) =>
        .then(async (result) => {
          console.log('File retrieval success!');
          let myBlob = await result.blob()
- 
+
           var reader  = new FileReader();
           reader.onload = function(e)  {
               setImage(e.target.result)
@@ -278,7 +278,7 @@ const Feed = (props ) =>
          console.error('Error:', error);
        });
 
-       
+
     }
 
     getData()

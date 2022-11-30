@@ -10,17 +10,14 @@ class MainPage extends React.Component
 {
   constructor(props) {
     console.log("Constructor MainPage called!")
-
     super(props);
-
   }
 
   render() {
     return (
       <div className="main-frame">
-        <NavBar loginStatus={this.props.loginStatus} setLoginState={this.setLoginState} />
-        <Feed loginStatus={this.props.loginStatus} setLoginState={this.setLoginState}/>
-
+        <NavBar loginStatus={this.props.loginStatus} setLoginState={this.props.setLoginState} />
+        <Feed loginStatus={this.props.loginStatus} setLoginState={this.props.setLoginState}/>
       </div>
     );
   }

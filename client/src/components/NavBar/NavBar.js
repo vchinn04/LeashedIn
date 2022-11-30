@@ -21,7 +21,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 
 import ErrorIcon from '@mui/icons-material/Error';
-import { spacing } from '@mui/system';
 
 import { useState, useEffect } from 'react';
 
@@ -39,12 +38,12 @@ const SearchListBox = (props) => //List that displays found profile buttons
                     <ListItemButton
                         disabled={(item._id==-1)? true : false}
                         component={Link} to={`/profile/${item.username}`}
+                        onClick={() => {props.setUserArr([]); props.setSearchState("")}}
                         sx={{
                            ".Mui-disabled": {
                             bgcolor: "green"
                           }
-                          }}
-                    >
+                          }}>
                             <ListItemIcon>
                               {(item._id!=-1) ? <Avatar src={props.userImages[item.username]} alt={item.username} /> : <ErrorIcon /> }
                             </ListItemIcon>
@@ -68,46 +67,50 @@ const NavBar = (props) =>
   const [userArrObj, setUserArr] = useState([]);
   const [inputImage, setImage] = useState(null);
   const [userImages, setUserImages] = useState({});
-  const getResponse = async(searchString) => {
+
+  const getResponse = async(searchString) => { // in charge of setting the user images array and returning user array
     const url = '/getUserArr?' + new URLSearchParams({ searchEntry: searchString }).toString() //Fire get event to find users with search string in their usernames
     const response = await fetch(url);
     const body = await response.json();
     if (response.status !== 200) throw Error(body.message);
 
     let promiseArr = []
-    let userArray = JSON.parse(body.userList)
+    let userArray = JSON.parse(body.userList) // get the array of users
     var userImagesT = userImages
-    for (let i of userArray)
+    for (let i of userArray) // get their profile pictures
     {
-        if (userImagesT[i.username] == undefined)
-        {
-          const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username: i.username }).toString()
+      if (userImagesT[i.username] == undefined)
+      {
+        const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username: i.username }).toString()
 
-          promiseArr.push(fetch(getPfpURL)
-                         .then(async (result) => {
+        promiseArr.push(fetch(getPfpURL)
+                        .then(async (result) =>
+                        {
                            console.log('File retrieval success!');
                            let myBlob = await result.blob()
 
                            var reader  = new FileReader();
+
                            reader.onload = function(e)  {
-                              userImagesT[i.username] = e.target.result
+                              userImagesT[i.username] = e.target.result // add it to the user images dictionary
                            }
+
                            reader.readAsDataURL(myBlob);
                          })
                          .catch((error) => {
                            console.error('Error:', error);
                          })
                        )
-         }
+       }
     }
 
-    await Promise.all(promiseArr)
+    await Promise.all(promiseArr) // wait untill all profile pictures recieved
 
-    setUserImages(userImagesT)
-    return userArray;
+    setUserImages(userImagesT) // set the user images dictionary
+    return userArray; // return the user array
   }
 
-   function handleInputChange(event) { //Fires everytime search textfield changes
+  function handleInputChange(event) { //Fires everytime search textfield changes
         const target = event.target;
 
         if (target.value.length >= 3) //If user enters 3 or more letters, then fire the get event
@@ -138,12 +141,11 @@ const NavBar = (props) =>
         setSearchState(target.value); //Update the Search State to make sure value in text field is up to date
   }
 
-  useEffect(() => {
-    console.log("SBASB")
+  useEffect(() => { // initial load function. sets up the
     const getData = async() => {
       const url = '/getUserProfilePic?' + new URLSearchParams({ username: props.loginStatus }).toString()
 
-      fetch(url)
+      fetch(url) // get the profile pic of user for profile button
       .then(async (result) => {
         console.log('File retrieval success!');
         let myBlob = await result.blob()
@@ -161,15 +163,14 @@ const NavBar = (props) =>
 
     getData()
   }, []);
+
   return (
     <div className="navbar-frame">
-
       <IconButton color="primary" aria-label="upload picture" component={Link} to="/">
         <Avatar src='/Logo.png' alt="Home" variant="rounded"/>
       </IconButton>
 
       <div className="search-frame">
-
           <TextField id="outlined-password-input"
             label="Search..."
             name="search"
@@ -195,7 +196,7 @@ const NavBar = (props) =>
              />
 
              {
-               (userArrObj.length > 0) && <SearchListBox userImages={userImages} userArr={userArrObj} />
+               (userArrObj.length > 0) && <SearchListBox setUserArr={setUserArr} setSearchState={setSearchState} userImages={userImages} userArr={userArrObj} />
              }
         </div>
 

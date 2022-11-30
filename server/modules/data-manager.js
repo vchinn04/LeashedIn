@@ -27,8 +27,6 @@ const petSchema = new mongoose.Schema({
   PetImage: String
 })
 
-
-
 const postSchema = new mongoose.Schema({
   username: String,
   postId: String,
@@ -80,7 +78,7 @@ exports.addUser = async function (usrEmailV, usrNameV, usrPasswordV) {
   console.log(userEntry);
 }
 
-exports.getUser =  async function (usrIndex) { //Getter function template
+exports.getUser =  async function (usrIndex) { //Get a specified user
   console.log("Getting user");
   console.log(usrIndex)
 
@@ -91,7 +89,7 @@ exports.getUser =  async function (usrIndex) { //Getter function template
   return  docs;
 }
 
-exports.getUserData =  async function (usrIndex) { //Getter function template
+exports.getUserData =  async function (usrIndex) { //Get the data of a single specified user
   console.log("Getting user data");
   console.log(usrIndex)
 
@@ -99,7 +97,7 @@ exports.getUserData =  async function (usrIndex) { //Getter function template
   return  docs;
 }
 
-exports.getUserList =  async function (searchParams) { //Getter function template
+exports.getUserList =  async function (searchParams) { // get a list of max length 5 based on search parameters
   console.log("Getting user list");
   console.log(searchParams)
   const regExVar = "/"+searchParams+"/"
@@ -134,17 +132,17 @@ exports.updateUser = function (userInfo) { //Function will be used for updating 
 
 
 /*-----------PET FUNCTIONS----------*/
-exports.createPet = async function(petEntry, usrIndx)  {
+exports.createPet = async function(petEntry, usrIndx)  { // adds a new pet entry to database
   petId = ""
   let isExist = false
   do
   {
-      petId = await crypto.randomBytes(20)
+      petId = await crypto.randomBytes(20) // generate a random hash for the pet key
       petId = petId.toString('hex')
 
-      isExist = await PetM.exists({ PetId: petId });
+      isExist = await PetM.exists({ PetId: petId }); // check if such a hash already exists
 
-      if (!isExist)
+      if (!isExist) // if it doesn't exit, then
       {
         petEntry["PetId"] = petId
         const petDatEntry = new PetM(petEntry)
@@ -168,12 +166,12 @@ exports.createPet = async function(petEntry, usrIndx)  {
   return petId
 }
 
-exports.getPet = async function (petId) {
+exports.getPet = async function (petId) { // return a specified pet entry
   let docs = await PetM.findOne({ PetId:petId });
   return  docs;
 }
 
-exports.getUserPets = async function (usrIndex) {
+exports.getUserPets = async function (usrIndex) { // return an array of the users pets
   let docs = await UserM.findOne({ username:usrIndex });
   petArr = []
 
@@ -185,14 +183,14 @@ exports.getUserPets = async function (usrIndex) {
   return  petArr;
 }
 
-exports.updatePet = async function(petInfo, petId) {
+exports.updatePet = async function(petInfo, petId) { // update an exisiting pet
   console.log(petInfo)
   console.log(petId)
   await PetM.findOneAndUpdate({PetId:petId}, petInfo);
   return true
 }
 
-exports.deletePet = async function(petId, userIndex) {
+exports.deletePet = async function(petId, userIndex) { // delete a pet
   let ret = await PetM.findOneAndRemove({PetId:petId});
   let docs = await UserM.findOne({ username:userIndex });
 
@@ -227,7 +225,7 @@ exports.addPost = async function (postEntry, usrIndx) {
         postEntry["postId"] = postId
         postEntry["postLikes"] = 0
         const postDatEntry = new PostM(postEntry)
-        
+
         await postDatEntry.save()
         let docs = await UserM.findOne({ username:usrIndx });
         console.log(docs)
@@ -372,7 +370,7 @@ exports.addComment = async function (commentEntry, postIndx) {
       {
         commentEntry["commentId"] = commentId
         const commentDatEntry = new CommentM(commentEntry)
-        
+
         await commentDatEntry.save()
         console.log(postIndx)
         let docs = await PostM.findOne({ postId:postIndx });
@@ -381,7 +379,7 @@ exports.addComment = async function (commentEntry, postIndx) {
         newCommentList = docs.postComments
         newCommentList.push(commentDatEntry)
 
-          
+
         PostM.findOneAndUpdate({postId:postIndx},{postComments: newCommentList}, (error,result) => {
           if(error){
             console.log("Error: ", error)
