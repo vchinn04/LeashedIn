@@ -3,11 +3,8 @@
     "",
     "\\client",
     "\\client\\src",
-    "\\client\\src\\components\\Login",
-    "\\client\\src\\components\\NavBar",
     "\\server",
     "\\server\\modules"
   ],
-  "SelectedNode": "\\client\\src\\setupProxy.js",
   "PreviewInSolutionExplorer": false
 }
