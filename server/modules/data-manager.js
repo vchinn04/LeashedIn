@@ -78,6 +78,17 @@ exports.getUser =  async function (usrIndex) { //Getter function template
   return  docs;
 }
 
+exports.getUserLiked =  async function (usrIndex) { //Getter function template
+  console.log("Getting user");
+  console.log(usrIndex)
+
+  let docs = await UserM.findOne({ username:usrIndex });
+  console.log("--------hehehe-----------")
+  console.log(docs.likedPosts)
+  console.log("------------------")
+  return docs.likedPosts;
+}
+
 exports.getUserData =  async function (usrIndex) { //Get the data of a single specified user
   console.log("Getting user data");
   console.log(usrIndex)
@@ -299,7 +310,9 @@ exports.updateLikedPosts = async function (postIndex, usrIndex) {
   let postDocs = await PostM.findOne({ postIndex:postIndex });
   let docs = await UserM.findOne({ username:usrIndex });
   newLikedList = docs.likedPosts
-  newLikedList.push(postDocs)
+  newLikedList.push(postIndex)
+  console.log("worked")
+  console.log(postIndex)
   UserM.findOneAndUpdate({username: usrIndex}, {likedPosts: newLikedList},function(error,result){
     if(error){
       console.log("Error: ", error)
@@ -308,9 +321,6 @@ exports.updateLikedPosts = async function (postIndex, usrIndex) {
       console.log("hello")
     }
   });
-  console.log("LIKED INFO")
-  console.log(docs2)
-
 
 }
 
@@ -374,6 +384,22 @@ exports.deletePost = async function(postId, userIndex) {
   UserM.findOneAndUpdate({username:userIndex},{posts: docs.posts},(error,result)=>{console.log("Successfully Updated User Post Deletion!")})
 
   return ret;
+}
+
+exports.deleteLiked = async function(postId, userIndex) {
+  let docs = await UserM.findOne({ username:userIndex });
+
+  let index = -1
+  for (let i = 0; i < docs.likedPosts.length; i++) {
+    if (postId == docs.likedPosts[i]){
+      index = i
+      break
+    }
+  }
+  if (index > -1)
+    docs.likedPosts.splice(index, 1);
+
+  UserM.findOneAndUpdate({username:userIndex},{likedPosts: docs.likedPosts},(error,result)=>{console.log("Successfully Updated User Post Deletion!")})
 }
 
 // Comment functions

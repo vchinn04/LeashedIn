@@ -71,6 +71,7 @@ const Feed = (props ) =>
   const [totalPostList, setTotalPostList] = useState(totalListT);
   const [postArr, setPostArr] = useState([]);
 
+
   const getPosts = async() => {
     const url = '/getPostArr?' //Fire get event to find users with search string in their usernames
     const response = await fetch(url);
@@ -81,6 +82,7 @@ const Feed = (props ) =>
     return postArray
 
 }
+
 
 
   const addPost = (postInformation, inputImageFile) => {
@@ -220,6 +222,9 @@ const Feed = (props ) =>
           setPostArr(postArray)
           console.log(postArray)
         })
+
+
+
       const url = '/getUserProfileText?' + new URLSearchParams({ username: props.loginStatus }).toString()
       const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username: props.loginStatus }).toString()
       const getPostListURL = '/getPostList?'

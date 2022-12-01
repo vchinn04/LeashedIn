@@ -49,6 +49,13 @@ app.get('/getUserArr', async (req, res) => { // returns an array of searched for
   res.send({ express: 'heye from Express', userList: JSON.stringify(userListData)  });
 });
 
+app.get('/getUserLiked', async (req, res) => { // returns an array of searched for users
+  console.log(req.query)
+  const userLiked = await dataManager.getUserLiked(req.query.username)
+
+  res.send({ liked: userLiked });
+});
+
 app.get('/getUserProfileText', async (req, res) => { // return the profile info of specified user
   console.log(req.query)
   const userData = await dataManager.getUserData(req.query.username)
@@ -358,7 +365,8 @@ app.get('/getPostLikes', async (req, res) => { //Get Event
 });
 
 app.post('/UpdatePostLikes', upload.single('image'), async (req, res) => {
-
+  console.log("erm okayyyy")
+  console.log(req.body)
   const postInfo = {
     postId: req.body.postId,
     postLikes: req.body.postLikes
@@ -370,9 +378,14 @@ app.post('/UpdatePostLikes', upload.single('image'), async (req, res) => {
 
 });
 
-app.post('/updateLikedPosts', async (req, res) => { //Get Event
-  console.log("erm okay")
+app.post('/updateLikedPosts', upload.single('image'), async (req, res) => { //Get Event
+  console.log("erm okayyy")
+  console.log(req.body)
+  console.log(req.body.userId)
+  console.log(req.body.postId)
   dataManager.updateLikedPosts(req.body.postId, req.body.userId);
+  res.send(JSON.stringify({ loginStatus: "ohh yea", errorMessage: 'No Errors!' }));
+
 });
 
 app.post('/UpdatePostLikes', upload.single('image'), async (req, res) => {
@@ -420,6 +433,10 @@ app.delete('/DeletePost', async (req, res) => { //Get Event
   }
   let ret = await dataManager.deletePost(req.query.postId, req.query.userIndex)
   res.send({ returnValue: ret })
+});
+
+app.delete('/DecreaseLikedPosts', upload.single('image'),async (req, res) => { //Get Event
+  await dataManager.deleteLiked(req.body.postId, req.body.userId)
 });
 
 
