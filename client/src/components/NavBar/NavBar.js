@@ -86,7 +86,6 @@ const NavBar = (props) =>
         promiseArr.push(fetch(getPfpURL)
                         .then(async (result) =>
                         {
-                           console.log('File retrieval success!');
                            let myBlob = await result.blob()
 
                            var reader  = new FileReader();
@@ -147,7 +146,6 @@ const NavBar = (props) =>
 
       fetch(url) // get the profile pic of user for profile button
       .then(async (result) => {
-        console.log('File retrieval success!');
         let myBlob = await result.blob()
 
          var reader  = new FileReader();

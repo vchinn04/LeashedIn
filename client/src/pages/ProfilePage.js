@@ -36,17 +36,16 @@ const EditSaveButton = (props) =>
 
 const ProfilePage = (props ) =>
 {
-  let { id } = useParams();
-  const [aboutState, setAboutState] = useState("");
-  const [isEditing, setEdit] = useState(false);
-  const [ownerName, setName] = useState("Victor Chinnappan");
-  const [inputImage, setImage] = useState(null);
-  const [inputImagePath, setImagePath] = useState(null);
-  const [inputImageFile, setImageFile] = useState(null);
-  const [petList, setPetList] = useState(petListT);
-  const [currentPet, setCurrentPet] = useState(null);
-
-  const avatarMarginTop = (props.loginStatus == id) ? -2 : 4
+  let { id } = useParams(); // access the query parameter passed in
+  const [currentId, setCurrentId] = useState(id);
+  const [aboutState, setAboutState] = useState(""); // Stores the owners about me text
+  const [isEditing, setEdit] = useState(false); // boolean that stores wether user is editing page or not
+  const [ownerName, setName] = useState(""); // stores the owner's name
+  const [inputImage, setImage] = useState(null); // stores the processed image for use with avatar
+  const [inputImagePath, setImagePath] = useState(null); // stores the path to uploaded image
+  const [inputImageFile, setImageFile] = useState(null); // stores the image file
+  const [petList, setPetList] = useState([]); // stores a list of pet entries
+  const [currentPet, setCurrentPet] = useState(null); // stores a pet entry (when selected)
 
   const setUpFile = (file) =>
   {
@@ -166,13 +165,13 @@ const ProfilePage = (props ) =>
 
   useEffect(() => {
     const getData = async() => {
-      const url = '/getUserProfileText?' + new URLSearchParams({ username: props.loginStatus }).toString()
-      const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username: props.loginStatus }).toString()
-      const getPetListURL = '/getUserPets?' + new URLSearchParams({ username: props.loginStatus }).toString()
+      console.log("PROFILE PAGE FOR USER: " + id)
+      const url = '/getUserProfileText?' + new URLSearchParams({ username: id }).toString()
+      const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username: id }).toString()
+      const getPetListURL = '/getUserPets?' + new URLSearchParams({ username: id }).toString()
 
       fetch(getPetListURL).then((response) => response.json())
        .then((result) => {
-         console.log('Info retrieval success!');
          if (result)
            var finalArr = []
            var promiseArr = [];
@@ -210,12 +209,9 @@ const ProfilePage = (props ) =>
 
                  fetch(url).then((response) => response.json())
                  .then((result) => {
-                   console.log('Info retrieval success!');
-                   if (result.aboutMe)
-                     setAboutState(result.aboutMe)
-
-                   if (result.ownerName)
-                     setName(result.ownerName)
+                   console.log('Profile Information retrieval success!');
+                   setAboutState(result.aboutMe)
+                   setName(result.ownerName)
                  })
                  .catch((error) => {
                    console.error('Error:', error);
@@ -223,7 +219,7 @@ const ProfilePage = (props ) =>
 
                  fetch(getPfpURL)
                  .then(async (result) => {
-                   console.log('File retrieval success!');
+                   console.log('Profile Picture retrieval success!');
                    let myBlob = await result.blob()
 
                    setUpFile(myBlob)
@@ -240,7 +236,16 @@ const ProfilePage = (props ) =>
 
     getData()
 
-  }, []);
+  useEffect(() => {
+    setUpFunction()
+  }, []); // called when its first rendered
+
+  if (id != currentId) // if we change to another users page, then fetch all the info again
+  {
+    setCurrentId(id)
+    setUpFunction()
+  }
+  /*----------------------------------*/
 
   return (
       <div className="profile-page-frame">
