@@ -312,8 +312,7 @@ exports.updateLikedPosts = async function (postIndex, usrIndex) {
   let docs = await UserM.findOne({ username:usrIndex });
   newLikedList = docs.likedPosts
   newLikedList.push(postIndex)
-  console.log("worked")
-  console.log(postIndex)
+
   UserM.findOneAndUpdate({username: usrIndex}, {likedPosts: newLikedList},function(error,result){
     if(error){
       console.log("Error: ", error)
@@ -342,7 +341,6 @@ exports.updateLikes = function (postInfo) { //Function will be used for updating
 
 exports.decreaseLikes = function (postInfo) { //Function will be used for updating existing users data
     console.log("Updating post");
-    console.log(postInfo.postId)
      PostM.findOneAndUpdate({postId: postInfo.postId}, {$inc : {'postLikes' : -1}},function(error,result){
        if(error){
          console.log("Error: ", error)

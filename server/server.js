@@ -64,7 +64,7 @@ app.get('/getUserProfileText', async (req, res) => { // return the profile info 
 
 app.get('/getUserProfilePic', async (req, res) => { // return the profile picture of a specified user
   const userData = await dataManager.getUserData(req.query.username)
-  if (userData.profilePicture){
+  if (userData && userData.profilePicture){
     let imagePath = "/images/" + userData.profilePicture
     res.sendFile(imagePath, { root: __dirname });
   }
@@ -84,7 +84,7 @@ app.get('/UserLogIn', async (req, res) => { // login authentication
   console.log(userData)
   userObj = userData[0];
   console.log(userObj)
-  
+
   if (userObj == undefined){
     console.log("Bad username!")
     res.send({ loginStatus: false, errorMessage: 'Invalid username or password!' });
@@ -326,8 +326,6 @@ app.post('/UserCreatePost', post_upload.single('postimage'), async (req, res) =>
     DisplayImage: req.body.inputImage,
     postImage: fileP
   }
-  console.log("HIII")
-  console.log(returnPost)
   res.send(JSON.stringify(returnPost));
 });
 
@@ -443,13 +441,10 @@ app.delete('/DecreaseLikedPosts', upload.single('image'),async (req, res) => { /
 
 app.get('/getPostArr', async (req, res) => { //Get Event
   const postListData = await dataManager.getPostList()
-  console.log("POST LIST")
-  console.log(postListData)
   res.send({ express: 'heye from Express', postList: JSON.stringify(postListData)  });
 });
 
 app.post('/UserCreateComment', upload.single('image'), async (req, res) => { //Get Event
-  console.log("Creating Comment!")
 
   const commentEntry = {
     username: req.body.userIndex,

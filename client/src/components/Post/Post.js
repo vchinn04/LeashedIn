@@ -24,7 +24,10 @@ import { Link } from 'react-router-dom';
 
 const commentListT = []
 const userListT = []
-
+const ColorDivider = styled(Divider)(({ theme }) => ({
+    color: "#7150BC",
+    backgroundColor: "#7150BC"
+  }));
 
 const Post = (props) => {
     const [countUp, setCountUp] = useState(0)
@@ -56,7 +59,6 @@ const Post = (props) => {
         data.append('commentDescription', commentInformation.CommentDescription)
         data.append('postIndex', props.postInfo.postId)
         data.append('userIndex', props.username)
-        console.log(props.postInfo.postId)
         fetch('/UserCreateComment',
           {
             method: 'POST',
@@ -69,7 +71,6 @@ const Post = (props) => {
             commentListNew.push(result)
 
             setCommentList(commentListNew)
-            console.log(commentList)
             window.location.reload(false);
 
           })
@@ -79,7 +80,6 @@ const Post = (props) => {
       }
 
       const updateLikes = (postInformation) => {
-        console.log(likeDB)
         if (likeDB)
           return
 
@@ -197,8 +197,6 @@ const Post = (props) => {
 
 
       const updateLikes2 = (postInformation) => {
-        console.log(likeDB)
-
         if (likeDB)
           return
 
@@ -215,7 +213,6 @@ const Post = (props) => {
               }
             )
           }
-          console.log(postArray)
 
 
         let index = -1
@@ -225,7 +222,6 @@ const Post = (props) => {
                     break
             }
         }
-        console.log(index)
 
         if (index == -1)
         {
@@ -238,9 +234,6 @@ const Post = (props) => {
             var data = new FormData()
             setLikedArr(postArray)
             setClicked(true)
-            setLikeDB(false)
-            console.log(postInformation.postId)
-            console.log(postInformation.postLikes)
             data.append('postId', postInformation.postId)
             data.append('postLikes', postInformation.postLikes)
             fetch('/DecreaseLikes',
@@ -252,7 +245,6 @@ const Post = (props) => {
             .then((result) => {
 
                 let postLikes = result
-                console.log(postLikes)
                 setLikeDB(false)
                 window.location.reload(false);
 
@@ -273,13 +265,11 @@ const Post = (props) => {
 
                 .then((result) => {
                   setLikeDB(false)
-                window.location.reload(false);
-
-
+                  window.location.reload(false);
                 })
                 .catch((error) => {
                   setLikeDB(false)
-                console.error('Error:', error);
+                  console.error('Error:', error);
                 });
 
         }
@@ -291,7 +281,6 @@ const Post = (props) => {
         const commentInformation = {
             CommentDescription: commentDescription,
           }
-        console.log(props.username)
 
           addComment(commentInformation)
           setComment(false)
@@ -301,7 +290,6 @@ const Post = (props) => {
     const deleteComment = (commentEntry) =>
     {
       console.log("Delete comment!")
-      console.log("hello")
 
 
       let index = -1
@@ -350,14 +338,11 @@ const Post = (props) => {
                 )
               }
               setLikedArr(postArray)
-              console.log(postArray)
             })
 
 
           const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username:  props.postInfo.username}).toString()
 
-          console.log(props.postInfo.username)
-          console.log(props.postInfo.DisplayImage)
 
            fetch(getPfpURL)
            .then(async (result) => {
@@ -383,7 +368,7 @@ const Post = (props) => {
 
     return (
             <Container className = "Post" >
-                <div className = 'row'>
+                <div className = 'row2'>
                     <IconButton className = 'row' color="primary" aria-label="profile"  component={Link} to={`/profile/${props.postInfo.username}`}>
                         <Avatar src={inputImage} alt="Profile" />
                      </IconButton>
@@ -413,7 +398,7 @@ const Post = (props) => {
             </Box>
 
 
-                <Divider component="li" sx={{marginLeft: '2%', marginRight: '2%', borderBottomWidth: 2}}/>
+                <ColorDivider component="li" sx={{ borderBottomWidth: 2}}/>
                 <div className='row'>
                     <Button
                     onClick={() =>
