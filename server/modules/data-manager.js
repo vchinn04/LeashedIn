@@ -1,8 +1,8 @@
 // getting-started.js
 const mongoose = require('mongoose');
 
-const mongoPass = require('./mongo-pass.js');
 const crypto = require('crypto');
+require('dotenv').config();
 
 const userSchema = new mongoose.Schema({
   email: String,
@@ -53,8 +53,9 @@ const CommentM = mongoose.model('Comments', commentSchema);
 
 
 exports.setupMongo = async function () { //Connect to our database and output that connection was successful
-  const uri = mongoPass.AtlasPass//url for connecting with our MongoDB Atlas
+  const uri = process.env.ATLAS_PASS//url for connecting with our MongoDB Atlas
   console.log('\x1b[33m', "Attempting Connection with MongoDB")
+
 
   await mongoose.connect(uri); //Try to connect to MongoDB
 
@@ -250,7 +251,7 @@ exports.addPost = async function (postEntry, usrIndx) {
         let totalPosts = await PostM.find();
         totalPostList = totalPosts
         totalPostList.push(postDatEntry)
-          
+
         UserM.findOneAndUpdate({username:usrIndx},{posts: newPostList}, {allPosts: totalPostList},(error,result) => {
           if(error){
             console.log("Error: ", error)
@@ -343,7 +344,7 @@ exports.decreaseLikes = function (postInfo) { //Function will be used for updati
 
   exports.getPostData =  async function (postIndex) { //Getter function template
     console.log(postIndex)
-  
+
     let docs = await PostM.findOne({ postId:postIndex });
     return  docs;
   }

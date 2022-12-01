@@ -456,12 +456,10 @@ app.delete('/DeleteComment', async (req, res) => { //Get Event
   if (!commentEntry)
     res.send({ returnValue: false })
 
-  
+
   let ret = await dataManager.deleteComment(req.query.commentId, req.query.postIndex)
   res.send({ returnValue: ret })
 });
 
 dataManager.setupMongo().catch(err => console.log(err)); //Initialize the DataBase in the data-manager modules
 app.listen(port, () => console.log(`Server Up! Listening on port ${port}`)); //Binds server to localhost:5000
-
-
