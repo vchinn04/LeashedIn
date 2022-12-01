@@ -24,7 +24,10 @@ import { Link } from 'react-router-dom';
 
 const commentListT = []
 const userListT = []
-
+const ColorDivider = styled(Divider)(({ theme }) => ({
+    color: "#7150BC",
+    backgroundColor: "#7150BC"
+  }));
 
 const Post = (props) => {
     const [countUp, setCountUp] = useState(0)
@@ -55,7 +58,6 @@ const Post = (props) => {
         data.append('commentDescription', commentInformation.CommentDescription)
         data.append('postIndex', props.postInfo.postId)
         data.append('userIndex', props.username)
-        console.log(props.postInfo.postId)
         fetch('/UserCreateComment',
           {
             method: 'POST',
@@ -68,7 +70,6 @@ const Post = (props) => {
             commentListNew.push(result)
 
             setCommentList(commentListNew)
-            console.log(commentList)
             window.location.reload(false);
 
           })
@@ -92,7 +93,6 @@ const Post = (props) => {
             )
           }
           setLikedArr(postArray)
-          console.log(postArray)
         })
 
         let index = -1
@@ -109,8 +109,6 @@ const Post = (props) => {
 
             setClicked(false)
         
-            console.log(postInformation.postId)
-            console.log(postInformation.postLikes)
             data.append('postId', postInformation.postId)
             data.append('postLikes', postInformation.postLikes)
             fetch('/UpdatePostLikes',
@@ -199,7 +197,6 @@ const Post = (props) => {
             )
           }
           setLikedArr(postArray)
-          console.log(postArray)
         })
 
         let index = -1
@@ -209,7 +206,6 @@ const Post = (props) => {
                     break
             }
         }
-        console.log(index)
 
         if (index == -1)
         {
@@ -219,8 +215,6 @@ const Post = (props) => {
         else {
             var data = new FormData()
             setClicked(true)
-            console.log(postInformation.postId)
-            console.log(postInformation.postLikes)
             data.append('postId', postInformation.postId)
             data.append('postLikes', postInformation.postLikes)
             fetch('/DecreaseLikes',
@@ -232,7 +226,6 @@ const Post = (props) => {
             .then((result) => {
         
                 let postLikes = result
-                console.log(postLikes)
                 window.location.reload(false);
                 
             })
@@ -267,7 +260,6 @@ const Post = (props) => {
         const commentInformation = {
             CommentDescription: commentDescription,
           }
-        console.log(props.username)
 
           addComment(commentInformation)
           setComment(false)
@@ -277,7 +269,6 @@ const Post = (props) => {
     const deleteComment = (commentEntry) =>
     {
       console.log("Delete comment!")
-      console.log("hello")
 
   
       let index = -1
@@ -326,14 +317,11 @@ const Post = (props) => {
                 )
               }
               setLikedArr(postArray)
-              console.log(postArray)
             })
     
   
           const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username:  props.postInfo.username}).toString()
 
-          console.log(props.postInfo.username)
-          console.log(props.postInfo.DisplayImage)
     
            fetch(getPfpURL)
            .then(async (result) => {
@@ -359,7 +347,7 @@ const Post = (props) => {
 
     return (
             <Container className = "Post" >
-                <div className = 'row'>
+                <div className = 'row2'>
                     <IconButton className = 'row' color="primary" aria-label="profile"  component={Link} to={`/profile/${props.postInfo.username}`}>
                         <Avatar src={inputImage} alt="Profile" />
                      </IconButton>
@@ -372,8 +360,8 @@ const Post = (props) => {
                     </Button>}
                 </div>
                     
-  
-            <Divider component="li" sx={{borderBottomWidth: 2, color: 'purple'}}/>
+                <ColorDivider component="li" sx={{ borderBottomWidth: 2}}/>
+
 
             <Box sx={{ mb: 0, mx: 'auto', color: "#7150BC",textAlign:"left", borderRadius: '15px' , marginTop: '15'}}>
                 <Container style={{marginBottom: '30'}}>
@@ -389,7 +377,7 @@ const Post = (props) => {
             </Box>
 
 
-                <Divider component="li" sx={{marginLeft: '2%', marginRight: '2%', borderBottomWidth: 2}}/>
+                <ColorDivider component="li" sx={{ borderBottomWidth: 2}}/>
                 <div className='row'>
                     <Button                 
                     onClick={() => 
@@ -408,7 +396,7 @@ const Post = (props) => {
                     <div className='row' style = {{color: 'black', fontWeight: '700'}} > 
                         Comment
                     </div> 
-                    <Container className = 'row' style = {{color: 'black', fontWeight: 'normal', justifyContent: 'space-between', marginLeft: 700}}>
+                    <Container className = 'row' style = {{color: 'black', fontWeight: '700', justifyContent: 'space-between', marginLeft: 700}}>
                      Likes: {props.likes} 
                     </Container>
                     <Divider component="li" sx={{borderBottomWidth: 2}}/>

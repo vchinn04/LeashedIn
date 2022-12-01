@@ -326,8 +326,6 @@ app.post('/UserCreatePost', post_upload.single('postimage'), async (req, res) =>
     DisplayImage: req.body.inputImage,
     postImage: fileP
   }
-  console.log("HIII")
-  console.log(returnPost)
   res.send(JSON.stringify(returnPost));
 });
 
@@ -443,13 +441,10 @@ app.delete('/DecreaseLikedPosts', upload.single('image'),async (req, res) => { /
 
 app.get('/getPostArr', async (req, res) => { //Get Event
   const postListData = await dataManager.getPostList()
-  console.log("POST LIST")
-  console.log(postListData)
   res.send({ express: 'heye from Express', postList: JSON.stringify(postListData)  });
 });
 
 app.post('/UserCreateComment', upload.single('image'), async (req, res) => { //Get Event
-  console.log("Creating Comment!")
 
   const commentEntry = {
     username: req.body.userIndex,

@@ -109,7 +109,6 @@ const Feed = (props ) =>
 
         
         let postListNew = postList
-        console.log(postList)
         result["DisplayImage"] = postInformation.DisplayImage // if it was succesful add the image sent back from server to pet entry
 
         postListNew.push(result)
@@ -124,7 +123,6 @@ const Feed = (props ) =>
       .then(res => {
         const someData = res;
         let postArray = res
-        console.log(postArray)
         if (postArray.length == 0) //If no users found then push a "fake" user to display that no users found
         {
           postArray.push(
@@ -158,7 +156,6 @@ const Feed = (props ) =>
       }
     }
 
-    console.log(postEntry.postId)
 
 
 
@@ -234,12 +231,10 @@ const Feed = (props ) =>
        .then((result) => {
          console.log('Info retrieval success!');
          if (result)
-           console.log(result)
            var finalArr = []
            var promiseArr = [];
            for (let i of result)
            {
-             console.log(i["postImage"])
              if (i.postImage == '')
                 continue
               const postPicURL = '/getPostPic?' + new URLSearchParams({ imagePath: i["postImage"] }).toString()
@@ -251,7 +246,6 @@ const Feed = (props ) =>
                    var reader  = new FileReader();
                    reader.onload = function(e)  {
                     i["DisplayImage"] = e.target.result
-                    console.log(i["DisplayImage"])
 
                    }
 
@@ -296,7 +290,7 @@ const Feed = (props ) =>
 
   return (
     <Container>
-        <Paper style={{maxHeight: 800, maxWidth: 1000, overflow: 'auto', backgroundColor: '#825DD7', margin: 500}}>
+        <Paper style={{maxHeight: 800, maxWidth: 1000, overflow: 'auto', backgroundColor: '#EEEFF1', margin: 500}}>
         <Container style={{alignContent: 'center'}}>
             <List style = {{margin: 100, alignContent:'center', width: 800, height: 700}}>
                 <MakeAPost  addPost={addPost} setCurrentPost={setCurrentPost}/>
