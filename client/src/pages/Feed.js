@@ -94,8 +94,8 @@ const Feed = (props ) =>
 
     data.append('PostDescription', postInformation.PostDescription)
     data.append('userIndex', props.loginStatus)
-
-    fetch('/UserCreatePost',
+    let tempArr = []
+    tempArr.push(fetch('/UserCreatePost',
       {
         method: 'POST',
         body: data
@@ -108,28 +108,31 @@ const Feed = (props ) =>
         postListNew.push(result)
 
         setPostList(postListNew)
+        window.location.reload(false)
       })
       .catch((error) => {
+        window.location.reload(false)
         console.error('Error:', error);
-      });
-
-      getPosts()
-      .then(res => {
-        const someData = res;
-        let postArray = res
-        if (postArray.length == 0) //If no users found then push a "fake" user to display that no users found
-        {
-          postArray.push(
-            {
-              _id: -1, //assign _id to -1 in order for the button to be disabled
-            }
-          )
-        }
-        setPostArr(postArray)
-      })
-      window.location.reload(false)
-
-
+      }));
+      
+      Promise.all(tempArr).then(() =>
+      {
+        getPosts()
+        .then(res => {
+          const someData = res;
+          let postArray = res
+          if (postArray.length == 0) //If no users found then push a "fake" user to display that no users found
+          {
+            postArray.push(
+              {
+                _id: -1, //assign _id to -1 in order for the button to be disabled
+              }
+            )
+          }
+          setPostArr(postArray)
+          window.location.reload(false)
+        })
+    });
 
   }
 
