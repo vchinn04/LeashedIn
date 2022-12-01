@@ -114,7 +114,7 @@ const Feed = (props ) =>
         window.location.reload(false)
         console.error('Error:', error);
       }));
-      
+
       Promise.all(tempArr).then(() =>
       {
         getPosts()
@@ -230,7 +230,10 @@ const Feed = (props ) =>
            for (let i of result)
            {
              if (i.postImage == '')
+             {
+               finalArr.push(i)
                 continue
+              }
               const postPicURL = '/getPostPic?' + new URLSearchParams({ imagePath: i["postImage"] }).toString()
 
               promiseArr.push(fetch(postPicURL)
