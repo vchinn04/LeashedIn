@@ -139,6 +139,7 @@ exports.addUser = async function (usrEmailV, usrNameV, usrPasswordV) {
 
 exports.moreInfoCreateUpdateUser = function (userInfo) { //Function will be used for updating existing users data
   console.log("Updating user");
+  console.log("THIS IS THE ABOUT ME: ", userInfo.aboutMe)
    UserM.findOneAndUpdate({username: userInfo.username},{entityType: userInfo.entityType, ownerName: userInfo.ownerName, aboutMe: userInfo.aboutMe},function(error,result){
      if(error){
        console.log("Error: ", error)
