@@ -66,7 +66,14 @@ app.get('/getUserProfilePic', async (req, res) => { // return the profile pictur
   const userData = await dataManager.getUserData(req.query.username)
   if (userData && userData.profilePicture){
     let imagePath = "/images/" + userData.profilePicture
-    res.sendFile(imagePath, { root: __dirname });
+    let checkPath = __dirname + imagePath
+    fs.exists(checkPath,  (exists) => {
+      if (exists)
+        res.sendFile(imagePath, { root: __dirname });
+      else {
+        res.send({result: false})
+      }
+    });
   }
   else {
     res.send({result: false})
@@ -110,12 +117,12 @@ app.post('/CheckUserExistence', async (req, res) => {
 });
 
 app.put('/UpdateProfile', upload.single('image'), async (req, res) => { // responsible for updating a user's profile
-  console.log("UPDATING USER!")
-  console.log(req.file)
-  console.log(req.body.username)
-  console.log(req.body.aboutme)
-  console.log(req.body.ownername)
-  console.log("------------------------")
+  //console.log("UPDATING USER!")
+//  console.log(req.file)
+  //console.log(req.body.username)
+//  console.log(req.body.aboutme)
+//  console.log(req.body.ownername)
+//  console.log("------------------------")
 
   const userInfo = {
     username: req.body.username,
@@ -181,7 +188,7 @@ app.get('/getUserPets', async (req, res) => { // returns an array of the users p
 app.get('/getPetPic', async (req, res) => { //returns the picture associated with the sepcified pet
   console.log(req.query)
   let imagePath = "/petpics/" + req.query.imagePath
-  res.sendfile(imagePath, { root: __dirname });
+  res.sendFile(imagePath, { root: __dirname });
 });
 
 app.post('/Pets', pet_upload.single('petimage'), async (req, res) => { // creates pet entry
@@ -308,7 +315,6 @@ app.post('/UserCreatePost', post_upload.single('postimage'), async (req, res) =>
     username: req.body.userIndex,
     postDescription: req.body.PostDescription,
     postLikes: 0,
-    DisplayImage: req.body.inputImage,
     postImage: ((req.file) ? req.file.filename : "")
   }
 
@@ -323,7 +329,6 @@ app.post('/UserCreatePost', post_upload.single('postimage'), async (req, res) =>
     postId: postId,
     postDescription: req.body.PostDescription,
     postLikes: 0,
-    DisplayImage: req.body.inputImage,
     postImage: fileP
   }
   res.send(JSON.stringify(returnPost));
@@ -345,9 +350,16 @@ app.get('/getPostList', async (req, res) => { //Get Event
 app.get('/getPostPic', async (req, res) => { //Get Event
   if (req.query.imagePath) {
     let imagePath2 = "/postpics/" + req.query.imagePath
-    console.log("IMAGEE")
-    console.log(imagePath2)
-    res.sendfile(imagePath2, { root: __dirname });
+    let checkPath = __dirname + imagePath2
+
+    fs.exists(checkPath,  (exists) => {
+      if (exists)
+        res.sendFile(imagePath2, { root: __dirname });
+      else {
+        console.log("ERROR " + imagePath2)
+        res.send({result: false})
+      }
+    });
   }
   else {
     res.send({result: false})
@@ -363,8 +375,6 @@ app.get('/getPostLikes', async (req, res) => { //Get Event
 });
 
 app.post('/UpdatePostLikes', upload.single('image'), async (req, res) => {
-  console.log("erm okayyyy")
-  console.log(req.body)
   const postInfo = {
     postId: req.body.postId,
     postLikes: req.body.postLikes
@@ -377,10 +387,6 @@ app.post('/UpdatePostLikes', upload.single('image'), async (req, res) => {
 });
 
 app.post('/updateLikedPosts', upload.single('image'), async (req, res) => { //Get Event
-  console.log("erm okayyy")
-  console.log(req.body)
-  console.log(req.body.userId)
-  console.log(req.body.postId)
   dataManager.updateLikedPosts(req.body.postId, req.body.userId);
   res.send(JSON.stringify({ loginStatus: "ohh yea", errorMessage: 'No Errors!' }));
 

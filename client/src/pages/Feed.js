@@ -88,17 +88,13 @@ const Feed = (props ) =>
   const addPost = (postInformation, inputImageFile) => {
     var data = new FormData()
 
-   console.log("hello")
-
     if (postInformation.PostImage)
       data.append('postimage', inputImageFile, inputImageFile.name)
 
 
-    if (postInformation.DisplayImage)
-        data.append('inputImage', postInformation.DisplayImage)
-
     data.append('PostDescription', postInformation.PostDescription)
     data.append('userIndex', props.loginStatus)
+
     fetch('/UserCreatePost',
       {
         method: 'POST',
@@ -106,8 +102,6 @@ const Feed = (props ) =>
       }).then((response) => response.json())
 
       .then((result) => {
-
-        
         let postListNew = postList
         result["DisplayImage"] = postInformation.DisplayImage // if it was succesful add the image sent back from server to pet entry
 
@@ -138,9 +132,6 @@ const Feed = (props ) =>
 
 
   }
-
-
-
 
   const deletePost = (postEntry) =>
   {
@@ -226,13 +217,13 @@ const Feed = (props ) =>
       const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username: props.loginStatus }).toString()
       const getPostListURL = '/getPostList?'
 
+      var promiseArr = [];
+      var finalArr = []
 
       fetch(getPostListURL).then((response) => response.json())
        .then((result) => {
          console.log('Info retrieval success!');
          if (result)
-           var finalArr = []
-           var promiseArr = [];
            for (let i of result)
            {
              if (i.postImage == '')
@@ -259,28 +250,29 @@ const Feed = (props ) =>
               finalArr.push(i)
             }
 
+
+           Promise.all(promiseArr).then(() =>
+           {
+             fetch(getPfpURL)
+             .then(async (result) => {
+               let myBlob = await result.blob()
+
+               var reader  = new FileReader();
+               reader.onload = function(e)  {
+                 setImage(e.target.result)
+               }
+               reader.readAsDataURL(myBlob);
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
+            setPostArr(finalArr)
+          });
+
        })
        .catch((error) => {
          console.error('Error:', error);
        });
-
-
-       fetch(getPfpURL)
-       .then(async (result) => {
-         console.log('File retrieval success!');
-         let myBlob = await result.blob()
-
-          var reader  = new FileReader();
-          reader.onload = function(e)  {
-              setImage(e.target.result)
-           }
-           reader.readAsDataURL(myBlob);
-       })
-       .catch((error) => {
-         console.error('Error:', error);
-       });
-
-
     }
 
     getData()
@@ -309,8 +301,8 @@ const Feed = (props ) =>
                             <Post key={element.postId} postInfo = {element} username = {props.loginStatus} deletePost={deletePost} likes = {element.postLikes} profilePic = {inputImage}>
                             </Post>
                             )
-                            }) 
-                    } 
+                            })
+                    }
                 </List>
             </Container>
         </Paper>

@@ -69,43 +69,26 @@ exports.setupMongo = async function () { //Connect to our database and output th
 }
 
 exports.getUser =  async function (usrIndex) { //Getter function template
-  console.log("Getting user");
-  console.log(usrIndex)
-
   let docs = await UserM.find({ username:usrIndex });
-  console.log("--------DOCS-----------")
-  console.log(docs)
-  console.log("------------------")
+
   return  docs;
 }
 
 exports.getUserLiked =  async function (usrIndex) { //Getter function template
-  console.log("Getting user");
-  console.log(usrIndex)
-
   let docs = await UserM.findOne({ username:usrIndex });
-  console.log("--------hehehe-----------")
-  console.log(docs.likedPosts)
-  console.log("------------------")
   return docs.likedPosts;
 }
 
 exports.getUserData =  async function (usrIndex) { //Get the data of a single specified user
-  console.log("Getting user data");
-  console.log(usrIndex)
-
   let docs = await UserM.findOne({ username:usrIndex });
   return  docs;
 }
 
 exports.getUserList =  async function (searchParams) { // get a list of max length 5 based on search parameters
-  console.log("Getting user list");
-  console.log(searchParams)
+
   const regExVar = "/"+searchParams+"/"
   let docs = await UserM.find({ username:{ $regex: new RegExp('^' + searchParams , 'i') } }).limit(5);
-  console.log("--------DOCS-----------")
-  console.log(docs)
-  console.log("------------------")
+
   return  docs;
 }
 
@@ -133,8 +116,7 @@ exports.addUser = async function (usrEmailV, usrNameV, usrPasswordV) {
   await userEntry.save(); //Save to our database
 
   const userss = await UserM.find(); //Trying to retrieve all the Users collection  documents.
-  console.log(userss);
-  console.log(userEntry);
+
 }
 
 exports.moreInfoCreateUpdateUser = function (userInfo) { //Function will be used for updating existing users data
@@ -249,7 +231,6 @@ exports.addPost = async function (postEntry, usrIndx) {
       postId = await crypto.randomBytes(20)
       postId = postId.toString('hex')
       isExist = await PostM.exists({ postId: postId });
-
       if (!isExist)
       {
         postEntry["postId"] = postId
@@ -318,7 +299,6 @@ exports.updateLikedPosts = async function (postIndex, usrIndex) {
     if(error){
       console.log("Error: ", error)
     }else{
-      console.log(result);
       console.log("hello")
     }
   });
@@ -332,7 +312,6 @@ exports.updateLikes = function (postInfo) { //Function will be used for updating
      if(error){
        console.log("Error: ", error)
      }else{
-       console.log(result);
        console.log("hello")
      }
 
@@ -361,9 +340,6 @@ exports.decreaseLikes = function (postInfo) { //Function will be used for updati
   exports.getPostList =  async function () { //Getter function template
     console.log("Getting post list");
     let docs = await PostM.find();
-    console.log("--------DOCS-----------")
-    console.log(docs)
-    console.log("------------------")
     return  docs;
   }
 
