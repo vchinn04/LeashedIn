@@ -1,6 +1,4 @@
-
-
-import React from 'react'
+import React from 'react';
 import { Divider } from '@mui/material';
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import CommentIcon from '@mui/icons-material/Comment';
