@@ -1,8 +1,8 @@
 // getting-started.js
 const mongoose = require('mongoose');
 
-const mongoPass = require('./mongo-pass.js');
 const crypto = require('crypto');
+require('dotenv').config();
 
 const userSchema = new mongoose.Schema({
   email: String,
@@ -32,6 +32,7 @@ const postSchema = new mongoose.Schema({
   postId: String,
   postDescription: String,
   postImage: String,
+  DisplayImage: String,
   postLikes: { type: Number, default: 0 },
   postComments: Array
 });
@@ -52,8 +53,9 @@ const CommentM = mongoose.model('Comments', commentSchema);
 
 
 exports.setupMongo = async function () { //Connect to our database and output that connection was successful
-  const uri = mongoPass.AtlasPass//url for connecting with our MongoDB Atlas
+  const uri = process.env.ATLAS_PASS//url for connecting with our MongoDB Atlas
   console.log('\x1b[33m', "Attempting Connection with MongoDB")
+
 
   await mongoose.connect(uri); //Try to connect to MongoDB
 
@@ -75,6 +77,17 @@ exports.getUser =  async function (usrIndex) { //Getter function template
   console.log(docs)
   console.log("------------------")
   return  docs;
+}
+
+exports.getUserLiked =  async function (usrIndex) { //Getter function template
+  console.log("Getting user");
+  console.log(usrIndex)
+
+  let docs = await UserM.findOne({ username:usrIndex });
+  console.log("--------hehehe-----------")
+  console.log(docs.likedPosts)
+  console.log("------------------")
+  return docs.likedPosts;
 }
 
 exports.getUserData =  async function (usrIndex) { //Get the data of a single specified user
@@ -245,16 +258,12 @@ exports.addPost = async function (postEntry, usrIndx) {
 
         await postDatEntry.save()
         let docs = await UserM.findOne({ username:usrIndx });
-        console.log(docs)
-        console.log("bro")
         newPostList = docs.posts
         newPostList.push(postId)
         let totalPosts = await PostM.find();
         totalPostList = totalPosts
         totalPostList.push(postDatEntry)
-        console.log("total")
-        console.log(totalPostList)
-          
+
         UserM.findOneAndUpdate({username:usrIndx},{posts: newPostList}, {allPosts: totalPostList},(error,result) => {
           if(error){
             console.log("Error: ", error)
@@ -282,36 +291,43 @@ exports.getPostLikes = async function (postId) {
 }
 
 exports.updatePost = async function(postInfo, postId) {
-  console.log(petInfo)
-  console.log(petId)
   await PostM.findOneAndUpdate({postId:postId}, postInfo);
   return true
-
 }
 
 exports.getUserPosts = async function (usrIndex) {
   let docs = await UserM.findOne({ username:usrIndex });
   postArr = []
-  console.log(docs)
-  console.log("bro")
 
   for (let i of docs.posts)
   {
-    console.log(i)
     let postEntry = await PostM.findOne({ postId:i });
-    console.log(postEntry)
     postArr.push(postEntry)
   }
 
   return postArr;
 }
 
+exports.updateLikedPosts = async function (postIndex, usrIndex) {
+  let postDocs = await PostM.findOne({ postIndex:postIndex });
+  let docs = await UserM.findOne({ username:usrIndex });
+  newLikedList = docs.likedPosts
+  newLikedList.push(postIndex)
 
+  UserM.findOneAndUpdate({username: usrIndex}, {likedPosts: newLikedList},function(error,result){
+    if(error){
+      console.log("Error: ", error)
+    }else{
+      console.log(result);
+      console.log("hello")
+    }
+  });
+
+}
 
 
 exports.updateLikes = function (postInfo) { //Function will be used for updating existing users data
   console.log("Updating post");
-  console.log(postInfo.postId)
    PostM.findOneAndUpdate({postId: postInfo.postId}, {$inc : {'postLikes' : 1}},function(error,result){
      if(error){
        console.log("Error: ", error)
@@ -326,7 +342,6 @@ exports.updateLikes = function (postInfo) { //Function will be used for updating
 
 exports.decreaseLikes = function (postInfo) { //Function will be used for updating existing users data
     console.log("Updating post");
-    console.log(postInfo.postId)
      PostM.findOneAndUpdate({postId: postInfo.postId}, {$inc : {'postLikes' : -1}},function(error,result){
        if(error){
          console.log("Error: ", error)
@@ -337,9 +352,8 @@ exports.decreaseLikes = function (postInfo) { //Function will be used for updati
   }
 
   exports.getPostData =  async function (postIndex) { //Getter function template
-    console.log("Getting post data");
     console.log(postIndex)
-  
+
     let docs = await PostM.findOne({ postId:postIndex });
     return  docs;
   }
@@ -372,6 +386,22 @@ exports.deletePost = async function(postId, userIndex) {
   return ret;
 }
 
+exports.deleteLiked = async function(postId, userIndex) {
+  let docs = await UserM.findOne({ username:userIndex });
+
+  let index = -1
+  for (let i = 0; i < docs.likedPosts.length; i++) {
+    if (postId == docs.likedPosts[i]){
+      index = i
+      break
+    }
+  }
+  if (index > -1)
+    docs.likedPosts.splice(index, 1);
+
+  UserM.findOneAndUpdate({username:userIndex},{likedPosts: docs.likedPosts},(error,result)=>{console.log("Successfully Updated User Post Deletion!")})
+}
+
 // Comment functions
 
 exports.addComment = async function (commentEntry, postIndx) {
@@ -389,10 +419,7 @@ exports.addComment = async function (commentEntry, postIndx) {
         const commentDatEntry = new CommentM(commentEntry)
 
         await commentDatEntry.save()
-        console.log(postIndx)
         let docs = await PostM.findOne({ postId:postIndx });
-        console.log(docs)
-        console.log("bro")
         newCommentList = docs.postComments
         newCommentList.push(commentDatEntry)
 

@@ -83,6 +83,7 @@ const MakeAPost = props => {
       reader.onload = function(e)  {
          setImage(e.target.result)
       }
+      console.log(file)
       setImageFile(file)
       reader.readAsDataURL(file);
     }
@@ -97,7 +98,6 @@ const MakeAPost = props => {
             DisplayImage: inputImage,
             PostDescription: postDescription,
           }
-
           props.addPost(postInformation, inputImageFile)
           togglePopup()
 
@@ -111,9 +111,9 @@ const MakeAPost = props => {
     
     return (
         <div>
-            <ColorButton variant="contained" size="large" sx={{ width: 1, fontWeight: 'bold', alignContent: 'center', marginBottom: 3}} onClick={togglePopup}>
+            <ColorButton2 variant="contained" size="large" sx={{ width: 1, fontWeight: 'bold', alignContent: 'center', marginBottom: 3}} onClick={togglePopup}>
                                Create A Post
-            </ColorButton>
+            </ColorButton2>
             <div sx={{ alignItems: 'center'}}>
                 {isOpen && <PopUp
                 content={<>

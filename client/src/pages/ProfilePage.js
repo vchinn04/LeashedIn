@@ -38,7 +38,6 @@ const EditSaveButton = (props) => // return edit button or save/cancel buttons d
 const ProfilePage = (props) =>
 {
   let { id } = useParams(); // access the query parameter passed in
-
   const [currentId, setCurrentId] = useState(id);
   const [aboutState, setAboutState] = useState(""); // Stores the owners about me text
   const [isEditing, setEdit] = useState(false); // boolean that stores wether user is editing page or not
@@ -236,13 +235,13 @@ const ProfilePage = (props) =>
   /*---------SET-UP FUNCTIONS----------*/
   const setUpFunction = () => {
     const getData = async() => {
+      console.log("PROFILE PAGE FOR USER: " + id)
       const url = '/getUserProfileText?' + new URLSearchParams({ username: id }).toString()
       const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username: id }).toString()
       const getPetListURL = '/getUserPets?' + new URLSearchParams({ username: id }).toString()
 
       fetch(getPetListURL).then((response) => response.json())
        .then((result) => {
-         console.log('Info retrieval success!');
          if (result)
            var finalArr = []
            var promiseArr = [];
@@ -262,6 +261,7 @@ const ProfilePage = (props) =>
                    var reader  = new FileReader();
                    reader.onload = function(e)  {
                      i["DisplayImage"] = e.target.result
+                     console.log(i["DisplayImage"])
                    }
 
                    reader.readAsDataURL(myBlob);
@@ -280,7 +280,7 @@ const ProfilePage = (props) =>
 
                  fetch(url).then((response) => response.json())
                  .then((result) => {
-                   console.log('Info retrieval success!');
+                   console.log('Profile Information retrieval success!');
                    setAboutState(result.aboutMe)
                    setName(result.ownerName)
                  })
@@ -290,7 +290,7 @@ const ProfilePage = (props) =>
 
                  fetch(getPfpURL)
                  .then(async (result) => {
-                   console.log('File retrieval success!');
+                   console.log('Profile Picture retrieval success!');
                    let myBlob = await result.blob()
 
                    setUpFile(myBlob)
@@ -314,8 +314,8 @@ const ProfilePage = (props) =>
 
   if (id != currentId) // if we change to another users page, then fetch all the info again
   {
-    setUpFunction()
     setCurrentId(id)
+    setUpFunction()
   }
   /*----------------------------------*/
 
