@@ -8,7 +8,7 @@
   to {background-color: rgba(0,0,0,0.2);}
 }
 
-.pet-display-frame {
+.main-display-frame {
   z-index: 1000;
   width: 100%;
   height: 100%;
@@ -23,7 +23,7 @@
   align-items: center;
 }
 
-.pet-info-frame {
+.display-frame {
   width: 750px;
   height: 800px;
   border-radius: 15px;
@@ -36,27 +36,24 @@
 }
 
 
-.pet-frame-close {
+.petwork-frame-close {
   top: 0.5%;
   left: 91%;
 }
 
-.pet-display-frame .username {
-  text-align:center;
+.petwork-text {
+  position: relative;
   margin-bottom: 0;
+  margin-top: 0;
+  top: -50px;
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
   text-align: center;
   font-family: Verdana, Aral, sans-serif;
   color: #825DD7;
 }
 
-.pet-display-frame .subname {
-  text-align:center;
-  margin-top: 0;
-  text-align: center;
-  font-family: Verdana, Aral, sans-serif;
-  font-size: 20px;
-  color: #C5C5C5;
-}
 
 IconButton {
   padding: EdgeInsets.zero;
