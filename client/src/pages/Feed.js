@@ -51,7 +51,6 @@ const Feed = (props ) =>
   let { id } = useParams();
   const [aboutState, setAboutState] = useState("");
   const [isEditing, setEdit] = useState(false);
-  const [ownerName, setName] = useState("Victor Chinnappan");
   const [inputImage, setImage] = useState(null);
   const [inputImagePath, setImagePath] = useState(null);
   const [inputImageFile, setImageFile] = useState(null);
@@ -72,6 +71,7 @@ const Feed = (props ) =>
   const [totalPostList, setTotalPostList] = useState(totalListT);
   const [postArr, setPostArr] = useState([]);
 
+
   const getPosts = async() => {
     const url = '/getPostArr?' //Fire get event to find users with search string in their usernames
     const response = await fetch(url);
@@ -84,61 +84,57 @@ const Feed = (props ) =>
 }
 
 
+
   const addPost = (postInformation, inputImageFile) => {
     var data = new FormData()
-
-   console.log("hello")
 
     if (postInformation.PostImage)
       data.append('postimage', inputImageFile, inputImageFile.name)
 
-    console.log(inputImageFile)
-    console.log(postInformation.PostImage)
+
     data.append('PostDescription', postInformation.PostDescription)
     data.append('userIndex', props.loginStatus)
-    fetch('/UserCreatePost',
+    let tempArr = []
+    tempArr.push(fetch('/UserCreatePost',
       {
         method: 'POST',
         body: data
       }).then((response) => response.json())
 
       .then((result) => {
-
-        
         let postListNew = postList
-        console.log(postList)
-        result["DisplayImage"] = postInformation.DisplayImage
+        result["DisplayImage"] = postInformation.DisplayImage // if it was succesful add the image sent back from server to pet entry
+
         postListNew.push(result)
 
         setPostList(postListNew)
+        window.location.reload(false)
       })
       .catch((error) => {
+        window.location.reload(false)
         console.error('Error:', error);
-      });
+      }));
 
-      getPosts()
-      .then(res => {
-        const someData = res;
-        let postArray = res
-        console.log(postArray)
-        if (postArray.length == 0) //If no users found then push a "fake" user to display that no users found
-        {
-          postArray.push(
-            {
-              _id: -1, //assign _id to -1 in order for the button to be disabled
-            }
-          )
-        }
-        setPostArr(postArray)
-      })
-      window.location.reload(false)
-
-
+      Promise.all(tempArr).then(() =>
+      {
+        getPosts()
+        .then(res => {
+          const someData = res;
+          let postArray = res
+          if (postArray.length == 0) //If no users found then push a "fake" user to display that no users found
+          {
+            postArray.push(
+              {
+                _id: -1, //assign _id to -1 in order for the button to be disabled
+              }
+            )
+          }
+          setPostArr(postArray)
+          window.location.reload(false)
+        })
+    });
 
   }
-
-
-
 
   const deletePost = (postEntry) =>
   {
@@ -154,7 +150,6 @@ const Feed = (props ) =>
       }
     }
 
-    console.log(postEntry.postId)
 
 
 
@@ -218,33 +213,37 @@ const Feed = (props ) =>
           setPostArr(postArray)
           console.log(postArray)
         })
+
+
+
       const url = '/getUserProfileText?' + new URLSearchParams({ username: props.loginStatus }).toString()
       const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username: props.loginStatus }).toString()
-      const getPostListURL = '/getUserPosts?' + new URLSearchParams({ username: props.loginStatus }).toString()
+      const getPostListURL = '/getPostList?'
 
+      var promiseArr = [];
+      var finalArr = []
 
       fetch(getPostListURL).then((response) => response.json())
        .then((result) => {
          console.log('Info retrieval success!');
          if (result)
-           var finalArr = []
-           var promiseArr = [];
            for (let i of result)
            {
-             if (i["DisplayImage"])
+             if (i.postImage == '')
+             {
+               finalArr.push(i)
                 continue
-
+              }
               const postPicURL = '/getPostPic?' + new URLSearchParams({ imagePath: i["postImage"] }).toString()
 
               promiseArr.push(fetch(postPicURL)
                  .then(async (result) => {
                    console.log('File retrieval success!');
                    let myBlob = await result.blob()
-
                    var reader  = new FileReader();
                    reader.onload = function(e)  {
-                     i["DisplayImage"] = e.target.result
-                     console.log(i)
+                    i["DisplayImage"] = e.target.result
+
                    }
 
                    reader.readAsDataURL(myBlob);
@@ -257,28 +256,29 @@ const Feed = (props ) =>
               finalArr.push(i)
             }
 
+
+           Promise.all(promiseArr).then(() =>
+           {
+             fetch(getPfpURL)
+             .then(async (result) => {
+               let myBlob = await result.blob()
+
+               var reader  = new FileReader();
+               reader.onload = function(e)  {
+                 setImage(e.target.result)
+               }
+               reader.readAsDataURL(myBlob);
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
+            setPostArr(finalArr)
+          });
+
        })
        .catch((error) => {
          console.error('Error:', error);
        });
-
-
-       fetch(getPfpURL)
-       .then(async (result) => {
-         console.log('File retrieval success!');
-         let myBlob = await result.blob()
-
-          var reader  = new FileReader();
-          reader.onload = function(e)  {
-              setImage(e.target.result)
-           }
-           reader.readAsDataURL(myBlob);
-       })
-       .catch((error) => {
-         console.error('Error:', error);
-       });
-
-
     }
 
     getData()
@@ -288,7 +288,7 @@ const Feed = (props ) =>
 
   return (
     <Container>
-        <Paper style={{maxHeight: 800, maxWidth: 1000, overflow: 'auto', backgroundColor: '#825DD7', margin: 500}}>
+        <Paper style={{maxHeight: 800, maxWidth: 1000, overflow: 'auto', backgroundColor: '#EEEFF1', margin: 500}}>
         <Container style={{alignContent: 'center'}}>
             <List style = {{margin: 100, alignContent:'center', width: 800, height: 700}}>
                 <MakeAPost  addPost={addPost} setCurrentPost={setCurrentPost}/>
@@ -307,8 +307,8 @@ const Feed = (props ) =>
                             <Post key={element.postId} postInfo = {element} username = {props.loginStatus} deletePost={deletePost} likes = {element.postLikes} profilePic = {inputImage}>
                             </Post>
                             )
-                            }) 
-                    } 
+                            })
+                    }
                 </List>
             </Container>
         </Paper>

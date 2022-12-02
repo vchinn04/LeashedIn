@@ -1,6 +1,4 @@
-
-
-import React from 'react'
+import React from 'react';
 import { Divider } from '@mui/material';
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import CommentIcon from '@mui/icons-material/Comment';
@@ -23,44 +21,54 @@ import styled from "styled-components";
 import { Link } from 'react-router-dom';
 
 const commentListT = []
+const userListT = []
+const ColorDivider = styled(Divider)(({ theme }) => ({
+    color: "#7150BC",
+    backgroundColor: "#7150BC"
+  }));
 
 const Post = (props) => {
     const [countUp, setCountUp] = useState(0)
     const [clicked, setClicked] = useState(false)
     const [comment, setComment] = useState(false)
     const [commentList, setCommentList] = useState(commentListT);
+    const [userList, setUserList] = useState(userListT);
+    const [likedArr, setLikedArr] = useState([]);
+    const [likeDB, setLikeDB] = useState(false);
+
     const [commentDescription, setCommentDescription] = useState("")
     const [inputImage, setImage] = useState(null);
 
+    const getLiked= async() => {
+        const url = '/getUserLiked?' + new URLSearchParams({ username: props.username }).toString()//Fire get event to find users with search string in their usernames
+        const response = await fetch(url);
+        const body= await response.json();
 
-/*     useEffect(() => {
-        setClicked(JSON.parse(window.localStorage.getItem('clicked')));
-      }, []);
-    
-      useEffect(() => {
-        window.localStorage.setItem('clicked', clicked);
-      }, [clicked]);
-     */
+        let postArray = body.liked
+
+        return postArray
+
+    }
+
+
       const addComment = (commentInformation) => {
         var data = new FormData()
-    
+
         data.append('commentDescription', commentInformation.CommentDescription)
         data.append('postIndex', props.postInfo.postId)
         data.append('userIndex', props.username)
-        console.log(props.postInfo.postId)
         fetch('/UserCreateComment',
           {
             method: 'POST',
             body: data
           }).then((response) => response.json())
-    
+
           .then((result) => {
-    
+
             let commentListNew = commentList
             commentListNew.push(result)
 
             setCommentList(commentListNew)
-            console.log(commentList)
             window.location.reload(false);
 
           })
@@ -69,51 +77,201 @@ const Post = (props) => {
           });
       }
 
-    const updateLikes = (postInformation) => {
-        var data = new FormData()
-    
-        console.log(postInformation.postId)
-        console.log(postInformation.postLikes)
-        data.append('postId', postInformation.postId)
-        data.append('postLikes', postInformation.postLikes)
-        fetch('/UpdatePostLikes',
+      const updateLikes = (postInformation) => {
+        if (likeDB)
+          return
+
+        setLikeDB(true)
+
+        getLiked()
+        .then(res => {
+          const someData = res;
+          let postArray = res
+          if (postArray.length == 0) //If no users found then push a "fake" user to display that no users found
           {
-            method: 'POST',
-            body: data
-          }).then((response) => response.json())
-    
-          .then((result) => {
-            window.location.reload(false);
-            
-          })
-          .catch((error) => {
-            console.error('Error:', error);
-          });
+            postArray.push(
+              {
+                _id: -1, //assign _id to -1 in order for the button to be disabled
+              }
+            )
+          }
+          console.log(postArray)
+
+
+        let index = -1
+        for (let i = 0; i < postArray.length; i++) {
+            if (postArray[i] == postInformation.postId){
+                    index = i
+                    break
+            }
+        }
+
+        if (index == -1)
+        {
+            var data = new FormData()
+
+            setLikedArr(postArray)
+            setClicked(false)
+            setLikeDB(false)
+            console.log(postInformation.postId)
+            console.log(postInformation.postLikes)
+            data.append('postId', postInformation.postId)
+            data.append('postLikes', postInformation.postLikes)
+            fetch('/UpdatePostLikes',
+              {
+                method: 'POST',
+                body: data
+              }).then((response) => response.json())
+
+              .then((result) => {
+                setLikeDB(false)
+                window.location.reload(false);
+
+              })
+              .catch((error) => {
+                setLikeDB(false)
+                console.error('Error:', error);
+              });
+
+              var data2 = new FormData()
+              data2.append('postId', postInformation.postId)
+              data2.append('userId', props.username)
+              fetch('/UpdateLikedPosts',
+                {
+                  method: 'POST',
+                  body: data2
+                }).then((response) => response.json())
+
+                .then((result) => {
+                  setLikeDB(false)
+                 window.location.reload(false);
+
+
+                })
+                .catch((error) => {
+                  setLikeDB(false)
+                  console.error('Error:', error);
+                });
+
+
+
+        }
+        else {
+            setLikedArr(postArray)
+            setClicked(true)
+            setLikeDB(false)
+        }
+
+      })
+
+
+}
+
+
+      const isClicked = (postInformation) => {
+
+
+        let index = -1
+        for (let i = 0; i < likedArr.length; i++) {
+            if (likedArr[i] == postInformation.postId){
+                    index = i
+                    break
+            }
+        }
+
+        if (index == -1)
+        {
+            return false
+
+
+        }
+        else {
+            return true
+
+        }
+
       }
+
+
 
       const updateLikes2 = (postInformation) => {
-        var data = new FormData()
-    
-        console.log(postInformation.postId)
-        console.log(postInformation.postLikes)
-        data.append('postId', postInformation.postId)
-        data.append('postLikes', postInformation.postLikes)
-        fetch('/DecreaseLikes',
+        if (likeDB)
+          return
+
+        setLikeDB(true)
+        getLiked()
+        .then(res => {
+          const someData = res;
+          let postArray = res
+          if (postArray.length == 0) //If no users found then push a "fake" user to display that no users found
           {
-            method: 'POST',
-            body: data
-          }).then((response) => response.json())
-    
-          .then((result) => {
-    
-            let postLikes = result
-            console.log(postLikes)
-            window.location.reload(false);
-            
-          })
-          .catch((error) => {
-            console.error('Error:', error);
-          });
+            postArray.push(
+              {
+                _id: -1, //assign _id to -1 in order for the button to be disabled
+              }
+            )
+          }
+
+
+        let index = -1
+        for (let i = 0; i < postArray.length; i++) {
+            if (postArray[i] == postInformation.postId){
+                    index = i
+                    break
+            }
+        }
+
+        if (index == -1)
+        {
+            setLikedArr(postArray)
+            setClicked(false)
+            setLikeDB(false)
+
+        }
+        else {
+            var data = new FormData()
+            setLikedArr(postArray)
+            setClicked(true)
+            data.append('postId', postInformation.postId)
+            data.append('postLikes', postInformation.postLikes)
+            fetch('/DecreaseLikes',
+            {
+                method: 'POST',
+                body: data
+            }).then((response) => response.json())
+
+            .then((result) => {
+
+                let postLikes = result
+                setLikeDB(false)
+                window.location.reload(false);
+
+            })
+            .catch((error) => {
+                setLikeDB(false)
+                console.error('Error:', error);
+            });
+
+            var data2 = new FormData()
+            data2.append('postId', postInformation.postId)
+            data2.append('userId', props.username)
+            fetch('/DecreaseLikedPosts',
+                {
+                method: 'DELETE',
+                body: data2
+                }).then((response) => response.json())
+
+                .then((result) => {
+                  setLikeDB(false)
+                  window.location.reload(false);
+                })
+                .catch((error) => {
+                  setLikeDB(false)
+                  console.error('Error:', error);
+                });
+
+        }
+        })
       }
 
       const handleCommentCreate = () => {
@@ -121,7 +279,6 @@ const Post = (props) => {
         const commentInformation = {
             CommentDescription: commentDescription,
           }
-        console.log(props.postInfo.postComments)
 
           addComment(commentInformation)
           setComment(false)
@@ -131,9 +288,8 @@ const Post = (props) => {
     const deleteComment = (commentEntry) =>
     {
       console.log("Delete comment!")
-      console.log("hello")
 
-  
+
       let index = -1
       for (let i = 0; i < props.postInfo.postComments.length; i++) {
         if (props.postInfo.postComments[i].commentId == commentEntry.commentId){
@@ -143,41 +299,54 @@ const Post = (props) => {
             }
         }
       }
-  
+
       if (index > -1)
       {
         const url = '/DeleteComment?' + new URLSearchParams({ commentId: props.postInfo.postComments[index].commentId, postIndex: props.postInfo.postId }).toString()
-  
+
         fetch(url, {
           method: 'DELETE',
         }).then((response) => response.json())
-  
+
         .then((result) => {
            console.log('Success:', result.returnValue);
-           window.location.reload(false);
            window.location.reload(false);
 
         })
         .catch((error) => {
           console.error('Error:', error);
         });
-  
+
       }
     }
-  
+
       useEffect(() => {
         const getData = async() => {
-    
-  
+
+            getLiked()
+            .then(res => {
+              const someData = res;
+              let postArray = res
+              if (postArray.length == 0) //If no users found then push a "fake" user to display that no users found
+              {
+                postArray.push(
+                  {
+                    _id: -1, //assign _id to -1 in order for the button to be disabled
+                  }
+                )
+              }
+              setLikedArr(postArray)
+            })
+
+
           const getPfpURL = '/getUserProfilePic?' + new URLSearchParams({ username:  props.postInfo.username}).toString()
 
-          console.log(props.postInfo.username)
-    
+
            fetch(getPfpURL)
            .then(async (result) => {
              console.log('File retrieval success!');
              let myBlob = await result.blob()
-     
+
               var reader  = new FileReader();
               reader.onload = function(e)  {
                   setImage(e.target.result)
@@ -187,68 +356,67 @@ const Post = (props) => {
            .catch((error) => {
              console.error('Error:', error);
            });
-    
-           
+
         }
 
     getData()
 
   }, []);
-  
+
 
     return (
             <Container className = "Post" >
-                <div className = 'row'>
+                <div className = 'row2'>
                     <IconButton className = 'row' color="primary" aria-label="profile"  component={Link} to={`/profile/${props.postInfo.username}`}>
                         <Avatar src={inputImage} alt="Profile" />
                      </IconButton>
-                    <div className = 'row' style = {{color: 'black', fontWeight: '700', }} > 
-                                        {props.postInfo.username} 
-                                </div> 
+                    <div className = 'row' style = {{color: 'black', fontWeight: '700', }} >
+                                        {props.postInfo.username}
+                                </div>
 
-                    <Button className = 'row' onClick={() => {props.deletePost(props.postInfo)}} color = "error" style={{marginLeft: 600}}>
+                    { (props.username == props.postInfo.username) && <Button className = 'row' onClick={() => {props.deletePost(props.postInfo)}} color = "error" style={{marginLeft: 600}}>
                         <DeleteIcon/>
-                    </Button>
+                    </Button>}
                 </div>
-                    
-  
+
+
             <Divider component="li" sx={{borderBottomWidth: 2, color: 'purple'}}/>
 
-            <Box sx={{  mb: 0, mx: 'auto', color: "#7150BC",textAlign:"left", borderRadius: '15px' , marginTop: '15'}}>
+            <Box sx={{ mb: 0, mx: 'auto', color: "#7150BC",textAlign:"left", borderRadius: '15px' , marginTop: '15'}}>
                 <Container style={{marginBottom: '30'}}>
-                    <div style = {{color: 'black', fontWeight: 'normal', justifyContent: 'space-between'}} > 
-                        {props.postInfo.postDescription} 
+                    <div style = {{color: 'black', fontWeight: 'normal', justifyContent: 'space-between'}} >
+                        {props.postInfo.postDescription}
                     </div>
-                    {props.postInfo.DisplayImage &&                     
+                    {(props.postInfo.DisplayImage !== null) &&
                     <img className = "image" sx = {{height: '20', width: '20'}}
                         src={props.postInfo.DisplayImage} /> }
 
-                    
-                </Container> 
+
+                </Container>
             </Box>
 
 
-                <Divider component="li" sx={{marginLeft: '2%', marginRight: '2%', borderBottomWidth: 2}}/>
+                <ColorDivider component="li" sx={{ borderBottomWidth: 2}}/>
                 <div className='row'>
-                    <Button                 
-                    onClick={() => 
-                        {{if (clicked == false) {updateLikes(props.postInfo); setClicked(true)} else {updateLikes2(props.postInfo); setClicked(false)}}}} style={{maxWidth: '30px', maxHeight: '30px', minWidth: '30px', minHeight: '30px'}}>
-                        {clicked ? <ThumbUpIcon style = {{color: "black"}}/> : <ThumbUpOffAltIcon style = {{color: "black"}}/>}
+                    <Button
+                    onClick={() =>
+                        {{if (isClicked(props.postInfo) == false) {updateLikes(props.postInfo); setClicked(true)} else {updateLikes2(props.postInfo); setClicked(false)}}}} style={{maxWidth: '30px', maxHeight: '30px', minWidth: '30px', minHeight: '30px'}}>
+                        {isClicked(props.postInfo) ? <ThumbUpIcon style = {{color: "black"}}/> : <ThumbUpOffAltIcon style = {{color: "black"}}/>}
                     </Button>
-                
-                    <div className='row' style = {{color: 'black', fontWeight: '700', marginRight: 15}} > 
-                        Like 
-                    </div> 
 
-                    <Button   onClick={() => 
+                    <div className='row' style = {{color: 'black', fontWeight: '700', marginRight: 15}} >
+                        Like
+                    </div>
+
+                    <Button   onClick={() =>
                         {{if (comment == false) {setComment(true)} else {setComment(false)}}}} style={{maxWidth: '30px', maxHeight: '30px', minWidth: '30px', minHeight: '30px'}}>
                             <CommentIcon style={{color: 'black', marginTop: 2, maxWidth: '20px', maxHeight: '20px', minWidth: '20px', minHeight: '20px'}}/>
                     </Button>
-                    <div className='row' style = {{color: 'black', fontWeight: '700'}} > 
+                    <div className='row' style = {{color: 'black', fontWeight: '700'}} >
                         Comment
-                    </div> 
+                    </div>
                     <Container className = 'row' style = {{color: 'black', fontWeight: 'normal', justifyContent: 'space-between', marginLeft: 700}}>
-                     Likes: {props.likes} 
+                     Likes: {props.likes}
                     </Container>
                     <Divider component="li" sx={{borderBottomWidth: 2}}/>
 
@@ -258,14 +426,14 @@ const Post = (props) => {
                             <div key={element.commentId} >
                                 <Box sx={{  mb: 0, mx: 'auto', color: "#7150BC",textAlign:"left", borderRadius: '30px' , marginTop: '15'}}>
                                     <div className = 'row' style={{fontWeight: '700', marginRight: 20}}>
-                                        {element.username}     
+                                        {element.username}
                                     </div>
                                     <div className = 'row'>
                                         {element.commentDescription}
                                     </div>
-                                    <Button className = 'row' onClick={() => {deleteComment(element)}} color = "error" style={{marginLeft: 70, fontSize: 10, fontWeight: '700'}}>
+                                    {(props.username == element.username) && <Button className = 'row' onClick={() => {deleteComment(element)}} color = "error" style={{marginLeft: 70, fontSize: 10, fontWeight: '700'}}>
                                         Delete
-                                    </Button>
+                                    </Button>}
                                 </Box>
                             </div>
                             )
@@ -280,7 +448,7 @@ const Post = (props) => {
                                 sx={{height:'10%'}}
                                 onChange={(event) => {setCommentDescription(event.target.value)}}
                             /> : <div/>}
-                    {comment ?   <Button variant="contained" size="small" sx={{ width: 1, fontWeight: 'bold', alignContent: 'center', marginBottom: 3}} onClick={() => 
+                    {comment ?   <Button variant="contained" size="small" sx={{ width: 1, fontWeight: 'bold', alignContent: 'center', marginBottom: 3}} onClick={() =>
                         {handleCommentCreate()}}>
                                 Comment
                     </Button> : <div/>}
@@ -297,6 +465,3 @@ const Post = (props) => {
 
 
 export default Post;
-
-
-

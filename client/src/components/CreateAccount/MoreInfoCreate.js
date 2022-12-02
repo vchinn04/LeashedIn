@@ -80,6 +80,14 @@ class MoreInfoCreate extends React.Component {
     }
 
     handleSubmit() {
+        if (this.state.entityType == "petOwner") {
+            this.state.aboutMe = "I am a proud pet owner!" + this.state.aboutMe;
+        } else if (this.state.entityType == "eventOrganizer") {
+            this.state.aboutMe = "I organize events!\nThe types of pets I host for are:\n" + this.state.aboutMe;
+        } else if (this.state.entityType == "shelterOrStore") {
+            this.state.aboutMe = "We offer pets!\nThe types of pets we have are:\n" + this.state.aboutMe;
+        }
+
         fetch('/MoreInfoCreateUpdateProfile',
           {
             method: 'POST',
@@ -135,11 +143,23 @@ class MoreInfoCreate extends React.Component {
         this.setState(state => {
             return {
               petsArray: a,
-              aboutMe: a.value
+              aboutMe: ""
             };
           });
-        // this.setState({ //add the pets to aboutme
-        //     aboutMe: JSON.stringify(this.state.petsArray)
+
+        this.setState({
+            aboutMe: this.state.aboutMe = ""
+        });
+
+        // add the pets to aboutme
+        a.forEach(({value}) => this.setState({
+            aboutMe: this.state.aboutMe += value + "\n"
+        }));
+
+        // var labels = a.map(obj => Object.keys(obj))
+        // this.setState({
+        //     // aboutMe: JSON.stringify({brug})
+        //     aboutMe: brug
         // });
     }
 
@@ -160,7 +180,7 @@ class MoreInfoCreate extends React.Component {
                                     value={this.state.ownerName} onChange={this.handleInputChange}/>
                                 </Form.Group>
                                  <Container className='eventOrganizerPets' fluid>
-                                <div>
+                                <div style={{width: '600px'}}>
                                     <h>I plan to host events for</h>
                                     <div>
                                         <Select
@@ -202,7 +222,7 @@ class MoreInfoCreate extends React.Component {
                                     value={this.state.ownerName} onChange={this.handleInputChange}/>
                             </Form.Group>
                             <Container className='shelterOrStorePets' fluid>
-                                <div>
+                                <div style={{width: '600px'}}>
                                     <h>We offer</h>
                                     <Select className="form-select" onChange={this.multiPetSelectHandleOnChange}
                                      value={this.state.petsArray} options={this.state.options} isMulti/>
@@ -220,10 +240,10 @@ class MoreInfoCreate extends React.Component {
               }}>
                 <div className='login-background-frame'>
                     <h1>Tell us more about yourself</h1>
-                    <Divider variant="middle" sx={{ m: -0.5, mb: 5 }}/>
+                    <Divider variant="middle" sx={{ m: -0.5, mb: 2 }}/>
                     <Container className='createAccountContainer' fluid>
                         <div>
-                            <div className="mt-4">
+                            <div className="mt-4" style={{width: '400px'}}>
                                 <h>I am {this.state.entityType == "eventOrganizer" ? "an" : "a"} </h>
                                 <Select className="form-select"
                                 onChange={this.entityHandleOnChange}

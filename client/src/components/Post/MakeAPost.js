@@ -68,27 +68,28 @@ const MakeAPost = props => {
     const [inputImageFile, setImageFile] = useState(null);
 
 
-    const handleFile = (event) =>
-    {
-      if (!event.target.files[0])
-        return
-  
-      setImagePath(event.target.value)
-      setUpFile(event.target.files[0])
-    }
-  
     const setUpFile = (file) =>
     {
       var reader  = new FileReader();
       reader.onload = function(e)  {
          setImage(e.target.result)
       }
+      console.log(file)
       setImageFile(file)
       reader.readAsDataURL(file);
     }
 
 
+    const handleFile = (event) =>
+    {
+      if (!event.target.files[0])
+        return
 
+      setImagePath(event.target.value)
+      setUpFile(event.target.files[0])
+    }
+
+    
     const handlePostCreate = () => {
         console.log("hiii")
 
@@ -97,7 +98,6 @@ const MakeAPost = props => {
             DisplayImage: inputImage,
             PostDescription: postDescription,
           }
-
           props.addPost(postInformation, inputImageFile)
           togglePopup()
 
@@ -108,12 +108,12 @@ const MakeAPost = props => {
     const togglePopup = () => {
         setIsOpen(!isOpen);
       }
-    
+
     return (
         <div>
-            <ColorButton variant="contained" size="large" sx={{ width: 1, fontWeight: 'bold', alignContent: 'center', marginBottom: 3}} onClick={togglePopup}>
+            <ColorButton2 variant="contained" size="large" sx={{ width: 1, fontWeight: 'bold', alignContent: 'center', marginBottom: 3}} onClick={togglePopup}>
                                Create A Post
-            </ColorButton>
+            </ColorButton2>
             <div sx={{ alignItems: 'center'}}>
                 {isOpen && <PopUp
                 content={<>
@@ -125,7 +125,7 @@ const MakeAPost = props => {
                                 onChange={(event) => {setPostDescription(event.target.value)}}
                             />
                     <img className = "image"
-                        src={inputImage} 
+                        src={inputImage}
                     />
                     <ColorButton2 variant="contained" component="label" color="primary"  size="small" sx={{fontWeight: 'bold', marginBottom: 5}}>
                         Image Upload
@@ -143,6 +143,3 @@ const MakeAPost = props => {
 }
 
 export default MakeAPost;
-
-
-
