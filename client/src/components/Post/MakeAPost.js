@@ -6,12 +6,12 @@ import './Post.css';
 import PopUp from './Popup'
 import { useState } from 'react';
 import TextField from '@mui/material/TextField';
-import Avatar from '@mui/material/Avatar';
-import { Form, Container } from 'react-bootstrap';
-import { Navigate } from 'react-router-dom';
+//import Avatar from '@mui/material/Avatar';
+//import { Form, Container } from 'react-bootstrap';
+//import { Navigate } from 'react-router-dom';
 
 
-import { AuthContext } from '../../context.js';
+//import { AuthContext } from '../../context.js';
 
 import { styled } from '@mui/material/styles';
 

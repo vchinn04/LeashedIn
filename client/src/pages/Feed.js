@@ -8,28 +8,28 @@ import List from '@mui/material/List';
 import { Paper } from '@mui/material';
 import MakeAPost from '../components/Post/MakeAPost'
 
-import NavBar from "../components/NavBar/NavBar"
-import Divider from '@mui/material/Divider';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
+//import NavBar from "../components/NavBar/NavBar"
+//import Divider from '@mui/material/Divider';
+//import Avatar from '@mui/material/Avatar';
+//import Button from '@mui/material/Button';
+//import Box from '@mui/material/Box';
 
 import EditIcon from '@mui/icons-material/Edit';
 import IconButton from '@mui/material/IconButton';
-import Grid from '@mui/material/Grid';
+//import Grid from '@mui/material/Grid';
 import { Form, Container } from 'react-bootstrap';
 import Post from "../components/Post/Post"
 
-import TextField from '@mui/material/TextField';
+//import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
-import AddBoxIcon from '@mui/icons-material/AddBox';
-import PetDisplay from "../components/PetComponents/PetDisplay"
-import CreatePet from "../components/PetComponents/CreatePet"
+//import AddBoxIcon from '@mui/icons-material/AddBox';
+//import PetDisplay from "../components/PetComponents/PetDisplay"
+//import CreatePet from "../components/PetComponents/CreatePet"
 
 const postListT = []
 const totalListT = []
-const totalListTwo = []
-const postArrT = []
+//const totalListTwo = []
+//const postArrT = []
 
 
 const EditSaveButton = (props) =>

@@ -8,13 +8,13 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { useEffect, useState } from 'react';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import { trusted } from 'mongoose';
+//import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+//import { trusted } from 'mongoose';
 import Avatar from '@mui/material/Avatar';
-import Grid from '@mui/material/Grid';
+//import Grid from '@mui/material/Grid';
 import './Post.css';
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
+//import EditIcon from '@mui/icons-material/Edit';
 import IconButton from '@mui/material/IconButton';
 import styled from "styled-components";
 
