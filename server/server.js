@@ -59,7 +59,7 @@ app.get('/getUserLiked', async (req, res) => { // returns an array of searched f
 app.get('/getUserProfileText', async (req, res) => { // return the profile info of specified user
   console.log(req.query)
   const userData = await dataManager.getUserData(req.query.username)
-  res.send({ aboutMe: userData.aboutMe, ownerName: userData.ownerName, followers: userData.followers})
+  res.send({ aboutMe: userData.aboutMe, ownerName: userData.ownerName, followers: userData.followers, following: userData.following})
 });
 
 app.get('/getUserProfilePic', async (req, res) => { // return the profile picture of a specified user
@@ -71,12 +71,12 @@ app.get('/getUserProfilePic', async (req, res) => { // return the profile pictur
       if (exists)
         res.sendFile(imagePath, { root: __dirname });
       else {
-        res.send({result: false})
+        res.send({result: true})
       }
     });
   }
   else {
-    res.send({result: false})
+    res.send({result: true})
   }
 });
 

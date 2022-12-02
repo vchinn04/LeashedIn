@@ -19,7 +19,6 @@ import IconButton from '@mui/material/IconButton';
 import Grid from '@mui/material/Grid';
 import { Form, Container } from 'react-bootstrap';
 import Post from "../components/Post/Post"
-import Comments from "../components/Comments"
 
 import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';

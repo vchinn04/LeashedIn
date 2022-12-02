@@ -18,6 +18,7 @@ import Chip from '@mui/material/Chip';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import PetDisplay from "../components/PetComponents/PetDisplay"
 import CreatePet from "../components/PetComponents/CreatePet"
+import FollowDisplay from "../components/FollowFolder/FollowDisplay"
 
 const EditSaveButton = (props) => // return edit button or save/cancel buttons depending on edit state
 {
@@ -45,7 +46,12 @@ const ProfilePage = (props) =>
   const [inputImage, setImage] = useState(null); // stores the processed image for use with avatar
   const [inputImagePath, setImagePath] = useState(null); // stores the path to uploaded image
   const [inputImageFile, setImageFile] = useState(null); // stores the image file
-  const [followersList, setFollowersList] = useState([]); // Stores the owners about me text
+  const [followersList, setFollowersList] = useState([]); // Stores the users that follow the current user
+  const [followingList, setFollowingList] = useState([]); // Stores an array of people person is following
+
+  const [displayFollowersList, setListDisplay] = useState(false); // Stores the owners about me text
+  const [displayFollowingList, setFollowingListDisplay] = useState(false); // Stores the owners about me text
+
   const [petList, setPetList] = useState([]); // stores a list of pet entries
   const [currentPet, setCurrentPet] = useState(null); // stores a pet entry (when selected)
 
@@ -115,12 +121,12 @@ const ProfilePage = (props) =>
   }
   /*----------------------------------*/
 
-  const handleFollowers = () =>
+  const handleFollowers = (overwriteId) =>
   {
 
     var data = {
       username: props.loginStatus,
-      usernameOther: id
+      usernameOther: (overwriteId ? overwriteId : id)
     }
     fetch('/UpdateFollowers', // Update the followers list
     {
@@ -134,11 +140,21 @@ const ProfilePage = (props) =>
     .then((result) => { // if it was successful, update the followers list
       console.log('Success:', result.loginStatus);
       setFollowersList(result.followerArr)
-
+      window.location.reload(false)
     })
     .catch((error) => {
       console.error('Error:', error);
     });
+  }
+
+  const displayFollowerList = () =>
+  {
+    setListDisplay(true)
+  }
+
+  const displayFollowingListFunc = () =>
+  {
+    setFollowingListDisplay(true)
   }
 
   /*---------PET FUNCTIONS----------*/
@@ -311,6 +327,9 @@ const ProfilePage = (props) =>
                    setName(result.ownerName)
                    if (result.followers)
                     setFollowersList(result.followers)
+
+                  if (result.following)
+                    setFollowingList(result.following)
                  })
                  .catch((error) => {
                    console.error('Error:', error);
@@ -353,12 +372,17 @@ const ProfilePage = (props) =>
         <NavBar loginStatus={props.loginStatus} setLoginState={props.setLoginState} />
 
         {currentPet && ((currentPet == "add") ? <CreatePet  handlePetAdd={handlePetAdd} petInfo={"add"} setCurrentPet={setCurrentPet}/> : <PetDisplay  canEdit={(props.loginStatus == id)} handlePetUpdate={handlePetUpdate} deletePet={deletePet} petInfo={currentPet} canEdit={(props.loginStatus == id)} setCurrentPet={setCurrentPet}/>)}
+        {displayFollowersList && <FollowDisplay userId={id} userArr={followersList} setListDisplay={setListDisplay}/>}
+        {displayFollowingList && <FollowDisplay userId={id} userArr={followingList} setListDisplay={setFollowingListDisplay} isFollowing={true} canEdit={(props.loginStatus == id)} handleFollowers={handleFollowers}  />}
 
         <div className="info-frame">
           <div className="pic-frame">
 
             {(props.loginStatus == id) && <EditSaveButton isEditing={isEditing} cancelSubmit={cancelSubmit} setEdit={setEdit} handleSubmit={handleSubmit}/>}
-            {(props.loginStatus != id) && <Chip label={(followersList.includes(props.loginStatus)) ? "Unfollow" : "Follow" } color={(followersList.includes(props.loginStatus)) ? "error" : "primary" }  size="medium" sx={{position: 'absolute', top:'9px', mb: 1, left: '1%' ,fontWeight: 'bold' }} onClick={handleFollowers}/>}
+            {(props.loginStatus != id) && <Chip label={(followersList.includes(props.loginStatus)) ? "Unfollow" : "Follow" } color={(followersList.includes(props.loginStatus)) ? "error" : "primary" }  size="medium" sx={{position: 'absolute', top:'9px', mb: 1, left: '1%' ,fontWeight: 'bold' }} onClick={() => {handleFollowers(null)}}/>}
+
+            <Chip label="Followers" color="primary"  size="medium" sx={{position: 'absolute', top:'87%', mb: 1, left: '91%' ,fontWeight: 'bold' }} onClick={displayFollowerList}/>
+            <Chip label="Following" color="primary"  size="medium" sx={{position: 'absolute', top:'75%', mb: 1, left: '91%' ,fontWeight: 'bold' }} onClick={displayFollowingListFunc}/>
 
             <Avatar
               src={inputImage}
