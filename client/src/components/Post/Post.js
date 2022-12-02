@@ -192,8 +192,6 @@ const Post = (props) => {
 
       }
 
-
-
       const updateLikes2 = (postInformation) => {
         if (likeDB)
           return
