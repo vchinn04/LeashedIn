@@ -5,12 +5,12 @@
     "\\client\\src",
     "\\client\\src\\components",
     "\\client\\src\\components\\CreateAccount",
-    "\\client\\src\\components\\Follow",
     "\\client\\src\\components\\Login",
-    "\\client\\src\\components\\SideBar",
-    "\\client\\src\\components\\styles",
-    "\\server"
+    "\\client\\src\\pages",
+    "\\server",
+    "\\server\\petpics",
+    "\\server\\postpics"
   ],
-  "SelectedNode": "\\client\\src\\components\\SideBar\\index.js",
+  "SelectedNode": "\\client\\src\\components\\CreateAccount\\MoreInfoCreate.js",
   "PreviewInSolutionExplorer": false
 }
