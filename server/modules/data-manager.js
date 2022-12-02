@@ -16,7 +16,9 @@ const userSchema = new mongoose.Schema({
   likedPosts: Array,
   userComments: Array,
   profilePicture: String,
-  username: String
+  username: String,
+  following: Array,
+  followers: Array
 });
 
 const petSchema = new mongoose.Schema({
@@ -140,6 +142,14 @@ exports.updateUser = function (userInfo) { //Function will be used for updating 
        console.log(result);
      }
    });
+}
+
+exports.updateFollowers = async function (user1, userOther, userInfo) { //Function will be used for updating existing users followers
+  console.log("Updating user followers!");
+  await UserM.findOneAndUpdate({username: user1},{following: userInfo.following});
+
+  let docs = await UserM.findOneAndUpdate({username: userOther},{followers: userInfo.followers}, {returnDocument: "after"})
+  return docs
 }
 
 

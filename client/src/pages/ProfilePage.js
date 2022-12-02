@@ -45,6 +45,7 @@ const ProfilePage = (props) =>
   const [inputImage, setImage] = useState(null); // stores the processed image for use with avatar
   const [inputImagePath, setImagePath] = useState(null); // stores the path to uploaded image
   const [inputImageFile, setImageFile] = useState(null); // stores the image file
+  const [followersList, setFollowersList] = useState([]); // Stores the owners about me text
   const [petList, setPetList] = useState([]); // stores a list of pet entries
   const [currentPet, setCurrentPet] = useState(null); // stores a pet entry (when selected)
 
@@ -114,6 +115,31 @@ const ProfilePage = (props) =>
   }
   /*----------------------------------*/
 
+  const handleFollowers = () =>
+  {
+
+    var data = {
+      username: props.loginStatus,
+      usernameOther: id
+    }
+    fetch('/UpdateFollowers', // Update the followers list
+    {
+      method: 'POST',
+      headers: { "Content-Type": "application/json",
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(data)
+    }).then((response) => response.json())
+
+    .then((result) => { // if it was successful, update the followers list
+      console.log('Success:', result.loginStatus);
+      setFollowersList(result.followerArr)
+
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+  }
 
   /*---------PET FUNCTIONS----------*/
   const handlePetAdd = (petInformation, inputImageFile) => // handle the creation of a new pet
@@ -283,6 +309,8 @@ const ProfilePage = (props) =>
                    console.log('Profile Information retrieval success!');
                    setAboutState(result.aboutMe)
                    setName(result.ownerName)
+                   if (result.followers)
+                    setFollowersList(result.followers)
                  })
                  .catch((error) => {
                    console.error('Error:', error);
@@ -330,6 +358,7 @@ const ProfilePage = (props) =>
           <div className="pic-frame">
 
             {(props.loginStatus == id) && <EditSaveButton isEditing={isEditing} cancelSubmit={cancelSubmit} setEdit={setEdit} handleSubmit={handleSubmit}/>}
+            {(props.loginStatus != id) && <Chip label={(followersList.includes(props.loginStatus)) ? "Unfollow" : "Follow" } color={(followersList.includes(props.loginStatus)) ? "error" : "primary" }  size="medium" sx={{position: 'absolute', top:'9px', mb: 1, left: '1%' ,fontWeight: 'bold' }} onClick={handleFollowers}/>}
 
             <Avatar
               src={inputImage}
@@ -356,7 +385,7 @@ const ProfilePage = (props) =>
               />
             }
 
-            <h2 className="subname">@{id}</h2>
+            <h2 className="subname">@{id} | Followers: {followersList.length}</h2>
           </div>
 
           <div className="about-me-frame">

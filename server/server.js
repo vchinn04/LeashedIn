@@ -59,7 +59,7 @@ app.get('/getUserLiked', async (req, res) => { // returns an array of searched f
 app.get('/getUserProfileText', async (req, res) => { // return the profile info of specified user
   console.log(req.query)
   const userData = await dataManager.getUserData(req.query.username)
-  res.send({ aboutMe: userData.aboutMe, ownerName: userData.ownerName})
+  res.send({ aboutMe: userData.aboutMe, ownerName: userData.ownerName, followers: userData.followers})
 });
 
 app.get('/getUserProfilePic', async (req, res) => { // return the profile picture of a specified user
@@ -144,6 +144,65 @@ app.put('/UpdateProfile', upload.single('image'), async (req, res) => { // respo
 
   dataManager.updateUser(userInfo);
   res.send(JSON.stringify({ loginStatus: "ohh yea", errorMessage: 'No Errors!' }));
+});
+
+app.post('/UpdateFollowers', async (req, res) => { // responsible for toggling followers
+  var userData = await dataManager.getUserData(req.body.username)
+  var userDataOther = await dataManager.getUserData(req.body.usernameOther)
+
+  if (!("following" in userData))
+    userData["following"] = []
+
+  if (!("followers" in userDataOther))
+    userDataOther["followers"] = []
+
+  var userArr = userData.following
+  var userArrOther = userDataOther.followers
+  var returnData = null
+
+  if (userArrOther.includes(req.body.username))
+  {
+    let index = -1
+    for (let i = 0; i < userArrOther.length; i++) {
+      if (req.body.username == userArrOther[i]){
+        index = i
+        break
+      }
+    }
+    if (index > -1)
+      userArrOther.splice(index, 1);
+
+    let index2 = -1
+    for (let i = 0; i < userArr.length; i++) {
+      if (req.body.usernameOther == userArr[i]){
+        index2 = i
+        break
+      }
+    }
+    if (index > -1)
+      userArr.splice(index2, 1);
+
+    var updateData = {
+      followers: userArrOther,
+      following: userArr
+    }
+    console.log(updateData)
+    returnData = await dataManager.updateFollowers(req.body.username, req.body.usernameOther, updateData)
+  }
+  else
+  {
+    userArr.push(req.body.usernameOther)
+    userArrOther.push(req.body.username)
+
+    var updateData = {
+      followers: userArrOther,
+      following: userArr
+    }
+
+    returnData = await dataManager.updateFollowers(req.body.username, req.body.usernameOther, updateData)
+  }
+
+  res.send({ followerArr: returnData.followers })
 });
 
 app.post('/UserCreateAccount', async (req, res) => { //Get Event
