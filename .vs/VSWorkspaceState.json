@@ -4,13 +4,13 @@
     "\\client",
     "\\client\\src",
     "\\client\\src\\components",
-    "\\client\\src\\components\\Following",
+    "\\client\\src\\components\\CreateAccount",
+    "\\client\\src\\components\\Follow",
     "\\client\\src\\components\\Login",
-    "\\client\\src\\components\\NavBar",
-    "\\client\\src\\components\\PetComponents",
-    "\\client\\src\\components\\Post",
-    "\\client\\src\\images"
+    "\\client\\src\\components\\SideBar",
+    "\\client\\src\\components\\styles",
+    "\\server"
   ],
-  "SelectedNode": "\\client\\src\\components\\Login\\Login.js",
+  "SelectedNode": "\\client\\src\\components\\SideBar\\index.js",
   "PreviewInSolutionExplorer": false
 }
