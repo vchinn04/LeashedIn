@@ -55,7 +55,7 @@ LeashedIn offers several distinct features. Users first create their account, wh
 # Credits and Acknowledgements
 The technologies we used were [React](https://reactjs.org/), [Node.js](https://nodejs.org/en/), [ExpressJS](https://expressjs.com/), and [MongoDB](https://www.mongodb.com/home) and [mongoose](https://mongoosejs.com/), [React-Router](https://reactrouter.com/en/main), [dotenv](https://www.npmjs.com/package/dotenv).
 
-Middlewares: [multer](https://www.npmjs.com/package/multer), [bodyParser](https://www.npmjs.com/package/body-parser)
+Middlewares: [multer](https://www.npmjs.com/package/multer), [body-parser](https://www.npmjs.com/package/body-parser)
 
 Libraries: [Material UI](https://mui.com/), [React-Bootstrap](https://react-bootstrap.github.io/), [styled-components](https://styled-components.com/), [react-select](https://react-select.com/home)
 
